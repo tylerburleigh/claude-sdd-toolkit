@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T23:01:13.338418Z",
+  "last_updated": "2025-11-20T23:08:25.296525Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 85,
+    "progress_percentage": 83,
     "current_phase": "phase-5"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 58,
+      "completed_tasks": 57,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1759,7 +1759,7 @@
     "phase-5": {
       "type": "phase",
       "title": "Persistent Project-Level Cache",
-      "status": "completed",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-5-files",
@@ -1773,20 +1773,19 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 11,
+      "completed_tasks": 10,
       "metadata": {
         "purpose": "80-95% faster incremental runs through SQLite-backed caching",
         "risk_level": "medium",
         "estimated_hours": 14,
         "needs_journaling": false,
-        "completed_at": "2025-11-20T23:01:13.321831Z",
         "journaled_at": "2025-11-20T23:01:13.338382Z"
       }
     },
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "completed",
+      "status": "in_progress",
       "parent": "phase-5",
       "children": [
         "task-5-1",
@@ -1796,10 +1795,9 @@
         "task-5-5"
       ],
       "total_tasks": 8,
-      "completed_tasks": 8,
+      "completed_tasks": 7,
       "metadata": {
         "needs_journaling": false,
-        "completed_at": "2025-11-20T21:40:11.647432Z",
         "journaled_at": "2025-11-20T21:40:11.659727Z"
       },
       "dependencies": {
@@ -2022,7 +2020,7 @@
     "task-5-5": {
       "type": "task",
       "title": "tests/test_persistent_cache.py",
-      "status": "completed",
+      "status": "in_progress",
       "parent": "phase-5-files",
       "children": [
         "task-5-5-1",
@@ -2036,11 +2034,12 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 2,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_persistent_cache.py",
         "task_category": "implementation",
-        "estimated_hours": 3
+        "estimated_hours": 3,
+        "status_note": "Reopening task due to fidelity review findings: missing test file tests/test_persistent_cache.py and minor cleanup needed"
       }
     },
     "task-5-5-1": {
@@ -2053,26 +2052,26 @@
       "completed_tasks": 1,
       "metadata": {
         "details": "Test cache population, hit detection, miss handling, invalidation on file change",
-        "started_at": "2025-11-20T21:36:41.069368Z",
-        "status_note": "Creating comprehensive cache tests for hit/miss scenarios and invalidation",
-        "completed_at": "2025-11-20T21:38:29.864511Z",
+        "started_at": "2025-11-20T23:05:37.594004Z",
+        "status_note": "Creating comprehensive cache hit/miss tests",
+        "completed_at": "2025-11-20T23:08:25.284123Z",
         "needs_journaling": false,
-        "actual_hours": 0.03,
-        "journaled_at": "2025-11-20T21:38:29.872959Z"
+        "actual_hours": 0.047,
+        "journaled_at": "2025-11-20T23:08:25.293103Z"
       }
     },
     "task-5-5-2": {
       "type": "subtask",
       "title": "Performance benchmark",
-      "status": "completed",
+      "status": "pending",
       "parent": "task-5-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 1,
+      "completed_tasks": 0,
       "metadata": {
         "details": "Measure first run vs cached run time, verify 80-95% speedup on cached run",
         "started_at": "2025-11-20T21:38:55.956479Z",
-        "status_note": "Creating performance benchmark for cache speedup measurement",
+        "status_note": "Reopening due to missing test file - will implement performance benchmark",
         "completed_at": "2025-11-20T21:40:11.647237Z",
         "needs_journaling": false,
         "actual_hours": 0.021,
@@ -3119,6 +3118,15 @@
       "content": "All child tasks in phase phase-5 have been completed.",
       "metadata": {},
       "task_id": "phase-5"
+    },
+    {
+      "timestamp": "2025-11-20T23:08:25.293093Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Cache hit/miss tests",
+      "author": "claude-code",
+      "content": "Implemented comprehensive test suite for persistent cache in tests/test_persistent_cache.py. Created 22 tests covering cache hit/miss detection, invalidation, dependency tracking, cascade invalidation, stats, performance characteristics, and edge cases. All 22 tests pass successfully. Also cleaned up debug comments from cli.py (lines 678-680) as identified in fidelity review.",
+      "metadata": {},
+      "task_id": "task-5-5-1"
     }
   ]
 }

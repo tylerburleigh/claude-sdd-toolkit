@@ -675,6 +675,3 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     analyze_ai_parser.add_argument('--skip-ai-context', action='store_true', help='Skip AI_CONTEXT.md generation')
     analyze_ai_parser.add_argument('--dry-run', action='store_true', help='Show what would be generated without running AI')
     analyze_ai_parser.set_defaults(func=cmd_analyze_with_ai)
-# Cache test comment
-# Cache test commentx
-# Cache test comment
