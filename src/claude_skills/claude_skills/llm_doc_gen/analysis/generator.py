@@ -403,7 +403,9 @@ class DocumentationGenerator:
         format_type: str = 'both',
         verbose: bool = False,
         parallel: bool = False,
-        num_workers: Optional[int] = None
+        num_workers: Optional[int] = None,
+        streaming: bool = False,
+        compress: bool = False
     ) -> None:
         """
         Generate documentation in specified format(s).
@@ -414,6 +416,8 @@ class DocumentationGenerator:
             verbose: Enable verbose output
             parallel: Enable parallel parsing (default: False)
             num_workers: Number of worker processes for parallel parsing (default: auto-detect)
+            streaming: Use streaming generation for JSON output (memory efficient)
+            compress: Use gzip compression for JSON output
         """
         # Generate analysis
         result = self.generate(
@@ -431,7 +435,14 @@ class DocumentationGenerator:
 
         if format_type in ['json', 'both']:
             json_path = output_dir / 'documentation.json'
-            self.save_json(json_path, analysis, statistics, verbose=verbose)
+            self.save_json(
+                json_path,
+                analysis,
+                statistics,
+                verbose=verbose,
+                streaming=streaming,
+                compress=compress
+            )
 
         if verbose:
             print(f"\n🎉 Documentation generation complete!")

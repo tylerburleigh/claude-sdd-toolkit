@@ -226,6 +226,8 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             verbose=getattr(args, 'verbose', False),
             parallel=getattr(args, 'parallel', False),
             num_workers=getattr(args, 'workers', None),
+            streaming=getattr(args, 'streaming', False),
+            compress=getattr(args, 'compress', False),
         )
         output_data = {
             "status": "ok",
@@ -603,6 +605,10 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     # Parallel processing options
     generate_parser.add_argument('--parallel', action='store_true', help='Enable parallel parsing using multiprocessing (faster on multi-core systems)')
     generate_parser.add_argument('--workers', type=int, metavar='N', help='Number of worker processes for parallel parsing (default: auto-detect CPU count - 1)')
+
+    # Streaming and compression options for JSON output
+    generate_parser.add_argument('--streaming', action='store_true', help='Use streaming generation for JSON output (memory efficient for large codebases)')
+    generate_parser.add_argument('--compress', action='store_true', help='Use gzip compression for JSON output')
 
     generate_parser.set_defaults(func=cmd_generate)
 
