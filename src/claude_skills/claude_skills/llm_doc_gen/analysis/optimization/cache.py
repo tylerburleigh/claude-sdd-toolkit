@@ -20,11 +20,13 @@ class PersistentCache:
     SQLite-backed persistent cache for parsed file results.
 
     Tracks file metadata (path, hash, modification time, size) and caches
-    parse results to avoid re-parsing unchanged files.
+    parse results to avoid re-parsing unchanged files. Supports dependency
+    tracking and cascade invalidation.
 
     Schema:
         file_metadata: path (TEXT PRIMARY KEY), hash (TEXT), mtime (REAL), size (INTEGER)
         cached_results: file_hash (TEXT PRIMARY KEY), result_blob (BLOB)
+        file_dependencies: file_path (TEXT), depends_on (TEXT), PRIMARY KEY (file_path, depends_on)
     """
 
     __slots__ = ('db_path', '_connection')
@@ -68,10 +70,25 @@ class PersistentCache:
                 )
             """)
 
+            # File dependencies table (for cascade invalidation)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS file_dependencies (
+                    file_path TEXT NOT NULL,
+                    depends_on TEXT NOT NULL,
+                    PRIMARY KEY (file_path, depends_on)
+                )
+            """)
+
             # Create index on hash for faster lookups
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_file_hash
                 ON file_metadata(hash)
+            """)
+
+            # Create index on depends_on for faster reverse lookups
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_depends_on
+                ON file_dependencies(depends_on)
             """)
 
             conn.commit()
@@ -188,7 +205,7 @@ class PersistentCache:
 
         Args:
             file_path: Path to source file
-            result: Parse result to cache
+            result: Parse result to cache (should be a ParseResult with dependencies)
         """
         if not file_path.exists():
             return
@@ -222,14 +239,34 @@ class PersistentCache:
                 (file_hash, result_blob)
             )
 
+            # Store dependencies if result has them
+            if hasattr(result, 'dependencies') and result.dependencies:
+                # First, clear old dependencies for this file
+                cursor.execute(
+                    "DELETE FROM file_dependencies WHERE file_path = ?",
+                    (str(file_path),)
+                )
+
+                # Store new dependencies
+                # dependencies is Dict[str, List[str]] mapping file paths to their imports
+                for dep_file in result.dependencies.get(str(file_path), []):
+                    cursor.execute(
+                        """
+                        INSERT OR IGNORE INTO file_dependencies (file_path, depends_on)
+                        VALUES (?, ?)
+                        """,
+                        (str(file_path), dep_file)
+                    )
+
             conn.commit()
 
-    def invalidate_file(self, file_path: Path):
+    def invalidate_file(self, file_path: Path, cascade: bool = True):
         """
         Invalidate cache entry for a file.
 
         Args:
             file_path: Path to file to invalidate
+            cascade: If True, also invalidate files that depend on this file
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -250,6 +287,12 @@ class PersistentCache:
                     (str(file_path),)
                 )
 
+                # Delete dependencies for this file
+                cursor.execute(
+                    "DELETE FROM file_dependencies WHERE file_path = ?",
+                    (str(file_path),)
+                )
+
                 # Check if any other files use this hash
                 cursor.execute(
                     "SELECT COUNT(*) FROM file_metadata WHERE hash = ?",
@@ -266,12 +309,39 @@ class PersistentCache:
 
                 conn.commit()
 
+            # Cascade invalidation to dependent files if requested
+            if cascade:
+                self._cascade_invalidation(file_path)
+
+    def _cascade_invalidation(self, file_path: Path):
+        """
+        Invalidate files that depend on the given file.
+
+        Args:
+            file_path: Path to file whose dependents should be invalidated
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            # Find all files that depend on this file
+            cursor.execute(
+                "SELECT file_path FROM file_dependencies WHERE depends_on = ?",
+                (str(file_path),)
+            )
+            dependent_files = [row[0] for row in cursor.fetchall()]
+
+        # Recursively invalidate dependent files (without cascading further to avoid cycles)
+        for dep_file_str in dependent_files:
+            dep_file_path = Path(dep_file_str)
+            self.invalidate_file(dep_file_path, cascade=False)
+
     def clear(self):
         """Clear all cached data."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM file_metadata")
             cursor.execute("DELETE FROM cached_results")
+            cursor.execute("DELETE FROM file_dependencies")
             conn.commit()
 
     def get_stats(self) -> Dict[str, int]:
@@ -279,7 +349,7 @@ class PersistentCache:
         Get cache statistics.
 
         Returns:
-            Dictionary with cache statistics (files_cached, results_cached, total_size_bytes)
+            Dictionary with cache statistics (files_cached, results_cached, total_size_bytes, dependencies_tracked)
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -293,8 +363,52 @@ class PersistentCache:
             cursor.execute("SELECT SUM(LENGTH(result_blob)) FROM cached_results")
             total_size = cursor.fetchone()[0] or 0
 
+            cursor.execute("SELECT COUNT(*) FROM file_dependencies")
+            dependencies_tracked = cursor.fetchone()[0]
+
             return {
                 'files_cached': files_cached,
                 'results_cached': results_cached,
-                'total_size_bytes': total_size
+                'total_size_bytes': total_size,
+                'dependencies_tracked': dependencies_tracked
             }
+
+    def get_dependencies(self, file_path: Path) -> list[str]:
+        """
+        Get list of files that the given file depends on.
+
+        Args:
+            file_path: Path to file
+
+        Returns:
+            List of file paths that this file depends on
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT depends_on FROM file_dependencies WHERE file_path = ?",
+                (str(file_path),)
+            )
+
+            return [row[0] for row in cursor.fetchall()]
+
+    def get_dependents(self, file_path: Path) -> list[str]:
+        """
+        Get list of files that depend on the given file.
+
+        Args:
+            file_path: Path to file
+
+        Returns:
+            List of file paths that depend on this file
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT file_path FROM file_dependencies WHERE depends_on = ?",
+                (str(file_path),)
+            )
+
+            return [row[0] for row in cursor.fetchall()]
