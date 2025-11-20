@@ -370,6 +370,89 @@ class CrossReferenceGraph:
 
         return symbol_index, import_index
 
+    def get_callers_indexed(self, function_name: str, symbol_index: SymbolIndex) -> List[CallSite]:
+        """
+        Get all places that call a given function using indexed lookup.
+
+        Uses SymbolIndex for O(1) resolution of function locations, then
+        filters call sites for matches. More efficient than get_callers()
+        when working with large codebases and pre-built indexes.
+
+        Args:
+            function_name: Name of the function
+            symbol_index: SymbolIndex to use for symbol resolution
+
+        Returns:
+            List of CallSite objects where this function is called
+
+        Example:
+            >>> symbol_idx, _ = graph.build_indexes()
+            >>> callers = graph.get_callers_indexed("parse_ast", symbol_idx)
+        """
+        # Use index to get all known locations of this function
+        function_locations = symbol_index.lookup_function(function_name)
+
+        if not function_locations:
+            return []
+
+        # Extract file paths from locations
+        function_files = {loc.file_path for loc in function_locations}
+
+        # Return all call sites where the callee matches this function
+        # Filter by file if we know the function's location
+        results = []
+        for call_site in self.callers.get(function_name, []):
+            # If we know where the function is defined, filter by that
+            if call_site.callee_file and call_site.callee_file not in function_files:
+                continue
+            results.append(call_site)
+
+        return results
+
+    def get_callees_indexed(
+        self,
+        function_name: str,
+        symbol_index: SymbolIndex,
+        file: Optional[str] = None
+    ) -> List[CallSite]:
+        """
+        Get all functions called by a given function using indexed lookup.
+
+        Uses SymbolIndex for O(1) resolution of the caller function location,
+        then retrieves call sites. More efficient than get_callees() when
+        working with large codebases and pre-built indexes.
+
+        Args:
+            function_name: Name of the calling function
+            symbol_index: SymbolIndex to use for symbol resolution
+            file: Optional file path for disambiguation
+
+        Returns:
+            List of CallSite objects representing functions called by this function
+
+        Example:
+            >>> symbol_idx, _ = graph.build_indexes()
+            >>> callees = graph.get_callees_indexed("process_file", symbol_idx)
+        """
+        # If file provided, use direct lookup
+        if file:
+            key = f"{file}:{function_name}"
+            return self.callees.get(key, [])
+
+        # Use index to find all locations of this function
+        function_locations = symbol_index.lookup_function(function_name)
+
+        if not function_locations:
+            return []
+
+        # Collect callees from all known locations
+        results = []
+        for location in function_locations:
+            key = f"{location.file_path}:{function_name}"
+            results.extend(self.callees.get(key, []))
+
+        return results
+
     def _file_to_module(self, file_path: str) -> str:
         """
         Convert a file path to a module name.

@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:23:56.840992Z",
+  "last_updated": "2025-11-20T19:26:34.987536Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 26,
+    "progress_percentage": 27,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 18,
+      "completed_tasks": 19,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -552,7 +552,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Replace O(n\u00b2) resolution with O(n log n) indexed lookups",
         "risk_level": "medium",
@@ -571,7 +571,7 @@
         "task-2-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -664,7 +664,7 @@
     "task-2-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-2-1",
@@ -680,7 +680,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
         "task_category": "refactoring",
@@ -709,13 +709,19 @@
     "task-2-2-2": {
       "type": "subtask",
       "title": "Add indexed resolution methods",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add get_callers_indexed(), get_callees_indexed() methods using indexes for O(1) lookup"
+        "details": "Add get_callers_indexed(), get_callees_indexed() methods using indexes for O(1) lookup",
+        "started_at": "2025-11-20T19:26:01.080539Z",
+        "status_note": "Adding get_callers_indexed() and get_callees_indexed() methods for O(1) lookups",
+        "completed_at": "2025-11-20T19:26:34.978183Z",
+        "needs_journaling": false,
+        "actual_hours": 0.009,
+        "journaled_at": "2025-11-20T19:26:34.985049Z"
       }
     },
     "task-2-3": {
@@ -2378,6 +2384,15 @@
       "content": "Added build_indexes() method to CrossReferenceGraph class for constructing optimized symbol indexes.\n\nImplementation details:\n- File: src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py\n- Method: CrossReferenceGraph.build_indexes() returns Tuple[SymbolIndex, ImportIndex]\n- Added import: from .symbol_index import SymbolIndex, ImportIndex\n\nFunctionality:\n- Builds SymbolIndex from call sites and instantiation sites\n- Builds ImportIndex from graph's import relationships\n- Deduplicates symbols using seen sets\n- Distinguishes between function calls and method calls\n- Helper method _file_to_module() for file-to-module conversion\n\nReturns optimized O(1) hash-based indexes from the existing CrossReferenceGraph data, enabling fast symbol resolution without nested loops.",
       "metadata": {},
       "task_id": "task-2-2-1"
+    },
+    {
+      "timestamp": "2025-11-20T19:26:34.985032Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add indexed resolution methods",
+      "author": "claude-code",
+      "content": "Added get_callers_indexed() and get_callees_indexed() methods to CrossReferenceGraph class. Both methods use SymbolIndex for O(1) function resolution. get_callers_indexed() finds all call sites for a function by looking up its locations in the index and filtering callers. get_callees_indexed() resolves the caller function location via index and retrieves its callees. Both include comprehensive docstrings with examples. Implementation at ast_analysis.py:373-454.",
+      "metadata": {},
+      "task_id": "task-2-2-2"
     }
   ]
 }
