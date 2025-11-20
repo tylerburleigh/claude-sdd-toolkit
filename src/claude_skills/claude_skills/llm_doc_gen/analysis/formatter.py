@@ -4,6 +4,7 @@ Generates Markdown and JSON documentation from analyzed codebase data.
 Supports multi-language projects.
 """
 
+import json
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 from collections import defaultdict
@@ -439,3 +440,83 @@ class SummaryGenerator:
                 "return_type": func.get("return_type")
             })
         return summaries
+
+
+class DetailWriter:
+    """
+    Generates detailed per-module documentation files.
+
+    Creates individual JSON files for each module in a docs/details/ directory,
+    containing complete documentation including docstrings, function bodies,
+    and full analysis data for that module.
+    """
+
+    def __init__(self, project_name: str, version: str):
+        self.project_name = project_name
+        self.version = version
+
+    def write_module_details(
+        self,
+        output_dir: Path,
+        analysis: Dict[str, Any],
+        statistics: Dict[str, Any]
+    ) -> List[Path]:
+        """
+        Generate detailed documentation files for each module.
+
+        Args:
+            output_dir: Base output directory (details will be in output_dir/details/)
+            analysis: Analyzed codebase data
+            statistics: Code statistics
+
+        Returns:
+            List of paths to generated detail files
+        """
+        details_dir = output_dir / "details"
+        details_dir.mkdir(parents=True, exist_ok=True)
+
+        generated_files = []
+
+        # Generate a detail file for each module
+        for module in analysis.get('modules', []):
+            module_path = Path(module['path'])
+            # Create safe filename from module path
+            safe_name = str(module_path).replace('/', '_').replace('\\', '_')
+            detail_file = details_dir / f"{safe_name}.json"
+
+            # Gather all classes and functions for this module
+            module_classes = [
+                cls for cls in analysis.get('classes', [])
+                if cls.get('file') == module['path']
+            ]
+            module_functions = [
+                func for func in analysis.get('functions', [])
+                if func.get('file') == module['path']
+            ]
+
+            # Build detail document
+            detail_doc = {
+                "metadata": {
+                    "project_name": self.project_name,
+                    "version": self.version,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "schema_version": SCHEMA_VERSION,
+                    "module_path": module['path']
+                },
+                "module": module,
+                "classes": module_classes,
+                "functions": module_functions,
+                "statistics": {
+                    "classes_count": len(module_classes),
+                    "functions_count": len(module_functions),
+                    "lines": module.get('lines', 0)
+                }
+            }
+
+            # Write detail file
+            with open(detail_file, 'w', encoding='utf-8') as f:
+                json.dump(detail_doc, f, indent=2, ensure_ascii=False)
+
+            generated_files.append(detail_file)
+
+        return generated_files
