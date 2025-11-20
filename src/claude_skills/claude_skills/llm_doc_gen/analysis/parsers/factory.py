@@ -188,31 +188,75 @@ class ParserFactory:
         Returns:
             Merged ParseResult from all workers
         """
-        # For now, delegate to sequential parsing
-        # Full parallel implementation will be added in subsequent tasks
-        # This establishes the API surface for parallel mode
+        # Collect all files from all languages with their parsers
+        file_tasks: List[tuple[Path, Language]] = []
+        language_file_counts: Dict[Language, int] = {}
 
-        result = ParseResult()
         for language in sorted(languages_to_parse, key=lambda x: x.value):
             parser = self.get_parser(language)
 
             if parser is None:
                 if verbose:
                     print(f"  ⚠️  {language.value.upper()}: No parser available (skipping)")
-                result.errors.append(
-                    f"No parser available for {language.value}"
-                )
                 continue
 
-            # TODO: Use ParallelParser here
-            # For now, fall back to sequential
-            lang_result = parser.parse_all(verbose=verbose)
-            result.merge(lang_result)
+            files = parser.find_files()
+            language_file_counts[language] = len(files)
+
+            if verbose and files:
+                print(f"  {language.value.upper()}: Found {len(files)} files")
+
+            # Add tasks as (file_path, language) tuples
+            for file_path in files:
+                file_tasks.append((file_path, language))
+
+        # If no files to parse, return empty result
+        if not file_tasks:
+            result = ParseResult()
+            if verbose:
+                self._print_summary(result, languages_to_parse)
+            return result
+
+        # Create parallel parser
+        parallel_parser = ParallelParser(num_workers=num_workers)
+
+        # Define worker function that parses a single file
+        def parse_single_file(task: tuple[Path, Language]) -> ParseResult:
+            file_path, language = task
+            parser = self.get_parser(language)
+            if parser is None:
+                return ParseResult(
+                    errors=[f"No parser available for {language.value}"]
+                )
+            return parser.parse_file(file_path)
+
+        # Progress callback for verbose mode
+        progress_callback = None
+        if verbose:
+            total_files = len(file_tasks)
+            def progress_callback(completed: int, total: int):
+                print(f"    [{completed}/{total}] files parsed...", end='\r')
+
+        # Parse all files in parallel
+        results = parallel_parser.parse_files(
+            file_tasks,
+            parse_single_file,
+            progress_callback=progress_callback
+        )
+
+        # Clear progress line
+        if verbose:
+            print(" " * 60, end='\r')
+
+        # Merge all results
+        merged_result = ParseResult()
+        for result in results:
+            merged_result.merge(result)
 
         if verbose:
-            self._print_summary(result, languages_to_parse)
+            self._print_summary(merged_result, languages_to_parse)
 
-        return result
+        return merged_result
 
     def parse_file(self, file_path: Path, verbose: bool = False) -> ParseResult:
         """
