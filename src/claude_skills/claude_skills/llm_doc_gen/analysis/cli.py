@@ -210,6 +210,21 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if getattr(args, 'filter_mode', None):
         filter_profile = FilterProfile(args.filter_mode)
 
+    # Handle cache options
+    cache_dir = None
+    if getattr(args, 'cache', False) or getattr(args, 'cache_dir', None):
+        # Use specified cache_dir or default
+        cache_dir = Path(getattr(args, 'cache_dir', None) or './.doc-cache')
+
+        # Clear cache if requested
+        if getattr(args, 'clear_cache', False):
+            from claude_skills.llm_doc_gen.analysis.optimization.cache import PersistentCache
+            if cache_dir.exists():
+                cache = PersistentCache(cache_dir)
+                cache.clear()
+                if not _print_if_json(args, {"status": "info", "message": "Cache cleared"}, printer):
+                    printer.detail(f"Cache cleared at {cache_dir}")
+
     generator = DocumentationGenerator(
         project_dir,
         project_name,
@@ -217,6 +232,7 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         exclude_patterns,
         languages,
         filter_profile,
+        cache_dir,
     )
 
     try:
@@ -609,6 +625,11 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     # Streaming and compression options for JSON output
     generate_parser.add_argument('--streaming', action='store_true', help='Use streaming generation for JSON output (memory efficient for large codebases)')
     generate_parser.add_argument('--compress', action='store_true', help='Use gzip compression for JSON output')
+
+    # Cache options
+    generate_parser.add_argument('--cache', action='store_true', help='Enable persistent caching of parse results (speeds up subsequent runs)')
+    generate_parser.add_argument('--cache-dir', type=str, help='Directory for cache storage (default: ./.doc-cache)')
+    generate_parser.add_argument('--clear-cache', action='store_true', help='Clear the cache before generating documentation')
 
     generate_parser.set_defaults(func=cmd_generate)
 

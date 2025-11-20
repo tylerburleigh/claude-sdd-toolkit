@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T21:34:18.954500Z",
+  "last_updated": "2025-11-20T21:36:14.479633Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 76,
+    "progress_percentage": 77,
     "current_phase": "phase-5"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 52,
+      "completed_tasks": 53,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1773,7 +1773,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "80-95% faster incremental runs through SQLite-backed caching",
         "risk_level": "medium",
@@ -1793,7 +1793,7 @@
         "task-5-5"
       ],
       "total_tasks": 8,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1974,7 +1974,7 @@
     "task-5-4": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-files",
       "children": [
         "task-5-4-1"
@@ -1987,7 +1987,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
         "task_category": "implementation",
@@ -1997,13 +1997,19 @@
     "task-5-4-1": {
       "type": "subtask",
       "title": "Add cache CLI flags",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add --cache, --cache-dir, --clear-cache flags to generate subcommand"
+        "details": "Add --cache, --cache-dir, --clear-cache flags to generate subcommand",
+        "started_at": "2025-11-20T21:34:43.901595Z",
+        "status_note": "Adding cache CLI flags to llm-doc-gen generate command",
+        "completed_at": "2025-11-20T21:36:14.469379Z",
+        "needs_journaling": false,
+        "actual_hours": 0.025,
+        "journaled_at": "2025-11-20T21:36:14.477095Z"
       }
     },
     "task-5-5": {
@@ -3002,6 +3008,15 @@
       "content": "Successfully added cache_dir parameter to DocumentationGenerator and integrated PersistentCache throughout the parsing pipeline.\n\nImplementation details:\n- Added cache parameter to ParserFactory.__init__() and stored as instance variable\n- Updated ParserFactory.get_parser() to pass cache when creating parser instances\n- Added cache parameter to create_parser_factory() function\n- Added PersistentCache import to generator.py module\n- Added cache_dir parameter to DocumentationGenerator.__init__() (defaults to None for backward compatibility)\n- Initialize PersistentCache when cache_dir is provided, otherwise cache remains None\n- Pass cache instance to create_parser_factory() which flows through to all parsers\n\nTesting performed:\n- Syntax validation passed for all modified files\n- Integration test verified:\n  * DocumentationGenerator accepts cache_dir parameter\n  * Cache is properly initialized when cache_dir is provided\n  * generate() method executes successfully with caching enabled\n  * Result structure is correct (contains 'analysis' and 'statistics' keys)\n  * No errors or exceptions during execution\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
       "metadata": {},
       "task_id": "task-5-3-1"
+    },
+    {
+      "timestamp": "2025-11-20T21:36:14.477084Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Cache CLI Flags Implementation",
+      "author": "claude-code",
+      "content": "Successfully added cache CLI flags to the llm-doc-gen generate subcommand.\n\nImplementation details:\n- Added three new CLI flags to the generate subcommand:\n  * --cache: Boolean flag to enable persistent caching (makes cache_dir default to ./.doc-cache)\n  * --cache-dir CACHE_DIR: Specify custom directory for cache storage\n  * --clear-cache: Clear the cache before generating documentation\n- Updated cmd_generate() to handle cache options:\n  * Check for --cache or --cache-dir flags\n  * Use specified cache_dir or default to ./.doc-cache\n  * If --clear-cache is set, initialize PersistentCache and call clear() method\n  * Pass cache_dir to DocumentationGenerator constructor\n- Added import for PersistentCache in cache clearing logic\n\nTesting performed:\n- Syntax validation passed\n- Help output verification confirmed all three flags appear:\n  * --cache shows in usage line\n  * --cache-dir CACHE_DIR shows in usage line\n  * --clear-cache shows in usage line\n  * All three flags have proper help text descriptions\n  * Flags are properly grouped under 'Cache options' section\n\nUsage examples:\n- sdd doc generate ./src --cache\n- sdd doc generate ./src --cache-dir /tmp/my-cache\n- sdd doc generate ./src --cache --clear-cache\n- sdd doc generate ./src --cache-dir ~/.cache/doc-gen --clear-cache\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py (added cache argument handling and CLI flags)",
+      "metadata": {},
+      "task_id": "task-5-4-1"
     }
   ]
 }
