@@ -497,3 +497,190 @@ def streaming_json_output(output_path: Path):
             yield writer
     finally:
         pass
+
+
+class NDJSONWriter:
+    """
+    Newline-delimited JSON writer for extremely memory-efficient streaming.
+
+    NDJSON format writes each entity as a complete JSON object on its own line,
+    making it ideal for:
+    - Processing with line-oriented Unix tools (grep, sed, awk)
+    - Streaming processing where entities arrive one at a time
+    - Parallel processing (each line is independent)
+    - Extremely large datasets that don't fit in memory
+
+    Unlike regular JSON, NDJSON doesn't require the entire document to be
+    valid JSON - each line is independently parseable.
+
+    Attributes:
+        output_path: Path to the output NDJSON file
+        compress: Whether to enable gzip compression
+        file_handle: Open file handle for writing
+        _entity_count: Number of entities written
+
+    Example:
+        >>> with NDJSONWriter('/path/to/output.ndjson') as writer:
+        ...     writer.write_metadata({'project': 'my-project'})
+        ...     writer.write_entity('module', {'name': 'mod1'})
+        ...     writer.write_entity('class', {'name': 'Class1'})
+    """
+
+    def __init__(self, output_path: Path, compress: bool = False):
+        """
+        Initialize NDJSON writer.
+
+        Args:
+            output_path: Path where NDJSON output will be written
+            compress: Whether to enable gzip compression (default: False)
+        """
+        self.output_path = Path(output_path)
+        self.compress = compress
+        self.file_handle: Optional[Union[TextIO, gzip.GzipFile]] = None
+        self._compression_wrapper: Optional[CompressionWrapper] = None
+        self._entity_count = 0
+
+    def __enter__(self):
+        """Context manager entry - opens file."""
+        if self.compress:
+            self._compression_wrapper = CompressionWrapper(self.output_path, compress=True)
+            self.file_handle = self._compression_wrapper.open('wt')
+        else:
+            self.file_handle = open(self.output_path, 'w', encoding='utf-8')
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - closes file."""
+        if self.file_handle:
+            if self._compression_wrapper:
+                self._compression_wrapper.close()
+            else:
+                self.file_handle.close()
+            self.file_handle = None
+        return False
+
+    def write_metadata(self, metadata: Dict[str, Any]) -> None:
+        """
+        Write metadata as the first line.
+
+        Args:
+            metadata: Dictionary containing project metadata
+
+        Example:
+            >>> writer.write_metadata({
+            ...     'type': 'metadata',
+            ...     'project': 'my-project',
+            ...     'version': '1.0.0'
+            ... })
+        """
+        if not self.file_handle:
+            raise RuntimeError("File not open. Use context manager (with statement).")
+
+        # Add type field if not present
+        if 'type' not in metadata:
+            metadata = {'type': 'metadata', **metadata}
+
+        self.file_handle.write(json.dumps(metadata) + '\n')
+        self._entity_count += 1
+
+    def write_entity(self, entity_type: str, entity: Dict[str, Any]) -> None:
+        """
+        Write a single entity as one line of JSON.
+
+        Args:
+            entity_type: Type of entity ('module', 'class', 'function', etc.)
+            entity: Dictionary representation of the entity
+
+        Example:
+            >>> writer.write_entity('module', {
+            ...     'name': 'my_module',
+            ...     'file_path': 'src/my_module.py'
+            ... })
+        """
+        if not self.file_handle:
+            raise RuntimeError("File not open. Use context manager (with statement).")
+
+        # Add type field if not present
+        if 'type' not in entity:
+            entity = {'type': entity_type, **entity}
+
+        self.file_handle.write(json.dumps(entity) + '\n')
+        self._entity_count += 1
+
+    def write_module(self, module: Dict[str, Any]) -> None:
+        """Write a module entity."""
+        self.write_entity('module', module)
+
+    def write_class(self, class_obj: Dict[str, Any]) -> None:
+        """Write a class entity."""
+        self.write_entity('class', class_obj)
+
+    def write_function(self, function: Dict[str, Any]) -> None:
+        """Write a function entity."""
+        self.write_entity('function', function)
+
+    def write_dependencies(self, dependencies: Dict[str, Any]) -> None:
+        """
+        Write dependencies as a single entity.
+
+        Args:
+            dependencies: Dictionary mapping file paths to their dependencies
+        """
+        self.write_entity('dependencies', {'data': dependencies})
+
+    def write_error(self, error: str) -> None:
+        """
+        Write a single error as an entity.
+
+        Args:
+            error: Error message
+
+        Example:
+            >>> writer.write_error('Parse error in file.py')
+        """
+        self.write_entity('error', {'message': error})
+
+    def write_errors(self, errors: list) -> None:
+        """
+        Write multiple errors as separate entities.
+
+        Args:
+            errors: List of error messages
+        """
+        for error in errors:
+            self.write_error(error)
+
+    def get_entity_count(self) -> int:
+        """
+        Get the number of entities written.
+
+        Returns:
+            Total number of JSON lines written
+        """
+        return self._entity_count
+
+
+@contextmanager
+def ndjson_output(output_path: Path, compress: bool = False):
+    """
+    Convenience context manager for NDJSON output.
+
+    Args:
+        output_path: Path where NDJSON output will be written
+        compress: Whether to enable gzip compression
+
+    Yields:
+        NDJSONWriter instance for writing entities
+
+    Example:
+        >>> with ndjson_output('/path/to/output.ndjson') as writer:
+        ...     writer.write_metadata({'project': 'my-project'})
+        ...     for module in modules:
+        ...         writer.write_module(module.to_dict())
+    """
+    writer = NDJSONWriter(output_path, compress=compress)
+    try:
+        with writer:
+            yield writer
+    finally:
+        pass
