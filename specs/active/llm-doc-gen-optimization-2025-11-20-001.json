@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:26:34.987536Z",
+  "last_updated": "2025-11-20T19:29:15.492685Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 27,
+    "progress_percentage": 29,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 19,
+      "completed_tasks": 20,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -552,7 +552,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Replace O(n\u00b2) resolution with O(n log n) indexed lookups",
         "risk_level": "medium",
@@ -571,7 +571,7 @@
         "task-2-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -727,7 +727,7 @@
     "task-2-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-3-1"
@@ -740,7 +740,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
         "task_category": "refactoring",
@@ -751,13 +751,19 @@
     "task-2-3-1": {
       "type": "subtask",
       "title": "Refactor _resolve_references to use FastResolver",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Replace nested loops at lines 109-248 with FastResolver.resolve_call(), maintain backward compatibility"
+        "details": "Replace nested loops at lines 109-248 with FastResolver.resolve_call(), maintain backward compatibility",
+        "started_at": "2025-11-20T19:28:10.914021Z",
+        "status_note": "Refactoring _resolve_references to use FastResolver for indexed lookups",
+        "completed_at": "2025-11-20T19:29:15.484863Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-20T19:29:15.490589Z"
       }
     },
     "task-2-4": {
@@ -2393,6 +2399,15 @@
       "content": "Added get_callers_indexed() and get_callees_indexed() methods to CrossReferenceGraph class. Both methods use SymbolIndex for O(1) function resolution. get_callers_indexed() finds all call sites for a function by looking up its locations in the index and filtering callers. get_callees_indexed() resolves the caller function location via index and retrieves its callees. Both include comprehensive docstrings with examples. Implementation at ast_analysis.py:373-454.",
       "metadata": {},
       "task_id": "task-2-2-2"
+    },
+    {
+      "timestamp": "2025-11-20T19:29:15.490578Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Refactor _resolve_references to use FastResolver",
+      "author": "claude-code",
+      "content": "Refactored _resolve_references() method in generator.py to use FastResolver with indexed lookups. Replaced 140+ lines of nested loop logic (lines 138-263) with 90 lines using build_indexes() and FastResolver.resolve_call() for O(1) symbol resolution. Maintained backward compatibility with fallback strategies for external imports and built-in methods. Added FastResolver import to generator.py. Significantly improves performance by eliminating O(n\u00b2) candidate scanning. Implementation at generator.py:125-215.",
+      "metadata": {},
+      "task_id": "task-2-3-1"
     }
   ]
 }
