@@ -7,8 +7,10 @@ AST traversal across multiple programming languages.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Optional, Any
+from typing import Dict, List, Set, Optional, Any, Tuple
 from enum import Enum
+
+from .symbol_index import SymbolIndex, ImportIndex
 
 
 class ReferenceType(Enum):
@@ -265,6 +267,134 @@ class CrossReferenceGraph:
             Set of imported module names
         """
         return self.imports.get(file, set())
+
+    def build_indexes(self) -> Tuple[SymbolIndex, ImportIndex]:
+        """
+        Build SymbolIndex and ImportIndex from the cross-reference graph data.
+
+        Constructs optimized hash-based indexes for O(1) symbol resolution
+        from the existing call sites, instantiations, and import relationships.
+
+        Returns:
+            Tuple of (SymbolIndex, ImportIndex) built from graph data
+
+        Example:
+            >>> graph = CrossReferenceGraph()
+            >>> # ... populate graph with calls and instantiations ...
+            >>> symbol_idx, import_idx = graph.build_indexes()
+            >>> # Now use indexes for fast lookups
+        """
+        symbol_index = SymbolIndex()
+        import_index = ImportIndex()
+
+        # Build import index from graph's import data
+        for source_file, imported_modules in self.imports.items():
+            # Convert file path to module name (simple heuristic)
+            source_module = self._file_to_module(source_file)
+
+            for imported_module in imported_modules:
+                # Try to find the imported module's file
+                imported_file = None
+                for file, modules in self.imports.items():
+                    if self._file_to_module(file) == imported_module:
+                        imported_file = file
+                        break
+
+                import_index.add_import(
+                    source_module,
+                    imported_module,
+                    source_file,
+                    imported_file
+                )
+
+        # Track which symbols we've seen to avoid duplicates
+        seen_functions = set()
+        seen_classes = set()
+        seen_methods = set()
+
+        # Build symbol index from call sites
+        for call_site in self.calls:
+            # Add caller as a function (if not already added)
+            caller_key = (call_site.caller, call_site.caller_file)
+            if caller_key not in seen_functions:
+                symbol_index.add_function(call_site.caller, call_site.caller_file)
+                seen_functions.add(caller_key)
+
+            # Add callee as a function (if we know its file)
+            if call_site.callee_file:
+                callee_key = (call_site.callee, call_site.callee_file)
+                if callee_key not in seen_functions:
+                    # Check if it's a method call
+                    if call_site.call_type == ReferenceType.METHOD_CALL:
+                        # Extract class name from metadata if available
+                        class_name = call_site.metadata.get('class_name')
+                        if class_name:
+                            method_key = (call_site.callee, class_name, call_site.callee_file)
+                            if method_key not in seen_methods:
+                                symbol_index.add_method(
+                                    call_site.callee,
+                                    class_name,
+                                    call_site.callee_file
+                                )
+                                seen_methods.add(method_key)
+                    else:
+                        symbol_index.add_function(
+                            call_site.callee,
+                            call_site.callee_file
+                        )
+                        seen_functions.add(callee_key)
+
+        # Build symbol index from instantiation sites
+        for inst_site in self.instantiations:
+            # Add the instantiated class
+            class_key = (inst_site.class_name, inst_site.instantiator_file)
+
+            # Try to find the class definition file
+            # For now, assume it's in the same file or we don't have that info
+            # In a real implementation, this would use import resolution
+            class_file = inst_site.metadata.get('class_file', inst_site.instantiator_file)
+
+            class_key = (inst_site.class_name, class_file)
+            if class_key not in seen_classes:
+                symbol_index.add_class(inst_site.class_name, class_file)
+                seen_classes.add(class_key)
+
+            # Add the instantiator as a function
+            instantiator_key = (inst_site.instantiator, inst_site.instantiator_file)
+            if instantiator_key not in seen_functions:
+                symbol_index.add_function(
+                    inst_site.instantiator,
+                    inst_site.instantiator_file
+                )
+                seen_functions.add(instantiator_key)
+
+        return symbol_index, import_index
+
+    def _file_to_module(self, file_path: str) -> str:
+        """
+        Convert a file path to a module name.
+
+        Simple heuristic: removes extension and converts slashes to dots.
+
+        Args:
+            file_path: File path
+
+        Returns:
+            Module name
+        """
+        # Remove common prefixes and extension
+        module = file_path.replace('/', '.').replace('\\', '.')
+
+        # Remove file extension
+        if '.' in module:
+            parts = module.rsplit('.', 1)
+            if parts[1] in ['py', 'js', 'ts', 'go']:
+                module = parts[0]
+
+        # Remove leading dots
+        module = module.lstrip('.')
+
+        return module
 
     def to_dict(self) -> Dict[str, Any]:
         """
