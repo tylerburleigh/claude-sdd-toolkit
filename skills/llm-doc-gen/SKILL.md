@@ -7,7 +7,7 @@ description: LLM-powered documentation generation for narrative architecture doc
 
 ## Overview
 
-The `Skill(sdd-toolkit:llm-doc-gen)` skill generates comprehensive, navigable documentation using Large Language Model (LLM) consultation. It creates sharded documentation (organized topic files) by having LLMs read and analyze source code directly, then synthesizing their insights into structured, human-readable guides.
+This skill generates comprehensive, navigable documentation using Large Language Model (LLM) consultation. It creates sharded documentation (organized topic files) by having LLMs read and analyze source code directly, then synthesizing their insights into structured, human-readable guides.
 
 **Core Capability:** Transform codebases into sharded documentation by orchestrating LLM analysis through workflow-driven steps, managing state for resumability, and producing organized topic files instead of monolithic documents.
 
