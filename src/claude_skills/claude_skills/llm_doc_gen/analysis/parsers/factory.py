@@ -6,7 +6,7 @@ and routes files to appropriate parsers.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Type
+from typing import Dict, List, Optional, Set, Type, Any
 from collections import defaultdict
 
 from .base import BaseParser, Language, ParseResult
@@ -24,7 +24,8 @@ class ParserFactory:
         self,
         project_root: Path,
         exclude_patterns: Optional[List[str]] = None,
-        languages: Optional[List[Language]] = None
+        languages: Optional[List[Language]] = None,
+        filter_chain: Optional[Dict[str, Any]] = None
     ):
         """
         Initialize the parser factory.
@@ -33,6 +34,9 @@ class ParserFactory:
             project_root: Root directory of the project
             exclude_patterns: Patterns to exclude from analysis
             languages: Specific languages to parse (None = auto-detect all)
+            filter_chain: Optional dictionary of filter instances from create_filter_chain().
+                Contains 'size_filter', 'count_limiter', and 'sampling' keys.
+                If None, no additional filtering is applied (backward compatible).
         """
         self.project_root = project_root.resolve()
         self.exclude_patterns = exclude_patterns or [
@@ -40,6 +44,7 @@ class ParserFactory:
             'build', 'dist', '.egg-info'
         ]
         self.requested_languages = languages
+        self.filter_chain = filter_chain
         self._parsers: Dict[Language, BaseParser] = {}
         self._parser_classes: Dict[Language, Type[BaseParser]] = {}
 
@@ -288,7 +293,8 @@ def _auto_register_parsers(factory: ParserFactory):
 def create_parser_factory(
     project_root: Path,
     exclude_patterns: Optional[List[str]] = None,
-    languages: Optional[List[Language]] = None
+    languages: Optional[List[Language]] = None,
+    filter_chain: Optional[Dict[str, Any]] = None
 ) -> ParserFactory:
     """
     Create a ParserFactory with all available parsers registered.
@@ -297,10 +303,11 @@ def create_parser_factory(
         project_root: Root directory of project
         exclude_patterns: Patterns to exclude
         languages: Specific languages to parse
+        filter_chain: Optional dictionary of filter instances from create_filter_chain()
 
     Returns:
         Configured ParserFactory instance
     """
-    factory = ParserFactory(project_root, exclude_patterns, languages)
+    factory = ParserFactory(project_root, exclude_patterns, languages, filter_chain)
     _auto_register_parsers(factory)
     return factory

@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T18:52:19.443076Z",
+  "last_updated": "2025-11-20T18:53:40.276415Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 7,
+    "progress_percentage": 8,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -57,7 +57,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Reduce processing scope through intelligent file selection and configurable limits",
         "risk_level": "low",
@@ -85,7 +85,7 @@
         "task-1-6"
       ],
       "total_tasks": 11,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -230,7 +230,7 @@
     "task-1-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-3-1",
@@ -246,7 +246,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
         "task_category": "refactoring",
@@ -257,13 +257,19 @@
     "task-1-3-1": {
       "type": "subtask",
       "title": "Add filter_chain parameter to ParserFactory.__init__",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Accept optional filter_chain parameter, default to None for backward compatibility"
+        "details": "Accept optional filter_chain parameter, default to None for backward compatibility",
+        "started_at": "2025-11-20T18:52:44.810247Z",
+        "status_note": "Adding filter_chain parameter to ParserFactory",
+        "completed_at": "2025-11-20T18:53:40.265070Z",
+        "needs_journaling": false,
+        "actual_hours": 0.015,
+        "journaled_at": "2025-11-20T18:53:40.274440Z"
       }
     },
     "task-1-3-2": {
@@ -2145,6 +2151,15 @@
       "content": "Implemented FilterProfile enum with three profiles (FAST, BALANCED, COMPLETE) representing different balances between speed and completeness. Created create_filter_chain() factory function that instantiates coordinated filter sets based on profile. FAST profile uses 200KB size limit, 50 files/dir, 20% sampling. BALANCED uses 500KB, 100 files/dir, no sampling. COMPLETE uses 2MB, 500 files/dir, no sampling. Factory supports custom overrides for size_limit, file_limit, and sample_rate. Updated __init__.py to export FilterProfile and create_filter_chain. All code includes comprehensive docstrings with examples.",
       "metadata": {},
       "task_id": "task-1-2-4"
+    },
+    {
+      "timestamp": "2025-11-20T18:53:40.274434Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add filter_chain parameter to ParserFactory.__init__",
+      "author": "claude-code",
+      "content": "Added filter_chain parameter to ParserFactory.__init__() with Optional[Dict[str, Any]] type, defaulting to None for backward compatibility. Parameter accepts dictionary of filter instances from create_filter_chain() containing 'size_filter', 'count_limiter', and 'sampling' keys. Also updated create_parser_factory() helper function to accept and pass through filter_chain parameter. Updated docstrings to document the new parameter. Changes are fully backward compatible - existing code without filter_chain continues to work unchanged.",
+      "metadata": {},
+      "task_id": "task-1-3-1"
     }
   ]
 }
