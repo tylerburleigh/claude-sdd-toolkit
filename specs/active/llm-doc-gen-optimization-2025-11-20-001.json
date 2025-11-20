@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:48:47.447167Z",
+  "last_updated": "2025-11-20T19:50:42.176577Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 41,
+    "progress_percentage": 42,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 28,
+      "completed_tasks": 29,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -925,7 +925,7 @@
         "depends": []
       },
       "total_tasks": 9,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "3-8x speedup through multi-core processing",
         "risk_level": "medium",
@@ -944,7 +944,7 @@
         "task-3-4"
       ],
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1103,7 +1103,7 @@
     "task-3-4": {
       "type": "task",
       "title": "tests/test_parallel_parsing.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3-files",
       "children": [
         "task-3-4-1",
@@ -1117,7 +1117,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_parallel_parsing.py",
         "task_category": "implementation",
@@ -1127,13 +1127,19 @@
     "task-3-4-1": {
       "type": "subtask",
       "title": "Correctness tests",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Verify parallel parsing produces same ParseResult as sequential, test merging correctness"
+        "details": "Verify parallel parsing produces same ParseResult as sequential, test merging correctness",
+        "started_at": "2025-11-20T19:49:39.238325Z",
+        "status_note": "Creating correctness tests for parallel parsing",
+        "completed_at": "2025-11-20T19:50:42.167493Z",
+        "needs_journaling": false,
+        "actual_hours": 0.017,
+        "journaled_at": "2025-11-20T19:50:42.174210Z"
       }
     },
     "task-3-4-2": {
@@ -2566,6 +2572,15 @@
       "content": "Added --parallel flag (boolean) and --workers N flag to generate subcommand in cli.py. Updated cmd_generate() to pass args.parallel and args.workers to generator.generate_all(). Updated DocumentationGenerator.generate_all() and generate() methods to accept and forward parallel/num_workers parameters to parser_factory.parse_all(). Complete integration chain: CLI args \u2192 cmd_generate \u2192 generate_all \u2192 generate \u2192 parse_all. Users can now enable parallel parsing with 'sdd doc generate ./src --parallel' or specify workers with '--parallel --workers 4'. Implementation at cli.py:602-603, 227-228 and generator.py:95-117, 386-409.",
       "metadata": {},
       "task_id": "task-3-3-1"
+    },
+    {
+      "timestamp": "2025-11-20T19:50:42.174201Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Correctness tests",
+      "author": "claude-code",
+      "content": "Created comprehensive correctness tests in tests/test_parallel_parsing.py. Tests verify parallel parsing produces identical results to sequential parsing, determinism across multiple runs, ParseResult merging correctness, error handling with sequential fallback, worker cache initialization, progress callbacks, chunk size calculation, and edge cases (empty lists, single file). Includes 17 test methods covering parallel/sequential consistency, determinism, auto-detection, chunking, and worker function behavior. File: tests/test_parallel_parsing.py (371 lines).",
+      "metadata": {},
+      "task_id": "task-3-4-1"
     }
   ]
 }
