@@ -15,7 +15,7 @@ The SDD Toolkit is a Python library and CLI toolkit for Spec-Driven Development 
 ### Components
 
 **For Claude Code:**
-- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `code-doc`, `doc-query`, etc.)
+- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `code-doc`, `doc-query`, `llm-doc-gen`, etc.)
 - Slash Commands - Quick actions (`/sdd-begin`, `/sdd-setup`)
 - Subagent System - Specialized agents for multi-step tasks
 
@@ -38,6 +38,7 @@ SDD Toolkit provides:
 - Automatic progress tracking with status updates and time recording
 - Multi-model AI consultation for quality reviews
 - AST-based code analysis with AI enhancement
+- AI-powered documentation generation for codebases
 - Version control integration through JSON files
 
 ## Quick Start
@@ -113,14 +114,14 @@ Each major capability is implemented as an independent skill module:
                          │
     ┌────────────────────┼────────────────────┐
     │                    │                    │
-┌───▼────┐         ┌─────▼─────┐       ┌─────▼─────┐
-│ code-  │         │    doc-   │       │   run-    │
-│ doc    │         │   query   │       │   tests   │
-│        │         │           │       │           │
-│ Docs   │         │  Analyze  │       │  Testing  │
-└───┬────┘         └─────┬─────┘       └─────┬─────┘
-    │                    │                   │
-    └────────────────────┼───────────────────┘
+┌───▼────┐     ┌─────▼─────┐   ┌─────▼─────┐   ┌─────▼─────┐
+│ code-  │     │    doc-   │   │ llm-doc-  │   │   run-    │
+│ doc    │     │   query   │   │   gen     │   │   tests   │
+│        │     │           │   │           │   │           │
+│ Docs   │     │  Analyze  │   │  AI Docs  │   │  Testing  │
+└───┬────┘     └─────┬─────┘   └─────┬─────┘   └─────┬─────┘
+    │                │               │               │
+    └────────────────┴───────────────┴───────────────┘
                          │
               Supporting Skills
     ┌────────────────────┼────────────────────┐
@@ -145,7 +146,7 @@ Each major capability is implemented as an independent skill module:
 - **sdd-update** - Track progress, update status, journal decisions
 
 **Supporting Skills:**
-- Documentation: `code-doc`, `doc-query`
+- Documentation: `code-doc`, `doc-query`, `llm-doc-gen`
 - Quality: `sdd-validate`, `sdd-fidelity-review`, `sdd-plan-review`, `sdd-modify`
 - Testing: `run-tests`
 - Utilities: `sdd-render`, `context-tracker`, `sdd-pr`

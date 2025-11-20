@@ -66,6 +66,62 @@ Use this skill when you need to:
 
 **All spec loading, task extraction, and requirement analysis happens inside the CLI tool.**
 
+## Querying Spec and Task Data Efficiently
+
+Before running a fidelity review, you may need to gather context about the spec, phases, or tasks. Use these efficient CLI commands instead of creating bash loops:
+
+### Query Multiple Tasks at Once
+```bash
+# Get all tasks in a phase
+sdd query-tasks <spec-id> --parent phase-1 --json
+
+# Get tasks by status
+sdd query-tasks <spec-id> --status completed --json
+
+# Combine filters
+sdd query-tasks <spec-id> --parent phase-2 --status pending --json
+
+# Get all tasks (no limit)
+sdd query-tasks <spec-id> --limit 0 --json
+```
+
+### Get Single Task Details
+```bash
+# Get detailed information about a specific task
+sdd get-task <spec-id> task-1-3
+```
+
+### List Phases
+```bash
+# See all phases with progress information
+sdd list-phases <spec-id>
+```
+
+### ❌ DON'T Do This (Inefficient)
+```bash
+# BAD: Bash loop calling sdd get-task repeatedly
+for i in 1 2 3 4 5; do
+  sdd get-task spec-id "task-1-$i"
+done
+
+# BAD: Creating temp scripts
+cat > /tmp/get_tasks.sh << 'EOF'
+...
+EOF
+
+# BAD: Using grep to parse JSON
+sdd get-task spec-id task-1 | grep -o '"status":"[^"]*"'
+```
+
+### ✅ DO This Instead
+```bash
+# GOOD: Single command gets all tasks in phase-1
+sdd query-tasks spec-id --parent phase-1 --json
+
+# GOOD: Parse JSON properly with jq if needed
+sdd query-tasks spec-id --parent phase-1 --json | jq '.[] | select(.status=="completed")'
+```
+
 ## Workflow
 
 This skill delegates all fidelity review logic to the dedicated `sdd fidelity-review` CLI tool, which handles spec loading, implementation analysis, AI consultation, and report generation.
@@ -101,8 +157,18 @@ sdd fidelity-review <spec-id> --task <task-id>
 - Read spec files with Read tool
 - Parse specs with Python or jq
 - Use cat/head/tail/grep on spec files
+- Create temporary bash scripts (e.g., `/tmp/*.sh`)
+- Use bash loops to iterate through tasks (e.g., `for i in 1 2 3; do sdd get-task...`)
+- Call `sdd get-task` in a loop - use `sdd query-tasks` for batch retrieval
+- Use grep/sed/awk to parse JSON outputs - all commands return structured JSON
 
-This skill must only run `sdd fidelity-review` commands (with `--task` or `--phase` parameter). No other shell commands are required for fidelity review, and the agent should not execute additional tooling alongside the CLI.
+**When you need task/spec context before running fidelity review:**
+✅ Use `sdd query-tasks <spec-id> --parent <phase-id> --json` to get all tasks in a phase
+✅ Use `sdd query-tasks <spec-id> --status <status> --json` to filter by status
+✅ Use `sdd get-task <spec-id> <task-id>` to get a single task's details
+✅ Use `sdd list-phases <spec-id>` to see all phases
+
+Then execute the fidelity review with the appropriate scope.
 
 Your job is to execute the CLI command and parse its JSON output.
 
@@ -281,10 +347,13 @@ Specified features not implemented:
 ### DON'T
 ❌ Attempt to manually implement review logic (CLI handles it)
 ❌ Read spec files directly with Read/Python/jq/Bash (CLI loads them)
+❌ Create temporary bash scripts or use bash loops (e.g., `for i in...; do sdd get-task...`)
+❌ Call `sdd get-task` in a loop - use `sdd query-tasks` for batch queries instead
+❌ Use grep/sed/awk to parse JSON - all CLI commands return structured JSON
 ❌ Skip input validation
 ❌ Ignore the CLI tool's consensus analysis
 ❌ Make up review findings not from CLI output
-❌ Perform additional analysis beyond the CLI’s consensus results
+❌ Perform additional analysis beyond the CLI's consensus results
 ❌ Open the persisted JSON report; reference its filepath instead
 
 ## Example Invocations
