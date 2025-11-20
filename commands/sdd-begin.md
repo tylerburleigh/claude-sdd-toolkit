@@ -136,19 +136,65 @@ Based on the user's selection:
 I'll help you resume work on task [task-id] from [spec-name]...
 ```
 
-Use the Skill tool to invoke sdd-next:
+**Before invoking sdd-next:**
+
+If `session_state.active_specs` has more than 1 spec, ask the user which spec they want to work on:
+- Use `AskUserQuestion` tool to present spec choices
+- Show up to 4 specs (sorted by completion % as provided by the helper)
+- Each option: `label` = spec_id, `description` = "title (XX% complete)"
+- Set `header` = "Spec" and `multiSelect` = false
+
+Example:
+```
+AskUserQuestion(
+  questions: [{
+    question: "Which specification would you like to work on?",
+    header: "Spec",
+    multiSelect: false,
+    options: [
+      { label: "spec-id-1", description: "Feature Title (45% complete)" },
+      { label: "spec-id-2", description: "Another Feature (23% complete)" }
+    ]
+  }]
+)
+```
+
+After user selects a spec (or if only 1 active spec exists), use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
 
-**IMPORTANT**: When invoking sdd-next, mention the spec_id from the last_task data and the task_id if known.
+**IMPORTANT**: When invoking sdd-next, mention the spec_id from the last_task data (or selected spec) and the task_id if known.
 
 **Option 2: "Continue with next task"**
 ```bash
 I'll use the sdd-next skill to find and prepare the next task...
 ```
 
-Use the Skill tool to invoke sdd-next:
+**Before invoking sdd-next:**
+
+If `session_state.active_specs` has more than 1 spec, ask the user which spec they want to work on:
+- Use `AskUserQuestion` tool to present spec choices
+- Show up to 4 specs (sorted by completion % as provided by the helper)
+- Each option: `label` = spec_id, `description` = "title (XX% complete)"
+- Set `header` = "Spec" and `multiSelect` = false
+
+Example:
+```
+AskUserQuestion(
+  questions: [{
+    question: "Which specification would you like to work on?",
+    header: "Spec",
+    multiSelect: false,
+    options: [
+      { label: "spec-id-1", description: "Feature Title (45% complete)" },
+      { label: "spec-id-2", description: "Another Feature (23% complete)" }
+    ]
+  }]
+)
+```
+
+After user selects a spec (or if only 1 active spec exists), use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
@@ -214,16 +260,27 @@ No problem! Let me know if you need any help with your project.
 
 Exit gracefully without invoking any skills.
 
-### Phase 6: Handle Multiple Specs (if applicable)
+### Phase 6: Invoke sdd-next with Context
 
-If user chose "Continue with next task" and there are multiple specs:
+After the user has selected a spec (from Phase 5), invoke sdd-next with the appropriate context:
 
-**Show spec selection:**
-```
-Which specification would you like to work on?
-```
+**For "Resume last task":**
+- Mention both the spec_id and task_id from `session_state.last_task`
+- Example: "I'll help you resume work on task `task-2-1` from spec `user-auth-2025-10-15-001`..."
 
-Use AskUserQuestion to let them choose the spec, then invoke sdd-next with that context.
+**For "Continue with next task":**
+- Mention the spec_id that was selected (or the only active spec if there was only one)
+- Example: "I'll use sdd-next to find the next task in spec `api-refactor-2025-10-18-002`..."
+
+**For newly activated specs (from pending backlog):**
+- After activation succeeds, mention the spec_id
+- Example: "Spec activated! I'll now help you find the first task in `monitoring-2025-10-20-001`..."
+
+The sdd-next skill will use this context to:
+1. Load the correct specification
+2. Identify the appropriate task to work on
+3. Present the task plan for user approval
+4. Guide the implementation
 
 ## Important Notes
 

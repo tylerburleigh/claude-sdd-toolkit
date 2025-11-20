@@ -27,7 +27,7 @@ class SDDContextGatherer:
         if not self.query.load():
             raise RuntimeError(
                 f"Documentation not found at {self.query.docs_path}. "
-                "Run code-doc skill first."
+                "Run `sdd doc generate` first."
             )
 
     def get_task_context(self, task_description: str) -> Dict[str, any]:

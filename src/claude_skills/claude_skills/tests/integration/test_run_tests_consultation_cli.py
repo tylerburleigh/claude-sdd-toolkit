@@ -183,8 +183,16 @@ def test_consult_auto_selects_tool_in_dry_run(
     assert "Prompt length:" in result.stdout
 
 
-def test_consult_prompt_mode_respects_dry_run(mock_tool_env: tuple[dict[str, str], Path]) -> None:
+def test_consult_prompt_mode_respects_dry_run(mock_tool_env: tuple[dict[str, str], Path], monkeypatch: pytest.MonkeyPatch) -> None:
     env, cwd = mock_tool_env
+
+    # Monkeypatch get_global_config_path to use the mock config
+    mock_config_path = cwd / ".claude" / "ai_config.yaml"
+    monkeypatch.setattr(
+        "claude_skills.common.ai_config.get_global_config_path",
+        lambda: mock_config_path
+    )
+
     result = run_cli(
         "test",
         "consult",
@@ -301,7 +309,8 @@ def test_consult_with_test_code(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
 

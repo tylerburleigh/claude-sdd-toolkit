@@ -4,10 +4,10 @@ Tests for HTML parser.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
 
 try:
-    from claude_skills.code_doc.parsers.html import HTMLParser
+    from claude_skills.llm_doc_gen.analysis.parsers.html import HTMLParser
     HTML_PARSER_AVAILABLE = True
 except ImportError:
     HTML_PARSER_AVAILABLE = False

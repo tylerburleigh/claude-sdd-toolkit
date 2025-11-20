@@ -51,10 +51,10 @@ from claude_skills.cli.sdd.output_utils import (
     DOC_ANALYZE_ESSENTIAL,
     DOC_ANALYZE_STANDARD,
 )
-from claude_skills.code_doc.generator import DocumentationGenerator
-from claude_skills.code_doc.parsers import Language, create_parser_factory
-from claude_skills.code_doc.calculator import calculate_statistics
-from claude_skills.code_doc.detectors import (
+from claude_skills.llm_doc_gen.analysis.generator import DocumentationGenerator
+from claude_skills.llm_doc_gen.analysis.parsers import Language, create_parser_factory
+from claude_skills.llm_doc_gen.analysis.calculator import calculate_statistics
+from claude_skills.llm_doc_gen.analysis.detectors import (
     detect_framework,
     identify_key_files,
     detect_layers,
@@ -62,7 +62,7 @@ from claude_skills.code_doc.detectors import (
     extract_readme,
     create_context_summary,
 )
-from claude_skills.code_doc.ai_consultation import (
+from claude_skills.llm_doc_gen.analysis.ai_consultation import (
     get_available_tools,
     generate_architecture_docs,
     generate_ai_context_docs,

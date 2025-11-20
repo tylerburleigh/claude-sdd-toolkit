@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from claude_skills.code_doc import cli
+from claude_skills.llm_doc_gen.analysis import cli
 
 
 class _StubPrinter:

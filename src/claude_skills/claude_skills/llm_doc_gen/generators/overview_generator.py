@@ -23,6 +23,7 @@ class ProjectData:
     file_count: int
     total_loc: int
     parts: Optional[List[Dict[str, Any]]] = None  # For multi-part projects
+    analysis: Optional[Dict[str, Any]] = None  # Codebase analysis from DocumentationGenerator
 
 
 class OverviewGenerator:
@@ -119,6 +120,43 @@ class OverviewGenerator:
         for category, tech in project_data.tech_stack.items():
             prompt_parts.append(f"- **{category}:** {tech}")
         prompt_parts.append("")
+
+        # Codebase Structure Statistics (from analysis)
+        if project_data.analysis:
+            prompt_parts.append("## Codebase Structure Statistics")
+            prompt_parts.append("")
+            prompt_parts.append("The following statistics provide ground truth about the system's structure:")
+            prompt_parts.append("")
+
+            # Module/file statistics
+            modules = project_data.analysis.get("modules", [])
+            if modules:
+                prompt_parts.append(f"### Top Modules by Complexity ({len(modules)} total)")
+                prompt_parts.append("")
+                # Sort by complexity and show top 10
+                sorted_modules = sorted(
+                    modules,
+                    key=lambda m: m.get("complexity", {}).get("total", 0),
+                    reverse=True
+                )[:10]
+                for module in sorted_modules:
+                    name = module.get("name", "Unknown")
+                    complexity = module.get("complexity", {}).get("total", 0)
+                    func_count = len(module.get("functions", []))
+                    class_count = len(module.get("classes", []))
+                    prompt_parts.append(f"- **{name}**: Complexity {complexity}, {func_count} functions, {class_count} classes")
+                prompt_parts.append("")
+
+            # Language statistics
+            languages = project_data.analysis.get("statistics", {}).get("languages", {})
+            if languages:
+                prompt_parts.append("### Language Breakdown")
+                prompt_parts.append("")
+                for lang, stats in sorted(languages.items(), key=lambda x: x[1].get("lines", 0), reverse=True)[:5]:
+                    lines = stats.get("lines", 0)
+                    files = stats.get("files", 0)
+                    prompt_parts.append(f"- **{lang}**: {lines:,} lines across {files} files")
+                prompt_parts.append("")
 
         # Key files to analyze (limited to manage token budget)
         prompt_parts.append("## Key Files to Analyze")

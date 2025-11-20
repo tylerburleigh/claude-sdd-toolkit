@@ -6,6 +6,61 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.6.8] - 2025-11-20
+
+### Added
+
+**LLM-Doc-Gen Skill (PR #30):**
+- New `llm-doc-gen` skill for LLM-powered documentation generation
+  - [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with conditional execution and resumability
+  - Multi-language codebase analysis (Python, JavaScript/TypeScript, Go, HTML, CSS)
+  - AI-powered narrative documentation generation with contextual explanations
+  - 7-section sharded documentation structure with auto-linking
+  - Monorepo/monolith detection with project type classification
+  - Resumable workflows with atomic state persistence
+- **AI Integration:**
+  - Multi-agent LLM consultation framework with parallel analysis
+  - Sophisticated prompts for project overview, architecture, and component documentation
+  - Support for Claude, GPT, Gemini, and other LLM providers
+- **CLI Command**: `sdd llm-doc-gen` with `--resume` flag for workflow recovery
+- **Documentation**:
+  - Overview, Architecture, Components, Setup, Usage, Testing, and API sections
+  - Index generation with automatic cross-linking
+  - Project Vital Signs (LOC, file count, languages)
+- **Testing**: 60+ unit tests, integration tests, end-to-end workflows, fidelity reviews
+
+### Changed
+
+**LLM-Doc-Gen Architecture Enhancement (PR #31):**
+- Integrated code-doc functionality as `llm_doc_gen.analysis` module for better cohesion
+  - Moved `code_doc/` → `llm_doc_gen/analysis/` (14 files including parsers)
+  - Eliminated architectural duplication between standalone and integrated analysis
+  - Net reduction of 442 lines across 68 files
+- Enhanced documentation generation with real codebase statistics
+  - Overview prompts now include module complexity and language breakdown
+  - Index pages display "Project Vital Signs" (LOC, file count, primary languages)
+  - Statistics flow: DocumentationGenerator → ProjectData → enhanced output
+- Simplified default output directory from `./docs/llm-generated` to `./docs`
+
+**Code Organization (PR #31):**
+- Migrated all code-doc tests to `tests/unit/llm_doc_gen/analysis/` (14 test files)
+- Updated imports across CLI, parsers, and test fixtures
+- Removed standalone code-doc agent (`agents/code-doc.md`)
+- Removed standalone code-doc skill documentation (`skills/code-doc/SKILL.md`, 28KB)
+
+### Fixed
+- Parameter naming corrections in DocumentationGenerator integration (PR #31)
+  - Corrected `root_path` → `project_dir`
+  - Corrected `project_version` → `version`
+  - Fixed `save_json()` parameter passing
+
+### Notes
+- LLM-doc-gen provides narrative, contextual documentation vs code-doc's structural documentation
+- All functionality preserved - code-doc reorganized for better architecture
+- No breaking changes to CLI or skill interfaces
+- Analysis capabilities now first-class component of llm-doc-gen
+- Combined PRs add ~22k lines (llm-doc-gen) while removing ~2k lines (code-doc integration)
+
 ## [0.6.5] - 2025-11-19
 
 ### Added

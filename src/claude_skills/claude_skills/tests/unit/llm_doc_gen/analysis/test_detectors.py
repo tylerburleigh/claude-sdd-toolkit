@@ -8,7 +8,7 @@ and context summary generation.
 import pytest
 from pathlib import Path
 
-from claude_skills.code_doc.detectors import (
+from claude_skills.llm_doc_gen.analysis.detectors import (
     detect_framework,
     identify_key_files,
     detect_layers,

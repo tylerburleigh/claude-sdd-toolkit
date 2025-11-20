@@ -283,8 +283,8 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                         result["errors"].append(proc.stderr)
 
             elif agent == "code-doc":
-                # Execute code-doc skill
-                doc_command = ["code-doc"]
+                # Execute doc generation via unified CLI
+                doc_command = ["sdd", "doc"]
                 if command:
                     doc_command.extend(command.split())
 

@@ -4,8 +4,8 @@ Tests for Python parser.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
-from claude_skills.code_doc.parsers.python import PythonParser
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
 
 
 class TestPythonParser:
@@ -1116,7 +1116,7 @@ class TestSchemaEnhancements:
 
     def test_call_reference_creation(self):
         """Test creating CallReference objects."""
-        from claude_skills.code_doc.schema import CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import CallReference
 
         ref = CallReference(
             name="process_data",
@@ -1132,7 +1132,7 @@ class TestSchemaEnhancements:
 
     def test_call_reference_to_dict(self):
         """Test CallReference serialization to dictionary."""
-        from claude_skills.code_doc.schema import CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import CallReference
 
         ref = CallReference(
             name="helper",
@@ -1151,7 +1151,7 @@ class TestSchemaEnhancements:
 
     def test_enhance_function_with_callers(self, parser, tmp_path):
         """Test enhancing function with callers field."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1179,7 +1179,7 @@ def target_func():
 
     def test_enhance_function_with_calls(self, parser, tmp_path):
         """Test enhancing function with calls field."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1205,7 +1205,7 @@ def caller_func():
 
     def test_enhance_function_with_call_count(self, parser, tmp_path):
         """Test enhancing function with optional call_count field."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1224,7 +1224,7 @@ def popular_func():
 
     def test_enhance_function_without_call_count(self, parser, tmp_path):
         """Test that call_count is omitted when not provided."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1243,7 +1243,7 @@ def some_func():
 
     def test_enhance_function_preserves_base_fields(self, parser, tmp_path):
         """Test that enhancement preserves all base ParsedFunction fields."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1276,7 +1276,7 @@ def test_func(x: int, y: str = 'default') -> bool:
 
     def test_enhance_function_with_empty_cross_refs(self, parser, tmp_path):
         """Test enhancing function with empty callers/calls lists."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1297,7 +1297,7 @@ def isolated_func():
 
     def test_enhance_function_with_none_cross_refs(self, parser, tmp_path):
         """Test enhancing function with None for callers/calls."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1318,7 +1318,7 @@ def func():
 
     def test_enhance_function_complete_example(self, parser, tmp_path):
         """Test complete enhancement with callers, calls, and call_count."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1366,7 +1366,7 @@ def middleware_func():
 
     def test_schema_version_constants(self):
         """Test that schema version constants are defined."""
-        from claude_skills.code_doc import schema
+        from claude_skills.llm_doc_gen.analysis import schema
 
         assert hasattr(schema, 'SCHEMA_VERSION')
         assert hasattr(schema, 'SCHEMA_VERSION_MAJOR')
@@ -1378,7 +1378,7 @@ def middleware_func():
 
     def test_call_reference_different_types(self):
         """Test CallReference with different call types."""
-        from claude_skills.code_doc.schema import CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import CallReference
 
         # Function call
         func_call = CallReference("func", "app.py", 1, "function_call")
@@ -1394,7 +1394,7 @@ def middleware_func():
 
     def test_enhance_with_method_calls(self, parser, tmp_path):
         """Test enhancement distinguishes function calls from method calls."""
-        from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1426,7 +1426,7 @@ class TestClassSchemaEnhancements:
 
     def test_instantiation_reference_creation(self):
         """Test creating InstantiationReference objects."""
-        from claude_skills.code_doc.schema import InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import InstantiationReference
 
         ref = InstantiationReference(
             instantiator="create_user",
@@ -1442,7 +1442,7 @@ class TestClassSchemaEnhancements:
 
     def test_instantiation_reference_to_dict(self):
         """Test InstantiationReference serialization to dictionary."""
-        from claude_skills.code_doc.schema import InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import InstantiationReference
 
         ref = InstantiationReference(
             instantiator="main",
@@ -1460,7 +1460,7 @@ class TestClassSchemaEnhancements:
 
     def test_instantiation_reference_without_context(self):
         """Test InstantiationReference without optional context field."""
-        from claude_skills.code_doc.schema import InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import InstantiationReference
 
         ref = InstantiationReference(
             instantiator="factory",
@@ -1478,7 +1478,7 @@ class TestClassSchemaEnhancements:
 
     def test_import_reference_creation(self):
         """Test creating ImportReference objects."""
-        from claude_skills.code_doc.schema import ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import ImportReference
 
         ref = ImportReference(
             importer="app.py",
@@ -1494,7 +1494,7 @@ class TestClassSchemaEnhancements:
 
     def test_import_reference_to_dict(self):
         """Test ImportReference serialization to dictionary."""
-        from claude_skills.code_doc.schema import ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import ImportReference
 
         ref = ImportReference(
             importer="services.py",
@@ -1512,7 +1512,7 @@ class TestClassSchemaEnhancements:
 
     def test_import_reference_without_alias(self):
         """Test ImportReference without optional alias field."""
-        from claude_skills.code_doc.schema import ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import ImportReference
 
         ref = ImportReference(
             importer="main.py",
@@ -1530,7 +1530,7 @@ class TestClassSchemaEnhancements:
 
     def test_enhance_class_with_instantiated_by(self, parser, tmp_path):
         """Test enhancing class with instantiated_by field."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking, InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking, InstantiationReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1558,7 +1558,7 @@ class User:
 
     def test_enhance_class_with_imported_by(self, parser, tmp_path):
         """Test enhancing class with imported_by field."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking, ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking, ImportReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1586,7 +1586,7 @@ class Product:
 
     def test_enhance_class_with_instantiation_count(self, parser, tmp_path):
         """Test enhancing class with optional instantiation_count field."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1606,7 +1606,7 @@ class Config:
 
     def test_enhance_class_without_instantiation_count(self, parser, tmp_path):
         """Test that instantiation_count is omitted when not provided."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1625,7 +1625,7 @@ class Helper:
 
     def test_enhance_class_preserves_base_fields(self, parser, tmp_path):
         """Test that enhancement preserves all base ParsedClass fields."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking, InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking, InstantiationReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1658,7 +1658,7 @@ class Animal:
 
     def test_enhance_class_with_empty_tracking(self, parser, tmp_path):
         """Test enhancing class with empty instantiated_by/imported_by lists."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1679,7 +1679,7 @@ class Unused:
 
     def test_enhance_class_with_none_tracking(self, parser, tmp_path):
         """Test enhancing class with None for instantiated_by/imported_by."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1700,7 +1700,7 @@ class MyClass:
 
     def test_enhance_class_complete_example(self, parser, tmp_path):
         """Test complete enhancement with instantiated_by, imported_by, and instantiation_count."""
-        from claude_skills.code_doc.schema import enhance_class_with_usage_tracking, InstantiationReference, ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking, InstantiationReference, ImportReference
 
         py_file = tmp_path / "test.py"
         py_file.write_text("""
@@ -1751,7 +1751,7 @@ class Database:
 
     def test_different_import_types(self):
         """Test ImportReference with different import types."""
-        from claude_skills.code_doc.schema import ImportReference
+        from claude_skills.llm_doc_gen.analysis.schema import ImportReference
 
         # Direct import: import module
         direct = ImportReference("app.py", 1, "direct")
@@ -1767,7 +1767,7 @@ class Database:
 
     def test_instantiation_context_types(self):
         """Test InstantiationReference with different context types."""
-        from claude_skills.code_doc.schema import InstantiationReference
+        from claude_skills.llm_doc_gen.analysis.schema import InstantiationReference
 
         # Module-level instantiation
         module_inst = InstantiationReference("config_loader", "config.py", 20, "module")

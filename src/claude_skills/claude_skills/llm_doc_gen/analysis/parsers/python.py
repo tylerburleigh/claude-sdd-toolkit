@@ -415,7 +415,7 @@ class PythonParser(BaseParser):
         try:
             from ..calculator import calculate_complexity
         except ImportError:
-            from claude_skills.code_doc.calculator import calculate_complexity
+            from claude_skills.llm_doc_gen.analysis.calculator import calculate_complexity
 
         complexity = calculate_complexity(node)
 

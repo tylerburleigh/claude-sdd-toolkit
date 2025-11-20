@@ -815,7 +815,7 @@ def cmd_prepare_task(args, printer):
         context = f"Documentation is {doc_status}. Generating docs enables automated file suggestions and dependency analysis."
 
         if prompt_for_generation(skill_name="sdd-next", context=context):
-            # User accepted - suggest running code-doc skill
+            # User accepted - suggest running sdd doc generate
             print("\n✅ To generate documentation, run:")
             print("   sdd doc generate")
             print("\n📝 After generation completes, re-run prepare-task to use the new documentation.\n")

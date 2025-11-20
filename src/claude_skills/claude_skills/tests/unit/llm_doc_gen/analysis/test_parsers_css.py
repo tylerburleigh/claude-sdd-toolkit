@@ -4,10 +4,10 @@ Tests for CSS parser.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
 
 try:
-    from claude_skills.code_doc.parsers.css import CSSParser
+    from claude_skills.llm_doc_gen.analysis.parsers.css import CSSParser
     CSS_PARSER_AVAILABLE = True
 except ImportError:
     CSS_PARSER_AVAILABLE = False

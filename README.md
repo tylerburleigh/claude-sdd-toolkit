@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.6.5-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.6.8-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -15,7 +15,7 @@ The SDD Toolkit is a Python library and CLI toolkit for Spec-Driven Development 
 ### Components
 
 **For Claude Code:**
-- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `code-doc`, `doc-query`, `llm-doc-gen`, etc.)
+- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `doc-query`, `llm-doc-gen`, etc.)
 - Slash Commands - Quick actions (`/sdd-begin`, `/sdd-setup`)
 - Subagent System - Specialized agents for multi-step tasks
 
@@ -146,7 +146,7 @@ Each major capability is implemented as an independent skill module:
 - **sdd-update** - Track progress, update status, journal decisions
 
 **Supporting Skills:**
-- Documentation: `code-doc`, `doc-query`, `llm-doc-gen`
+- Documentation: `doc-query`, `llm-doc-gen`
 - Quality: `sdd-validate`, `sdd-fidelity-review`, `sdd-plan-review`, `sdd-modify`
 - Testing: `run-tests`
 - Utilities: `sdd-render`, `context-tracker`, `sdd-pr`
@@ -230,7 +230,6 @@ All specs are Git-trackable JSON files.
 
 | Skill | Purpose | Example Usage |
 |-------|---------|---------------|
-| **code-doc** | Generate codebase docs | "Document this codebase" |
 | **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" |
 | **context-tracker** | Monitor Claude usage | "Show my context consumption" |
 
@@ -342,7 +341,6 @@ Each task represents a single, focused change.
 Skills using multi-agent consultation:
 - `sdd-plan-review` - Spec quality assessment
 - `sdd-fidelity-review` - Implementation verification
-- `code-doc` - Architecture analysis
 
 **Process:**
 1. Parallel consultation of 2+ AI models (default: cursor-agent + gemini)
@@ -417,7 +415,7 @@ User Request → Main Claude → Task Tool → Subagent → Execute → Report B
 
 **Skills Using Subagents:**
 - `sdd-validate`, `sdd-plan-review`, `sdd-fidelity-review`
-- `sdd-update`, `run-tests`, `code-doc`, `sdd-modify`
+- `sdd-update`, `run-tests`, `sdd-modify`
 
 **Skills Running Directly:**
 - `sdd-plan`, `sdd-next`, `doc-query`
@@ -474,7 +472,7 @@ Claude: Resuming rate-limiting-001
 ```
 You: Document this codebase with AI enhancement
 
-Claude: [Uses code-doc skill]
+Claude: [Uses llm-doc-gen]
         Analyzing 183 files...
         Consulting cursor-agent and gemini...
 
@@ -679,14 +677,6 @@ run-tests:
     gemini: gemini-2.5-pro
     cursor-agent: composer-1
 
-code-doc:
-  tool_priority:
-    - gemini
-    - cursor-agent
-  models:
-    gemini: gemini-2.5-flash
-    cursor-agent: composer-1
-
 sdd-plan-review:
   tool_priority:
     - gemini
@@ -811,7 +801,7 @@ From architecture analysis:
 
 ```bash
 ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
-# Should show: sdd-plan, sdd-next, code-doc, etc.
+# Should show: sdd-plan, sdd-next, doc-query, llm-doc-gen, etc.
 ```
 
 ### CLI Commands Not Found
@@ -918,6 +908,10 @@ sdd render <spec>
 
 ## Version History
 
+**0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
+
+**0.6.5** - OpenCode AI provider with Node.js integration. Read-only security mode. Comprehensive provider documentation.
+
 **0.6.0** - Three-tier verbosity system (QUIET/NORMAL/VERBOSE) with ~50% output reduction. AI consultation enhancements with fallback and retry logic. Context optimization for sdd-next. Work mode configuration. High-level task operations.
 
 **0.5.1** - Provider abstraction with Gemini, Codex, Cursor Agent, Claude. Claude provider has read-only restrictions. 360s timeout for extended reasoning.
@@ -993,4 +987,4 @@ See [INSTALLATION.md](INSTALLATION.md) for setup.
 
 ---
 
-**Version**: 0.6.0 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.6.8 | **License**: MIT | **Author**: Tyler Burleigh

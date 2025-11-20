@@ -50,7 +50,8 @@ Note: The tool uses internal module names. User-facing commands are shown in par
 - `sdd-update` (→ `sdd update`) - Progress tracking and status updates
 - `doc-query` (→ `sdd doc find-*`) - Codebase documentation queries
 - `run-tests` (→ `sdd test run`) - Test discovery and execution
-- `code-doc` (→ `sdd doc generate`) - Documentation generation
+- `llm-doc-gen` (→ `sdd llm-doc-gen generate`) - LLM-based documentation
+- Documentation generation (formerly `code-doc`) now integrated via `sdd doc generate`
 - `sdd-integration` - SDD/doc-query integration
 
 ### Output Sections

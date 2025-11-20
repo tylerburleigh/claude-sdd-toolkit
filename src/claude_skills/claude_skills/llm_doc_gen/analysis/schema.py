@@ -25,7 +25,7 @@ To adopt v2.0 features:
 
 1. Function Cross-References:
    ```python
-   from claude_skills.code_doc.schema import enhance_function_with_cross_refs, CallReference
+   from claude_skills.llm_doc_gen.analysis.schema import enhance_function_with_cross_refs, CallReference
 
    # Existing v1.0 code works unchanged
    func_dict = parsed_function.to_dict()
@@ -37,7 +37,7 @@ To adopt v2.0 features:
 
 2. Class Usage Tracking:
    ```python
-   from claude_skills.code_doc.schema import enhance_class_with_usage_tracking, InstantiationReference
+   from claude_skills.llm_doc_gen.analysis.schema import enhance_class_with_usage_tracking, InstantiationReference
 
    # Existing v1.0 code works unchanged
    class_dict = parsed_class.to_dict()
@@ -75,7 +75,7 @@ v2.0 maintains full backward compatibility with v1.0:
 Example Usage:
 
     >>> # Parse a file
-    >>> from claude_skills.code_doc.parsers.python import PythonParser
+    >>> from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
     >>> parser = PythonParser(root_path, [])
     >>> result = parser.parse_file("example.py")
     >>>
@@ -84,7 +84,7 @@ Example Usage:
     >>> basic_schema = func.to_dict()
     >>>
     >>> # v2.0 usage (opt-in)
-    >>> from claude_skills.code_doc.schema import (
+    >>> from claude_skills.llm_doc_gen.analysis.schema import (
     ...     enhance_function_with_cross_refs,
     ...     CallReference
     ... )
@@ -175,7 +175,7 @@ def enhance_function_with_cross_refs(
         - call_count: optional integer (only if provided)
 
     Example:
-        >>> from claude_skills.code_doc.parsers.python import PythonParser
+        >>> from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
         >>> parser = PythonParser(root_path, [])
         >>> result = parser.parse_file("example.py")
         >>> func = result.functions[0]
@@ -323,7 +323,7 @@ def enhance_class_with_usage_tracking(
         - instantiation_count: optional integer (only if provided)
 
     Example:
-        >>> from claude_skills.code_doc.parsers.python import PythonParser
+        >>> from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
         >>> parser = PythonParser(root_path, [])
         >>> result = parser.parse_file("models.py")
         >>> cls = result.classes[0]

@@ -4,10 +4,10 @@ Tests for JavaScript/TypeScript parser.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
 
 try:
-    from claude_skills.code_doc.parsers.javascript import JavaScriptParser
+    from claude_skills.llm_doc_gen.analysis.parsers.javascript import JavaScriptParser
     JAVASCRIPT_PARSER_AVAILABLE = True
 except ImportError:
     JAVASCRIPT_PARSER_AVAILABLE = False

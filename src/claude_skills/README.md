@@ -143,7 +143,8 @@ claude_skills/
 ├── sdd_validate/       # Validation tools
 ├── doc_query/          # Documentation queries
 ├── run_tests/          # Test execution
-├── code_doc/           # Documentation generation
+├── llm_doc_gen/        # LLM documentation generation
+│   └── analysis/       # Code analysis module (formerly code_doc)
 └── tests/              # Test suite
 ```
 
@@ -165,7 +166,7 @@ This package is part of the larger Claude Skills ecosystem located at `~/.claude
 - Find next tasks (sdd next)
 - Track progress (sdd update)
 - Validate specs (sdd validate)
-- Generate and query documentation (code-doc, doc-query)
+- Generate and query documentation (llm-doc-gen, doc-query)
 - Run and debug tests (run-tests)
 
 See [../../README.md](../../README.md) for how everything works together.

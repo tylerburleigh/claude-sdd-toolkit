@@ -4,10 +4,10 @@ Tests for Go parser.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
 
 try:
-    from claude_skills.code_doc.parsers.go import GoParser
+    from claude_skills.llm_doc_gen.analysis.parsers.go import GoParser
     GO_PARSER_AVAILABLE = True
 except ImportError:
     GO_PARSER_AVAILABLE = False
