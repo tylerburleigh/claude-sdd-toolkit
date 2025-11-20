@@ -5,10 +5,97 @@ Provides StreamingJSONWriter that writes JSON incrementally to disk,
 avoiding large in-memory accumulation of parsed entities.
 """
 
+import gzip
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, TextIO
+from typing import Dict, Any, Optional, TextIO, Union
 from contextlib import contextmanager
+
+
+class CompressionWrapper:
+    """
+    Wrapper for optional gzip compression of output files.
+
+    Provides transparent compression by wrapping file handles with gzip.GzipFile
+    when compression is enabled, reducing disk space usage by 60-80% for JSON output.
+
+    Attributes:
+        file_path: Path to the output file
+        compress: Whether to enable gzip compression
+        file_handle: Underlying file handle (gzipped or plain)
+
+    Example:
+        >>> # With compression
+        >>> wrapper = CompressionWrapper('/path/to/output.json.gz', compress=True)
+        >>> handle = wrapper.open()
+        >>> handle.write('{"data": "compressed"}')
+        >>> wrapper.close()
+        >>>
+        >>> # Without compression
+        >>> wrapper = CompressionWrapper('/path/to/output.json', compress=False)
+        >>> handle = wrapper.open()
+        >>> handle.write('{"data": "plain"}')
+        >>> wrapper.close()
+    """
+
+    def __init__(self, file_path: Path, compress: bool = False):
+        """
+        Initialize compression wrapper.
+
+        Args:
+            file_path: Path to the output file
+            compress: Whether to enable gzip compression (default: False)
+        """
+        self.file_path = Path(file_path)
+        self.compress = compress
+        self.file_handle: Optional[Union[TextIO, gzip.GzipFile]] = None
+
+    def open(self, mode: str = 'wt') -> Union[TextIO, gzip.GzipFile]:
+        """
+        Open the file with optional compression.
+
+        Args:
+            mode: File open mode (default: 'wt' for text write)
+
+        Returns:
+            File handle (gzipped if compression enabled, plain otherwise)
+
+        Raises:
+            RuntimeError: If file is already open
+        """
+        if self.file_handle is not None:
+            raise RuntimeError("File already open")
+
+        if self.compress:
+            # Open with gzip compression
+            # Use text mode by default for JSON
+            if 't' not in mode and 'b' not in mode:
+                mode = mode + 't'
+            self.file_handle = gzip.open(self.file_path, mode=mode, encoding='utf-8')
+        else:
+            # Open as plain text file
+            self.file_handle = open(self.file_path, mode=mode, encoding='utf-8')
+
+        return self.file_handle
+
+    def close(self) -> None:
+        """
+        Close the file handle.
+
+        Safe to call multiple times.
+        """
+        if self.file_handle is not None:
+            self.file_handle.close()
+            self.file_handle = None
+
+    def __enter__(self):
+        """Context manager entry - opens file."""
+        return self.open()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - closes file."""
+        self.close()
+        return False
 
 
 class StreamingJSONWriter:
@@ -42,15 +129,18 @@ class StreamingJSONWriter:
         ...     writer.write_function({'name': 'my_func', ...})
     """
 
-    def __init__(self, output_path: Path):
+    def __init__(self, output_path: Path, compress: bool = False):
         """
         Initialize streaming JSON writer.
 
         Args:
             output_path: Path where JSON output will be written
+            compress: Whether to enable gzip compression (default: False)
         """
         self.output_path = Path(output_path)
-        self.file_handle: Optional[TextIO] = None
+        self.compress = compress
+        self.file_handle: Optional[Union[TextIO, gzip.GzipFile]] = None
+        self._compression_wrapper: Optional[CompressionWrapper] = None
         self._first_module = True
         self._first_class = True
         self._first_function = True
@@ -61,7 +151,13 @@ class StreamingJSONWriter:
 
     def __enter__(self):
         """Context manager entry - opens file and starts JSON structure."""
-        self.file_handle = open(self.output_path, 'w', encoding='utf-8')
+        # Use CompressionWrapper if compression enabled
+        if self.compress:
+            self._compression_wrapper = CompressionWrapper(self.output_path, compress=True)
+            self.file_handle = self._compression_wrapper.open('wt')
+        else:
+            self.file_handle = open(self.output_path, 'w', encoding='utf-8')
+
         # Start root JSON object
         self.file_handle.write('{\n')
         return self
@@ -71,7 +167,11 @@ class StreamingJSONWriter:
         if not self._finalized:
             self.finalize()
         if self.file_handle:
-            self.file_handle.close()
+            # Use CompressionWrapper's close if available
+            if self._compression_wrapper:
+                self._compression_wrapper.close()
+            else:
+                self.file_handle.close()
             self.file_handle = None
         return False
 
