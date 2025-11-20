@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import shutil
 
-from parsers import (
+from .parsers import (
     DeepScanParser,
     ScanConfig,
     create_deep_scanner,

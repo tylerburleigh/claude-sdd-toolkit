@@ -8,7 +8,7 @@ import tempfile
 import shutil
 import json
 
-from detectors import (
+from .detectors import (
     ProjectStructureDetector,
     ProjectStructure,
     ProjectType,
