@@ -9,6 +9,7 @@ import sqlite3
 import hashlib
 import json
 import pickle
+import gzip
 from pathlib import Path
 from typing import Optional, Any, Dict
 from contextlib import contextmanager
@@ -146,8 +147,10 @@ class PersistentCache:
                 result_row = cursor.fetchone()
 
                 if result_row:
-                    # Deserialize and return cached result
-                    return pickle.loads(result_row[0])
+                    # Decompress and deserialize cached result
+                    compressed_data = result_row[0]
+                    decompressed_data = gzip.decompress(compressed_data)
+                    return pickle.loads(decompressed_data)
 
             # If mtime/size changed, verify with hash
             current_hash = self._compute_file_hash(file_path)
@@ -172,7 +175,10 @@ class PersistentCache:
                 result_row = cursor.fetchone()
 
                 if result_row:
-                    return pickle.loads(result_row[0])
+                    # Decompress and deserialize cached result
+                    compressed_data = result_row[0]
+                    decompressed_data = gzip.decompress(compressed_data)
+                    return pickle.loads(decompressed_data)
 
             return None
 
@@ -191,8 +197,9 @@ class PersistentCache:
         stat = file_path.stat()
         file_hash = self._compute_file_hash(file_path)
 
-        # Serialize result
-        result_blob = pickle.dumps(result)
+        # Serialize and compress result
+        pickled_data = pickle.dumps(result)
+        result_blob = gzip.compress(pickled_data)
 
         with self._get_connection() as conn:
             cursor = conn.cursor()
