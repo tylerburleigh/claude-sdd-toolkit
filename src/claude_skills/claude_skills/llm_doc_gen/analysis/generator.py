@@ -360,7 +360,9 @@ class DocumentationGenerator:
         output_path: Path,
         analysis: Dict[str, Any],
         statistics: Dict[str, Any],
-        verbose: bool = False
+        verbose: bool = False,
+        streaming: bool = False,
+        compress: bool = False
     ):
         """
         Generate and save JSON documentation.
@@ -370,15 +372,27 @@ class DocumentationGenerator:
             analysis: Analyzed codebase data
             statistics: Calculated statistics
             verbose: Enable verbose output
+            streaming: Use streaming generation for memory efficiency
+            compress: Use gzip compression for output
         """
         if verbose:
             print("📋 Generating JSON documentation...")
 
-        json_doc = self.json_generator.generate(analysis, statistics)
-
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(json_doc, f, indent=2)
+
+        if streaming:
+            # Use streaming generation (writes directly to file)
+            self.json_generator.generate_streaming(
+                output_path,
+                analysis,
+                statistics,
+                compress=compress
+            )
+        else:
+            # Use in-memory generation
+            json_doc = self.json_generator.generate(analysis, statistics)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(json_doc, f, indent=2)
 
         if verbose:
             print(f"✅ JSON: {output_path}")
