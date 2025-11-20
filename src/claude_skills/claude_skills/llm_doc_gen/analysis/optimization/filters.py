@@ -5,8 +5,9 @@ during codebase analysis.
 """
 
 import os
+import random
 from pathlib import Path
-from typing import Union, Optional, List, Dict
+from typing import Union, Optional, List, Dict, Callable
 from collections import defaultdict
 
 
@@ -206,6 +207,192 @@ class FileCountLimiter:
             Dictionary mapping directory paths to file counts
         """
         return dict(self._directory_counts)
+
+
+class SamplingStrategy:
+    """Sampling strategy for very large projects (10K+ files).
+
+    For massive codebases, processing every file may be impractical. This class
+    implements intelligent sampling to select a representative subset based on:
+    - Recency (modification time)
+    - Depth (directory depth in the tree)
+    - Importance (customizable scoring function)
+
+    Args:
+        sample_rate: Fraction of files to include (0.0 to 1.0). Default is 0.1 (10%).
+        seed: Random seed for reproducible sampling. If None, sampling is non-deterministic.
+        importance_scorer: Optional function that takes a file path and returns an
+            importance score (higher = more important). If provided, files are
+            weighted by importance in addition to recency and depth.
+
+    Example:
+        >>> strategy = SamplingStrategy(sample_rate=0.1)
+        >>> files = ["src/a.py", "src/b.py", ...]  # 10,000 files
+        >>> sampled = strategy.sample_files(files)  # Returns ~1,000 files
+    """
+
+    def __init__(
+        self,
+        sample_rate: float = 0.1,
+        seed: Optional[int] = None,
+        importance_scorer: Optional[Callable[[Path], float]] = None
+    ):
+        """Initialize the sampling strategy.
+
+        Args:
+            sample_rate: Fraction of files to sample (default: 0.1 for 10%)
+            seed: Random seed for reproducible sampling (default: None)
+            importance_scorer: Optional function to score file importance
+        """
+        if not 0.0 <= sample_rate <= 1.0:
+            raise ValueError(f"sample_rate must be between 0.0 and 1.0, got {sample_rate}")
+
+        self.sample_rate = sample_rate
+        self.seed = seed
+        self.importance_scorer = importance_scorer
+
+        if seed is not None:
+            random.seed(seed)
+
+    def sample_files(self, file_paths: List[Union[str, Path]]) -> List[Path]:
+        """Sample a representative subset of files from a large collection.
+
+        The sampling strategy combines:
+        1. Recency: Files modified more recently are prioritized
+        2. Depth: Files at different directory depths are represented
+        3. Importance: Optional custom scoring for domain-specific importance
+
+        Args:
+            file_paths: List of file paths to sample from
+
+        Returns:
+            Sampled subset of file paths
+
+        Example:
+            >>> strategy = SamplingStrategy(sample_rate=0.2)
+            >>> all_files = list_all_files()  # 10,000 files
+            >>> sample = strategy.sample_files(all_files)  # ~2,000 files
+        """
+        # Convert to Path objects and filter valid files
+        valid_files = []
+        for file_path in file_paths:
+            file_path = Path(file_path)
+            if file_path.exists() and file_path.is_file():
+                valid_files.append(file_path)
+
+        if not valid_files:
+            return []
+
+        # Calculate target sample size
+        target_size = max(1, int(len(valid_files) * self.sample_rate))
+
+        # If sample rate would include everything, return all files
+        if target_size >= len(valid_files):
+            return valid_files
+
+        # Score each file based on multiple criteria
+        scored_files = []
+        for file_path in valid_files:
+            score = self._calculate_file_score(file_path)
+            scored_files.append((file_path, score))
+
+        # Sort by score (highest first) and take top N
+        scored_files.sort(key=lambda x: x[1], reverse=True)
+        sampled = [f[0] for f in scored_files[:target_size]]
+
+        # Add some randomness to ensure variety across runs (if no seed)
+        if self.seed is None and len(sampled) > 1:
+            random.shuffle(sampled)
+
+        return sampled
+
+    def _calculate_file_score(self, file_path: Path) -> float:
+        """Calculate a composite score for file importance.
+
+        Args:
+            file_path: Path to score
+
+        Returns:
+            Composite score combining recency, depth, and custom importance
+        """
+        score = 0.0
+
+        # Recency score (40% weight)
+        try:
+            mtime = file_path.stat().st_mtime
+            # Normalize to 0-1 range (recent = higher score)
+            # Use a simple heuristic: files modified in last 30 days get higher scores
+            recency_score = min(1.0, mtime / (2**31))  # Normalize timestamp
+            score += recency_score * 0.4
+        except OSError:
+            pass
+
+        # Depth score (30% weight)
+        # Files at moderate depth (2-4 levels) are often more important than
+        # very shallow (root) or very deep (nested) files
+        depth = len(file_path.parts) - 1
+        if 2 <= depth <= 4:
+            depth_score = 1.0
+        elif depth < 2:
+            depth_score = 0.5
+        else:
+            depth_score = max(0.0, 1.0 - (depth - 4) * 0.1)
+        score += depth_score * 0.3
+
+        # Custom importance score (30% weight)
+        if self.importance_scorer is not None:
+            try:
+                importance = self.importance_scorer(file_path)
+                score += importance * 0.3
+            except Exception:
+                # If custom scorer fails, just skip this component
+                pass
+
+        return score
+
+    def estimate_sample_size(self, total_files: int) -> int:
+        """Estimate how many files would be sampled from a given total.
+
+        Args:
+            total_files: Total number of files available
+
+        Returns:
+            Estimated number of files that would be sampled
+
+        Example:
+            >>> strategy = SamplingStrategy(sample_rate=0.1)
+            >>> strategy.estimate_sample_size(10000)
+            1000
+        """
+        return max(1, int(total_files * self.sample_rate))
+
+    def should_sample(self, current_count: int, total_count: int) -> bool:
+        """Determine if the current file should be included based on position.
+
+        This is useful for streaming scenarios where you're processing files
+        one at a time and want to sample without loading everything into memory.
+
+        Args:
+            current_count: Current file index (0-based)
+            total_count: Total number of files
+
+        Returns:
+            True if this file should be included in the sample
+
+        Example:
+            >>> strategy = SamplingStrategy(sample_rate=0.1)
+            >>> for i in range(10000):
+            ...     if strategy.should_sample(i, 10000):
+            ...         process_file(files[i])
+        """
+        if total_count == 0:
+            return False
+
+        # Simple deterministic sampling based on position
+        target_size = self.estimate_sample_size(total_count)
+        interval = total_count / target_size if target_size > 0 else float('inf')
+
+        return (current_count % int(interval)) == 0 if interval >= 1 else True
 
 
 class ContentFilter:

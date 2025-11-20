@@ -9,7 +9,13 @@ token usage during codebase analysis and documentation generation:
 - cache: Caching mechanisms for AST parsing and analysis results
 """
 
-from .filters import ContentFilter, should_process_file, FileSizeFilter, FileCountLimiter
+from .filters import (
+    ContentFilter,
+    should_process_file,
+    FileSizeFilter,
+    FileCountLimiter,
+    SamplingStrategy,
+)
 from .parallel import ParallelProcessor, process_files_parallel
 from .streaming import StreamingProcessor, process_in_chunks
 from .cache import CacheManager, get_cached_result, set_cached_result
@@ -20,6 +26,7 @@ __all__ = [
     "should_process_file",
     "FileSizeFilter",
     "FileCountLimiter",
+    "SamplingStrategy",
     # Parallel processing
     "ParallelProcessor",
     "process_files_parallel",
