@@ -32,7 +32,7 @@ class DynamicPattern(Enum):
     GETATTR_SETATTR = "getattr_setattr"
 
 
-@dataclass
+@dataclass(slots=True)
 class CallSite:
     """Represents a location where a function/method is called."""
     caller: str  # Name of the calling function/method
@@ -44,7 +44,7 @@ class CallSite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
+@dataclass(slots=True)
 class InstantiationSite:
     """Represents a location where a class is instantiated."""
     class_name: str  # Name of the instantiated class
@@ -54,7 +54,7 @@ class InstantiationSite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
+@dataclass(slots=True)
 class DynamicPatternWarning:
     """Warning about a dynamic pattern that may affect accuracy."""
     pattern_type: DynamicPattern
