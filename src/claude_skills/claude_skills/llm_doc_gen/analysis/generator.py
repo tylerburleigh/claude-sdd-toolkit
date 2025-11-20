@@ -21,6 +21,7 @@ try:
         SCHEMA_VERSION
     )
     from .ast_analysis import CrossReferenceGraph
+    from .optimization.filters import FilterProfile, create_filter_chain
 except ImportError:
     from parsers import create_parser_factory, Language, ParseResult
     from calculator import calculate_statistics
@@ -34,6 +35,7 @@ except ImportError:
         SCHEMA_VERSION
     )
     from ast_analysis import CrossReferenceGraph
+    from optimization.filters import FilterProfile, create_filter_chain
 
 
 class DocumentationGenerator:
@@ -49,7 +51,8 @@ class DocumentationGenerator:
         project_name: str,
         version: str = "1.0.0",
         exclude_patterns: Optional[list] = None,
-        languages: Optional[List[Language]] = None
+        languages: Optional[List[Language]] = None,
+        filter_profile: Optional[FilterProfile] = None
     ):
         """
         Initialize the documentation generator.
@@ -60,18 +63,29 @@ class DocumentationGenerator:
             version: Project version
             exclude_patterns: List of patterns to exclude from analysis
             languages: Specific languages to parse (None = auto-detect all)
+            filter_profile: Optional filter profile (FAST, BALANCED, COMPLETE).
+                If None, no additional filtering is applied (backward compatible).
+                Use FilterProfile.FAST for large codebases, FilterProfile.BALANCED
+                for typical projects, or FilterProfile.COMPLETE for comprehensive analysis.
         """
         self.project_dir = project_dir.resolve()
         self.project_name = project_name
         self.version = version
         self.exclude_patterns = exclude_patterns or []
         self.languages = languages
+        self.filter_profile = filter_profile
+
+        # Create filter chain if profile is specified
+        filter_chain = None
+        if filter_profile is not None:
+            filter_chain = create_filter_chain(filter_profile)
 
         # Initialize components
         self.parser_factory = create_parser_factory(
             project_dir,
             self.exclude_patterns,
-            languages
+            languages,
+            filter_chain
         )
         self.md_generator = MarkdownGenerator(project_name, version)
         self.json_generator = JSONGenerator(project_name, version)

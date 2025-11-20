@@ -4,9 +4,9 @@ This package provides optimization utilities to improve performance and reduce
 token usage during codebase analysis and documentation generation:
 
 - filters: Content filtering to exclude irrelevant files/patterns
-- parallel: Parallel processing for file analysis
-- streaming: Streaming/chunked processing for large codebases
-- cache: Caching mechanisms for AST parsing and analysis results
+- parallel: Parallel processing for file analysis (planned)
+- streaming: Streaming/chunked processing for large codebases (planned)
+- cache: Caching mechanisms for AST parsing and analysis results (planned)
 """
 
 from .filters import (
@@ -18,9 +18,6 @@ from .filters import (
     FilterProfile,
     create_filter_chain,
 )
-from .parallel import ParallelProcessor, process_files_parallel
-from .streaming import StreamingProcessor, process_in_chunks
-from .cache import CacheManager, get_cached_result, set_cached_result
 
 __all__ = [
     # Filters
@@ -31,14 +28,14 @@ __all__ = [
     "SamplingStrategy",
     "FilterProfile",
     "create_filter_chain",
-    # Parallel processing
-    "ParallelProcessor",
-    "process_files_parallel",
-    # Streaming
-    "StreamingProcessor",
-    "process_in_chunks",
-    # Cache
-    "CacheManager",
-    "get_cached_result",
-    "set_cached_result",
+    # Parallel processing (planned)
+    # "ParallelProcessor",
+    # "process_files_parallel",
+    # Streaming (planned)
+    # "StreamingProcessor",
+    # "process_in_chunks",
+    # Cache (planned)
+    # "CacheManager",
+    # "get_cached_result",
+    # "set_cached_result",
 ]
