@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List
 try:
     from .parsers import create_parser_factory, Language, ParseResult
     from .calculator import calculate_statistics
-    from .formatter import MarkdownGenerator, JSONGenerator
+    from .formatter import MarkdownGenerator, JSONGenerator, SummaryGenerator
     from .schema import (
         enhance_function_with_cross_refs,
         enhance_class_with_usage_tracking,
@@ -27,7 +27,7 @@ try:
 except ImportError:
     from parsers import create_parser_factory, Language, ParseResult
     from calculator import calculate_statistics
-    from formatter import MarkdownGenerator, JSONGenerator
+    from formatter import MarkdownGenerator, JSONGenerator, SummaryGenerator
     from schema import (
         enhance_function_with_cross_refs,
         enhance_class_with_usage_tracking,

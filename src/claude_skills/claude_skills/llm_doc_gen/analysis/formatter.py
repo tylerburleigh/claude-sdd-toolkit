@@ -322,3 +322,120 @@ class JSONGenerator:
             output_path=output_file,
             compress=compress
         )
+
+
+class SummaryGenerator:
+    """
+    Generates lightweight codebase summary JSON with signatures only.
+
+    This generator produces a minimal summary suitable for quick reference
+    and IDE integration. It includes function/class signatures and basic
+    metadata but omits docstrings, function bodies, and detailed analysis
+    to keep the output size small.
+    """
+
+    def __init__(self, project_name: str, version: str):
+        self.project_name = project_name
+        self.version = version
+
+    def generate(
+        self,
+        analysis: Dict[str, Any],
+        statistics: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Generate lightweight summary JSON with signatures only.
+
+        Args:
+            analysis: Analyzed codebase data
+            statistics: Code statistics
+
+        Returns:
+            Dict containing minimal summary documentation
+        """
+        # Detect languages present
+        languages = set()
+        for module in analysis.get('modules', []):
+            lang = module.get('language', 'unknown')
+            if lang != 'unknown':
+                languages.add(lang)
+
+        # Prepare metadata
+        metadata = {
+            "project_name": self.project_name,
+            "version": self.version,
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "languages": sorted(list(languages)) if languages else ["unknown"],
+            "schema_version": SCHEMA_VERSION,
+            "summary": True  # Flag to indicate this is a summary format
+        }
+
+        # Generate lightweight summaries
+        return {
+            "metadata": metadata,
+            "statistics": self._summarize_statistics(statistics),
+            "modules": self._summarize_modules(analysis.get('modules', [])),
+            "classes": self._summarize_classes(analysis.get('classes', [])),
+            "functions": self._summarize_functions(analysis.get('functions', []))
+        }
+
+    def _summarize_statistics(self, statistics: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract only essential statistics."""
+        return {
+            "total_files": statistics.get("total_files", 0),
+            "total_classes": statistics.get("total_classes", 0),
+            "total_functions": statistics.get("total_functions", 0),
+            "total_lines": statistics.get("total_lines", 0)
+        }
+
+    def _summarize_modules(self, modules: List[Dict]) -> List[Dict]:
+        """Generate lightweight module summaries."""
+        summaries = []
+        for module in modules:
+            summaries.append({
+                "path": module.get("path"),
+                "language": module.get("language"),
+                "lines": module.get("lines", 0),
+                "classes": len(module.get("classes", [])),
+                "functions": len(module.get("functions", []))
+            })
+        return summaries
+
+    def _summarize_classes(self, classes: List[Dict]) -> List[Dict]:
+        """Generate lightweight class summaries with signatures only."""
+        summaries = []
+        for cls in classes:
+            summary = {
+                "name": cls.get("name"),
+                "file": cls.get("file"),
+                "line": cls.get("line"),
+                "bases": cls.get("bases", []),
+                "methods": []
+            }
+
+            # Include only method signatures (no docstrings or bodies)
+            for method in cls.get("methods", []):
+                summary["methods"].append({
+                    "name": method.get("name"),
+                    "signature": method.get("signature"),
+                    "line": method.get("line"),
+                    "parameters": method.get("parameters", []),
+                    "return_type": method.get("return_type")
+                })
+
+            summaries.append(summary)
+        return summaries
+
+    def _summarize_functions(self, functions: List[Dict]) -> List[Dict]:
+        """Generate lightweight function summaries with signatures only."""
+        summaries = []
+        for func in functions:
+            summaries.append({
+                "name": func.get("name"),
+                "signature": func.get("signature"),
+                "file": func.get("file"),
+                "line": func.get("line"),
+                "parameters": func.get("parameters", []),
+                "return_type": func.get("return_type")
+            })
+        return summaries
