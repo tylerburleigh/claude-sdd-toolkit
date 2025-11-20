@@ -54,6 +54,7 @@ from claude_skills.cli.sdd.output_utils import (
 from claude_skills.llm_doc_gen.analysis.generator import DocumentationGenerator
 from claude_skills.llm_doc_gen.analysis.parsers import Language, create_parser_factory
 from claude_skills.llm_doc_gen.analysis.calculator import calculate_statistics
+from claude_skills.llm_doc_gen.analysis.optimization.filters import FilterProfile, create_filter_chain
 from claude_skills.llm_doc_gen.analysis.detectors import (
     detect_framework,
     identify_key_files,
@@ -204,12 +205,18 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             printer.detail("Continuing with all languages...")
             languages = None
 
+    # Handle filter profile and custom overrides
+    filter_profile = None
+    if getattr(args, 'filter_mode', None):
+        filter_profile = FilterProfile(args.filter_mode)
+
     generator = DocumentationGenerator(
         project_dir,
         project_name,
         args.version,
         exclude_patterns,
         languages,
+        filter_profile,
     )
 
     try:
@@ -580,6 +587,17 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     generate_parser.add_argument('--version', default='1.0.0', help='Project version (default: 1.0.0)')
     generate_parser.add_argument('--language', help='Filter by language (python, javascript, typescript, go, html, css)')
     generate_parser.add_argument('--exclude', action='append', default=[], help='Exclude pattern (can be used multiple times)')
+
+    # Filter options for large codebases
+    generate_parser.add_argument(
+        '--filter-mode',
+        choices=['fast', 'balanced', 'complete'],
+        help='Filter profile: fast (aggressive filtering for large codebases), balanced (moderate filtering), complete (minimal filtering)'
+    )
+    generate_parser.add_argument('--max-file-size', type=int, help='Maximum file size in bytes (overrides filter-mode default)')
+    generate_parser.add_argument('--max-files-per-dir', type=int, help='Maximum files per directory (overrides filter-mode default)')
+    generate_parser.add_argument('--sample-rate', type=float, help='Sampling rate 0.0-1.0 for very large projects (overrides filter-mode default)')
+
     generate_parser.set_defaults(func=cmd_generate)
 
     validate_parser = subparsers.add_parser(

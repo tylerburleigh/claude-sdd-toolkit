@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T18:56:27.682364Z",
+  "last_updated": "2025-11-20T18:58:31.484865Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 11,
+    "progress_percentage": 13,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -57,7 +57,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Reduce processing scope through intelligent file selection and configurable limits",
         "risk_level": "low",
@@ -85,7 +85,7 @@
         "task-1-6"
       ],
       "total_tasks": 11,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -336,7 +336,7 @@
     "task-1-5": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-5-1"
@@ -349,7 +349,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
         "task_category": "implementation",
@@ -359,13 +359,19 @@
     "task-1-5-1": {
       "type": "subtask",
       "title": "Add CLI flags for filtering options",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add --filter-mode (fast/balanced/complete), --max-file-size, --max-files-per-dir, --sample-rate flags to generate subcommand"
+        "details": "Add --filter-mode (fast/balanced/complete), --max-file-size, --max-files-per-dir, --sample-rate flags to generate subcommand",
+        "started_at": "2025-11-20T18:56:55.679141Z",
+        "status_note": "Adding CLI flags for filtering options",
+        "completed_at": "2025-11-20T18:58:31.477127Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-20T18:58:31.482635Z"
       }
     },
     "task-1-6": {
@@ -2190,6 +2196,15 @@
       "content": "Added filter_profile parameter to DocumentationGenerator.__init__() at lines 48-91. Parameter accepts Optional[FilterProfile] (FAST, BALANCED, or COMPLETE), defaulting to None for backward compatibility. When filter_profile is provided, creates filter_chain using create_filter_chain() and passes it to create_parser_factory(). Added imports for FilterProfile and create_filter_chain from optimization.filters module in both try and except blocks. Updated docstring with detailed guidance on when to use each profile. Changes are fully backward compatible - existing code without filter_profile continues to work unchanged. Fixed optimization/__init__.py to only import filters module since parallel, streaming, and cache modules don't exist yet.",
       "metadata": {},
       "task_id": "task-1-4-1"
+    },
+    {
+      "timestamp": "2025-11-20T18:58:31.482626Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add CLI flags for filtering options",
+      "author": "claude-code",
+      "content": "Added CLI flags to cli.py for filtering options. Added --filter-mode flag with choices fast/balanced/complete. Added --max-file-size (int) to override default file size limit. Added --max-files-per-dir (int) to override files per directory limit. Added --sample-rate (float, 0.0-1.0) to override sampling rate for very large projects. Added import for FilterProfile and create_filter_chain at line 57. Modified cmd_generate function (lines 208-220) to parse filter_mode argument and create FilterProfile enum, then pass it to DocumentationGenerator. All flags are optional and fully backward compatible.",
+      "metadata": {},
+      "task_id": "task-1-5-1"
     }
   ]
 }
