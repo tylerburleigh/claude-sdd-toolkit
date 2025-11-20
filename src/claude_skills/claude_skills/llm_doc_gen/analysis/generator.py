@@ -89,6 +89,9 @@ class DocumentationGenerator:
         # Parse codebase using ParserFactory
         parse_result = self.parser_factory.parse_all(verbose=verbose)
 
+        # Resolve cross-references
+        self._resolve_references(parse_result)
+
         # Convert ParseResult to dictionary format for backward compatibility
         analysis = self._convert_parse_result(parse_result)
 
@@ -102,6 +105,79 @@ class DocumentationGenerator:
             'analysis': analysis,
             'statistics': statistics
         }
+
+    def _resolve_references(self, parse_result: ParseResult):
+        """
+        Resolve unknown file references in the cross-reference graph.
+        Uses name matching, context, and imports to resolve call targets.
+
+        Args:
+            parse_result: The parse result containing functions, modules, and graph
+        """
+        if not parse_result.cross_references:
+            return
+
+        graph = parse_result.cross_references
+
+        # 1. Build lookup maps
+        # Function name -> list of files defining it
+        function_map = {}
+        for func in parse_result.functions:
+            if func.name not in function_map:
+                function_map[func.name] = []
+            function_map[func.name].append(func.file)
+
+        # Class name -> list of files defining it
+        class_map = {}
+        for cls in parse_result.classes:
+            if cls.name not in class_map:
+                class_map[cls.name] = []
+            class_map[cls.name].append(cls.file)
+
+        # 2. Resolve function calls
+        for call in graph.calls:
+            if call.callee_file:
+                continue
+
+            # Get candidates (functions or classes/constructors)
+            candidates = function_map.get(call.callee, [])
+            if not candidates:
+                candidates = class_map.get(call.callee, [])
+
+            if not candidates:
+                continue
+
+            # Strategy A: Exact match
+            if len(candidates) == 1:
+                call.callee_file = candidates[0]
+                continue
+
+            # Strategy B: Same file (local call)
+            if call.caller_file in candidates:
+                call.callee_file = call.caller_file
+                continue
+
+            # Strategy C: Check imports (simplified)
+            # Get imports for the caller file
+            imports = graph.imports.get(call.caller_file, set())
+
+            # Check if any candidate file stem matches an imported name
+            # This is a heuristic and may not handle aliasing or full paths correctly
+            found_import = False
+            for candidate_file in candidates:
+                # Extract simple name from file path (e.g., "utils.py" -> "utils")
+                candidate_name = Path(candidate_file).stem
+                
+                # Check if this name appears in imports (either as exact match or suffix)
+                # e.g., import utils -> matches utils
+                # e.g., from common import utils -> matches utils
+                for imp in imports:
+                    if imp == candidate_name or imp.endswith(f".{candidate_name}"):
+                        call.callee_file = candidate_file
+                        found_import = True
+                        break
+                if found_import:
+                    break
 
     def _convert_parse_result(self, result: ParseResult) -> Dict[str, Any]:
         """
