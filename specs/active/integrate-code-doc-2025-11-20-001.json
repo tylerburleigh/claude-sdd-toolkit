@@ -1,7 +1,7 @@
 {
   "spec_id": "integrate-code-doc-2025-11-20-001",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-20T14:59:39.784355Z",
+  "last_updated": "2025-11-20T15:00:58.197252Z",
   "title": "Integrate Code-Doc into LLM-Doc-Gen",
   "metadata": {
     "title": "Integrate Code-Doc into LLM-Doc-Gen",
@@ -39,7 +39,7 @@
         "modified_by": "sdd-cli"
       }
     ],
-    "progress_percentage": 44,
+    "progress_percentage": 55,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -55,7 +55,7 @@
         "phase-3"
       ],
       "total_tasks": 9,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Consolidate documentation tools."
       },
@@ -80,7 +80,7 @@
         "task-1-5"
       ],
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Connect the two python modules."
       },
@@ -215,17 +215,23 @@
       "id": "task-1-4",
       "type": "task",
       "title": "Update CLI Output Defaults",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Streamline output location.",
         "file_path": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
         "changes": "Change default `output-dir` from `./docs/llm-generated` to `./docs`.",
         "details": "Update the argparse default value for the `--output-dir` argument so that generated documentation sits at the top level of the documentation folder by default.",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-20T15:00:07.296096Z",
+        "status_note": "Updating default output directory from ./docs/llm-generated to ./docs",
+        "completed_at": "2025-11-20T15:00:58.193299Z",
+        "needs_journaling": false,
+        "actual_hours": 0.014,
+        "journaled_at": "2025-11-20T15:00:58.195925Z"
       },
       "dependencies": {
         "blocks": [],
@@ -397,6 +403,15 @@
       "content": "Successfully enhanced index page with project vital signs statistics.\n\nAccomplishments:\n- Extended IndexData dataclass with three new optional fields:\n  - file_count: Total files in project\n  - total_loc: Total lines of code\n  - primary_languages: List of top languages by usage\n- Updated _generate_header method in IndexGenerator to add \"Project Vital Signs\" section\n- Implemented markdown table format displaying:\n  - Lines of Code (formatted with thousands separator)\n  - Total Files (formatted with thousands separator)\n  - Top Languages (comma-separated list, limited to top 5)\n- Updated create_index_data_from_project in main.py to pass statistics from ProjectData to IndexData\n- Statistics flow: DocumentationGenerator \u2192 ProjectData \u2192 IndexData \u2192 index.md\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py (IndexData dataclass, _generate_header method)\n- src/claude_skills/claude_skills/llm_doc_gen/main.py (create_index_data_from_project function)\n\nTest verification:\n- Import test passed for updated modules\n\nImplementation details:\n- Project Vital Signs section appears after basic metadata and before Project Overview\n- Table format provides clean presentation of key metrics\n- Section only renders if at least one statistic is available (graceful degradation)\n- Number formatting includes thousand separators for readability",
       "metadata": {},
       "task_id": "task-1-3"
+    },
+    {
+      "timestamp": "2025-11-20T15:00:58.195912Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update CLI Output Defaults",
+      "author": "claude-code",
+      "content": "Successfully updated CLI output directory default from ./docs/llm-generated to ./docs.\n\nAccomplishments:\n- Changed argparse default value for --output-dir from './docs/llm-generated' to './docs'\n- Updated help text in argparse configuration to reflect new default\n- Updated module docstring to document new default directory\n- Streamlined output location to top-level docs folder\n\nFiles modified:\n- src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py (argparse configuration, module docstring)\n\nChanges made:\n- Line 185: default='./docs/llm-generated' \u2192 default='./docs'\n- Line 186: help text updated to show new default\n- Line 14: docstring updated to show new default\n\nImpact:\n- Generated documentation now sits at ./docs by default instead of ./docs/llm-generated\n- Simpler, more conventional output structure\n- Users can still override with --output-dir if needed",
+      "metadata": {},
+      "task_id": "task-1-4"
     }
   ]
 }

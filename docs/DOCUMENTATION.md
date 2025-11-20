@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 09:58:13
+**Generated:** 2025-11-20 10:00:01
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 349
-- **Total Lines:** 123412
+- **Total Lines:** 123435
 - **Total Classes:** 498
 - **Total Functions:** 1580
 - **Avg Complexity:** 4.58
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 348
-- **Lines:** 123115
+- **Lines:** 123138
 - **Classes:** 498
 - **Functions:** 1573
 - **Avg Complexity:** 4.59
@@ -1671,7 +1671,7 @@ Example:
 ### `IndexGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:72`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:75`
 
 **Description:**
 > Generates index.md following 7-section structure.

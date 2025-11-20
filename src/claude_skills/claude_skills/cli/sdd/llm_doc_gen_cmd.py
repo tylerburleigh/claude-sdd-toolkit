@@ -11,7 +11,7 @@ Subcommands:
     generate    Generate documentation using LLMs
 
 Options for generate:
-    --output-dir DIR     Output directory for documentation (default: ./docs/llm-generated)
+    --output-dir DIR     Output directory for documentation (default: ./docs)
     --name NAME          Project name (default: directory name)
     --description DESC   Project description
     --batch-size N       Number of shards to process per batch (default: 3)
@@ -182,8 +182,8 @@ def register_llm_doc_gen(subparsers: argparse._SubParsersAction, parent_parser: 
     generate_parser.add_argument('directory', help='Project directory to document')
     generate_parser.add_argument(
         '--output-dir',
-        default='./docs/llm-generated',
-        help='Output directory for documentation (default: ./docs/llm-generated)'
+        default='./docs',
+        help='Output directory for documentation (default: ./docs)'
     )
     generate_parser.add_argument(
         '--name',
