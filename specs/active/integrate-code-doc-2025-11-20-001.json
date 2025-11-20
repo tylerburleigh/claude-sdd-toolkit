@@ -1,7 +1,7 @@
 {
   "spec_id": "integrate-code-doc-2025-11-20-001",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-20T14:56:09.708902Z",
+  "last_updated": "2025-11-20T14:57:49.119834Z",
   "title": "Integrate Code-Doc into LLM-Doc-Gen",
   "metadata": {
     "title": "Integrate Code-Doc into LLM-Doc-Gen",
@@ -39,7 +39,7 @@
         "modified_by": "sdd-cli"
       }
     ],
-    "progress_percentage": 22,
+    "progress_percentage": 33,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -55,7 +55,7 @@
         "phase-3"
       ],
       "total_tasks": 9,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Consolidate documentation tools."
       },
@@ -80,7 +80,7 @@
         "task-1-5"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Connect the two python modules."
       },
@@ -155,17 +155,23 @@
       "id": "task-1-2",
       "type": "task",
       "title": "Enhance Prompts with Codebase Data",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Provide LLM with ground truth structure from codebase.json.",
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py",
         "changes": "Update `format_overview_prompt` to accept and include `analysis` data (module list, complexity stats) in the context section.",
         "details": "Pass the structured analysis data (obtained in Task 1-1) down to the generators. In the prompt, add a section '## Codebase Structure Statistics' that lists top modules by complexity and dependency counts, helping the LLM understand the system's 'shape' before reading individual files.",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-20T14:56:40.364100Z",
+        "status_note": "Enhancing overview prompts with codebase analysis statistics",
+        "completed_at": "2025-11-20T14:57:49.116841Z",
+        "needs_journaling": false,
+        "actual_hours": 0.019,
+        "journaled_at": "2025-11-20T14:57:49.119029Z"
       },
       "dependencies": {
         "blocks": [],
@@ -367,6 +373,15 @@
       "content": "Successfully integrated DocumentationGenerator from analysis module into data collection workflow.\n\nAccomplishments:\n- Replaced placeholder scanning in create_project_data_from_scan with actual DocumentationGenerator\n- Imported DocumentationGenerator from claude_skills.llm_doc_gen.analysis.generator\n- Configured generator with project root, name, version, and output directory\n- Run generator with verbose=False for silent operation\n- Implemented explicit save_json() call (NO markdown generation per spec requirements)\n- Extract statistics from generator result including:\n  - total_files count\n  - total_lines (LOC) count\n  - languages breakdown with line counts\n- Populate ProjectData with real analysis data instead of placeholders\n- Derive primary_languages from statistics (top 3 by line count)\n- Build tech_stack from detected languages\n- Added optional output_dir parameter to function signature\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/main.py (create_project_data_from_scan function)\n\nTest verification:\n- Import test passed: from claude_skills.llm_doc_gen.main import create_project_data_from_scan\n\nNext tasks unblocked:\n- task-1-2 (Enhance Prompts with Codebase Data)\n- task-1-3 (Enhance Index with Codebase Stats)",
       "metadata": {},
       "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-11-20T14:57:49.119023Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Enhance Prompts with Codebase Data",
+      "author": "claude-code",
+      "content": "Successfully enhanced overview prompts with codebase analysis data.\n\nAccomplishments:\n- Extended ProjectData dataclass with optional `analysis` field to hold codebase analysis from DocumentationGenerator\n- Updated `format_overview_prompt` method to include \"Codebase Structure Statistics\" section when analysis data is available\n- Added module complexity statistics showing top 10 modules by complexity with function/class counts\n- Added language breakdown showing top 5 languages by line count with file counts\n- Updated main.py to extract modules and statistics from generator result and pass to ProjectData\n- Analysis data now flows from DocumentationGenerator \u2192 ProjectData \u2192 overview prompts\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py (ProjectData dataclass, format_overview_prompt method)\n- src/claude_skills/claude_skills/llm_doc_gen/main.py (create_project_data_from_scan function)\n\nTest verification:\n- Import test passed for updated modules\n\nPrompt enhancement details:\n- New section \"## Codebase Structure Statistics\" added after Technology Stack\n- Provides ground truth about system structure to LLM\n- Lists top modules by complexity with metadata (functions, classes)\n- Shows language breakdown with lines and file counts\n- Helps LLM understand system \"shape\" before reading individual files",
+      "metadata": {},
+      "task_id": "task-1-2"
     }
   ]
 }

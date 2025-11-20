@@ -374,8 +374,12 @@ def create_project_data_from_scan(
     if output_dir:
         generator.save_json()
 
-    # Extract statistics and analysis from result
+    # Extract statistics and full analysis from result
     statistics = result.get("statistics", {})
+    analysis = {
+        "modules": result.get("modules", []),
+        "statistics": statistics
+    }
 
     # Detect structure
     structure = detect_project_structure(project_root)
@@ -406,7 +410,8 @@ def create_project_data_from_scan(
         directory_structure=directory_tree,
         file_count=statistics.get("total_files", 0),
         total_loc=statistics.get("total_lines", 0),
-        parts=None  # Would be populated for multi-part
+        parts=None,  # Would be populated for multi-part
+        analysis=analysis  # Include analysis data for prompt enhancement
     )
 
 

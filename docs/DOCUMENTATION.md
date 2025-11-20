@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 09:55:02
+**Generated:** 2025-11-20 09:56:32
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 349
-- **Total Lines:** 123334
+- **Total Lines:** 123369
 - **Total Classes:** 498
 - **Total Functions:** 1580
 - **Avg Complexity:** 4.58
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 348
-- **Lines:** 123037
+- **Lines:** 123072
 - **Classes:** 498
 - **Functions:** 1573
 - **Avg Complexity:** 4.59
@@ -18375,7 +18375,7 @@ Returns:
 ### `create_index_data_from_project(project_data, project_description) -> IndexData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:378`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:413`
 **Complexity:** 1
 
 **Description:**
@@ -18573,25 +18573,27 @@ Returns:
 
 ---
 
-### `create_project_data_from_scan(project_root, project_name) -> ProjectData`
+### `create_project_data_from_scan(project_root, project_name, output_dir) -> ProjectData`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:343`
-**Complexity:** 1
+**Complexity:** 4
 
 **Description:**
-> Create ProjectData from project scan.
+> Create ProjectData from project scan using DocumentationGenerator.
 
 Args:
     project_root: Root directory of project
     project_name: Name of the project
+    output_dir: Optional output directory to save codebase.json
 
 Returns:
-    ProjectData instance
+    ProjectData instance populated with analysis data
 
 **Parameters:**
 - `project_root`: Path
 - `project_name`: str
+- `output_dir`: Optional[Path]
 
 ---
 
