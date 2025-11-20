@@ -23,6 +23,7 @@ try:
     from .ast_analysis import CrossReferenceGraph
     from .optimization.indexing import FastResolver
     from .optimization.filters import FilterProfile, create_filter_chain
+    from .optimization.cache import PersistentCache
 except ImportError:
     from parsers import create_parser_factory, Language, ParseResult
     from calculator import calculate_statistics
@@ -38,6 +39,7 @@ except ImportError:
     from ast_analysis import CrossReferenceGraph
     from optimization.indexing import FastResolver
     from optimization.filters import FilterProfile, create_filter_chain
+    from optimization.cache import PersistentCache
 
 
 class DocumentationGenerator:
@@ -54,7 +56,8 @@ class DocumentationGenerator:
         version: str = "1.0.0",
         exclude_patterns: Optional[list] = None,
         languages: Optional[List[Language]] = None,
-        filter_profile: Optional[FilterProfile] = None
+        filter_profile: Optional[FilterProfile] = None,
+        cache_dir: Optional[Path] = None
     ):
         """
         Initialize the documentation generator.
@@ -69,6 +72,9 @@ class DocumentationGenerator:
                 If None, no additional filtering is applied (backward compatible).
                 Use FilterProfile.FAST for large codebases, FilterProfile.BALANCED
                 for typical projects, or FilterProfile.COMPLETE for comprehensive analysis.
+            cache_dir: Optional directory for persistent parse result caching.
+                If None, caching is disabled. If provided, enables persistent caching
+                to avoid re-parsing unchanged files across runs.
         """
         self.project_dir = project_dir.resolve()
         self.project_name = project_name
@@ -76,6 +82,11 @@ class DocumentationGenerator:
         self.exclude_patterns = exclude_patterns or []
         self.languages = languages
         self.filter_profile = filter_profile
+
+        # Initialize cache if cache_dir is provided
+        cache = None
+        if cache_dir is not None:
+            cache = PersistentCache(cache_dir)
 
         # Create filter chain if profile is specified
         filter_chain = None
@@ -87,7 +98,8 @@ class DocumentationGenerator:
             project_dir,
             self.exclude_patterns,
             languages,
-            filter_chain
+            filter_chain,
+            cache
         )
         self.md_generator = MarkdownGenerator(project_name, version)
         self.json_generator = JSONGenerator(project_name, version)

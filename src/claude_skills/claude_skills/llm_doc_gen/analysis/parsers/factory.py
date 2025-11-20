@@ -26,7 +26,8 @@ class ParserFactory:
         project_root: Path,
         exclude_patterns: Optional[List[str]] = None,
         languages: Optional[List[Language]] = None,
-        filter_chain: Optional[Dict[str, Any]] = None
+        filter_chain: Optional[Dict[str, Any]] = None,
+        cache: Optional[Any] = None
     ):
         """
         Initialize the parser factory.
@@ -38,6 +39,7 @@ class ParserFactory:
             filter_chain: Optional dictionary of filter instances from create_filter_chain().
                 Contains 'size_filter', 'count_limiter', and 'sampling' keys.
                 If None, no additional filtering is applied (backward compatible).
+            cache: Optional PersistentCache instance for caching parse results
         """
         self.project_root = project_root.resolve()
         self.exclude_patterns = exclude_patterns or [
@@ -46,6 +48,7 @@ class ParserFactory:
         ]
         self.requested_languages = languages
         self.filter_chain = filter_chain
+        self.cache = cache
         self._parsers: Dict[Language, BaseParser] = {}
         self._parser_classes: Dict[Language, Type[BaseParser]] = {}
 
@@ -94,7 +97,7 @@ class ParserFactory:
         # Create new parser if class is registered
         if language in self._parser_classes:
             parser_class = self._parser_classes[language]
-            parser = parser_class(self.project_root, self.exclude_patterns)
+            parser = parser_class(self.project_root, self.exclude_patterns, self.cache)
             self._parsers[language] = parser
             return parser
 
@@ -425,7 +428,8 @@ def create_parser_factory(
     project_root: Path,
     exclude_patterns: Optional[List[str]] = None,
     languages: Optional[List[Language]] = None,
-    filter_chain: Optional[Dict[str, Any]] = None
+    filter_chain: Optional[Dict[str, Any]] = None,
+    cache: Optional[Any] = None
 ) -> ParserFactory:
     """
     Create a ParserFactory with all available parsers registered.
@@ -435,10 +439,11 @@ def create_parser_factory(
         exclude_patterns: Patterns to exclude
         languages: Specific languages to parse
         filter_chain: Optional dictionary of filter instances from create_filter_chain()
+        cache: Optional PersistentCache instance for caching parse results
 
     Returns:
         Configured ParserFactory instance
     """
-    factory = ParserFactory(project_root, exclude_patterns, languages, filter_chain)
+    factory = ParserFactory(project_root, exclude_patterns, languages, filter_chain, cache)
     _auto_register_parsers(factory)
     return factory
