@@ -463,3 +463,247 @@ class SymbolIndex:
                 f"functions={len(self.function_map)}, "
                 f"classes={len(self.class_map)}, "
                 f"methods={len(self.method_map)})")
+
+
+class FastResolver:
+    """Fast symbol resolution using pre-built indexes.
+
+    Provides O(1) lookups for function calls and class instantiations by
+    leveraging SymbolIndex and ImportIndex instead of scanning through
+    all modules with nested loops.
+
+    Attributes:
+        symbol_index: Index of functions, classes, and methods
+        import_index: Index of module imports and dependencies
+
+    Example:
+        >>> symbol_idx = SymbolIndex()
+        >>> import_idx = ImportIndex()
+        >>> resolver = FastResolver(symbol_idx, import_idx)
+        >>>
+        >>> # Resolve a function call
+        >>> locations = resolver.resolve_call("parse_file", "app.main")
+        >>> # Returns list of (file_path, symbol_type) tuples
+        >>>
+        >>> # Resolve a class instantiation
+        >>> locations = resolver.resolve_instantiation("Parser", "app.main")
+        >>> # Returns list of (file_path, class_name) tuples
+    """
+
+    def __init__(self, symbol_index: SymbolIndex, import_index: ImportIndex):
+        """Initialize resolver with indexes.
+
+        Args:
+            symbol_index: Pre-built symbol index
+            import_index: Pre-built import index
+        """
+        self.symbol_index = symbol_index
+        self.import_index = import_index
+
+    def resolve_call(
+        self,
+        name: str,
+        calling_module: str
+    ) -> List[Tuple[str, str]]:
+        """Resolve a function or method call to its definition locations.
+
+        Uses index lookups (O(1)) instead of scanning all modules (O(n)).
+
+        Args:
+            name: Name of the function or method being called
+            calling_module: Module where the call is made
+
+        Returns:
+            List of (file_path, symbol_type) tuples where symbol_type is
+            'function' or 'method'. Empty list if not found.
+
+        Example:
+            >>> locations = resolver.resolve_call("parse_file", "app.main")
+            >>> # Returns [("/app/parser.py", "function")]
+        """
+        results = []
+
+        # Check if it's a function in the current module
+        calling_file = self.import_index.get_file_path(calling_module)
+        if calling_file:
+            functions_in_file = self.symbol_index.find_function(name)
+            if calling_file in functions_in_file:
+                results.append((calling_file, "function"))
+
+        # Check if it's a function in an imported module
+        imported_modules = self.import_index.get_imports(calling_module)
+        for imported_module in imported_modules:
+            imported_file = self.import_index.get_file_path(imported_module)
+            if imported_file:
+                functions_in_file = self.symbol_index.find_function(name)
+                if imported_file in functions_in_file:
+                    results.append((imported_file, "function"))
+
+        # Check if it's a method
+        method_locations = self.symbol_index.find_method(name)
+        for class_name, file_path in method_locations:
+            # Method is available if:
+            # 1. It's in the current module, OR
+            # 2. Its class is imported
+            if file_path == calling_file:
+                results.append((file_path, "method"))
+            else:
+                # Check if the class is imported
+                class_files = self.symbol_index.find_class(class_name)
+                if file_path in class_files:
+                    # Check if this file's module is imported
+                    for module, mod_file in self.import_index.module_to_file.items():
+                        if mod_file == file_path and module in imported_modules:
+                            results.append((file_path, "method"))
+                            break
+
+        return results
+
+    def resolve_instantiation(
+        self,
+        class_name: str,
+        calling_module: str
+    ) -> List[Tuple[str, str]]:
+        """Resolve a class instantiation to its definition location.
+
+        Uses index lookups (O(1)) instead of scanning all modules (O(n)).
+
+        Args:
+            class_name: Name of the class being instantiated
+            calling_module: Module where the instantiation occurs
+
+        Returns:
+            List of (file_path, class_name) tuples. Empty list if not found.
+
+        Example:
+            >>> locations = resolver.resolve_instantiation("Parser", "app.main")
+            >>> # Returns [("/app/parser.py", "Parser")]
+        """
+        results = []
+
+        # Find all locations where this class is defined
+        class_files = self.symbol_index.find_class(class_name)
+
+        if not class_files:
+            return results
+
+        # Get the calling module's file
+        calling_file = self.import_index.get_file_path(calling_module)
+
+        # Get imported modules
+        imported_modules = self.import_index.get_imports(calling_module)
+
+        for file_path in class_files:
+            # Class is accessible if:
+            # 1. It's in the current module, OR
+            # 2. Its module is imported
+
+            if file_path == calling_file:
+                results.append((file_path, class_name))
+            else:
+                # Check if this file's module is imported
+                for module, mod_file in self.import_index.module_to_file.items():
+                    if mod_file == file_path and module in imported_modules:
+                        results.append((file_path, class_name))
+                        break
+
+        return results
+
+    def resolve_symbol(
+        self,
+        name: str,
+        calling_module: str,
+        symbol_type: Optional[str] = None
+    ) -> List[Tuple[str, str, str]]:
+        """Resolve any symbol (function, class, or method) to its location.
+
+        Args:
+            name: Symbol name
+            calling_module: Module where symbol is referenced
+            symbol_type: Optional type hint ('function', 'class', 'method')
+
+        Returns:
+            List of (file_path, symbol_type, context) tuples where context
+            is either the symbol name (for functions/classes) or
+            "ClassName.method_name" (for methods)
+        """
+        results = []
+
+        if symbol_type is None or symbol_type == 'function':
+            # Try resolving as a function
+            call_results = self.resolve_call(name, calling_module)
+            for file_path, sym_type in call_results:
+                if sym_type == 'function':
+                    results.append((file_path, 'function', name))
+
+        if symbol_type is None or symbol_type == 'class':
+            # Try resolving as a class
+            class_results = self.resolve_instantiation(name, calling_module)
+            for file_path, cls_name in class_results:
+                results.append((file_path, 'class', cls_name))
+
+        if symbol_type is None or symbol_type == 'method':
+            # Try resolving as a method
+            call_results = self.resolve_call(name, calling_module)
+            for file_path, sym_type in call_results:
+                if sym_type == 'method':
+                    # Find which class this method belongs to
+                    method_locations = self.symbol_index.find_method(name)
+                    for cls_name, m_file in method_locations:
+                        if m_file == file_path:
+                            results.append((file_path, 'method', f"{cls_name}.{name}"))
+                            break
+
+        return results
+
+    def get_available_symbols(self, module: str) -> Dict[str, Set[str]]:
+        """Get all symbols available in a module's scope.
+
+        Includes symbols defined in the module and symbols from imports.
+
+        Args:
+            module: Module name
+
+        Returns:
+            Dictionary with keys 'functions', 'classes', 'methods' containing
+            sets of available symbol names
+        """
+        result = {
+            'functions': set(),
+            'classes': set(),
+            'methods': set()
+        }
+
+        # Get module's own file
+        module_file = self.import_index.get_file_path(module)
+        if module_file:
+            # Add symbols from the module itself
+            file_symbols = self.symbol_index.get_file_symbols(module_file)
+            result['functions'].update(file_symbols['functions'])
+            result['classes'].update(file_symbols['classes'])
+            # Extract method names from "ClassName.method_name" format
+            for method_ref in file_symbols['methods']:
+                if '.' in method_ref:
+                    method_name = method_ref.split('.', 1)[1]
+                    result['methods'].add(method_name)
+
+        # Add symbols from imported modules
+        imported_modules = self.import_index.get_imports(module)
+        for imported_module in imported_modules:
+            imported_file = self.import_index.get_file_path(imported_module)
+            if imported_file:
+                file_symbols = self.symbol_index.get_file_symbols(imported_file)
+                result['functions'].update(file_symbols['functions'])
+                result['classes'].update(file_symbols['classes'])
+                for method_ref in file_symbols['methods']:
+                    if '.' in method_ref:
+                        method_name = method_ref.split('.', 1)[1]
+                        result['methods'].add(method_name)
+
+        return result
+
+    def __repr__(self) -> str:
+        """Get string representation of resolver."""
+        return (f"FastResolver("
+                f"symbols={len(self.symbol_index)}, "
+                f"modules={len(self.import_index)})")
