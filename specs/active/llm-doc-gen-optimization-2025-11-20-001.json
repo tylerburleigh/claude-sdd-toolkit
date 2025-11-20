@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T23:27:25.253953Z",
+  "last_updated": "2025-11-20T23:29:41.972443Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 92,
+    "progress_percentage": 94,
     "current_phase": "phase-6"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 63,
+      "completed_tasks": 64,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -2187,7 +2187,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "100x smaller primary output through summary/detail separation",
         "risk_level": "high",
@@ -2207,7 +2207,7 @@
         "task-6-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2386,7 +2386,7 @@
     "task-6-4": {
       "type": "task",
       "title": "tests/test_two_tier_output.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-6-files",
       "children": [
         "task-6-4-1",
@@ -2400,7 +2400,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_two_tier_output.py",
         "task_category": "implementation",
@@ -2410,13 +2410,19 @@
     "task-6-4-1": {
       "type": "subtask",
       "title": "Summary/detail correctness tests",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-6-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Verify summary contains signatures, detail files contain full data, linked references work"
+        "details": "Verify summary contains signatures, detail files contain full data, linked references work",
+        "started_at": "2025-11-20T23:27:47.656662Z",
+        "status_note": "Creating tests for summary/detail correctness",
+        "completed_at": "2025-11-20T23:29:41.962147Z",
+        "needs_journaling": false,
+        "actual_hours": 0.032,
+        "journaled_at": "2025-11-20T23:29:41.969933Z"
       }
     },
     "task-6-4-2": {
@@ -3231,6 +3237,15 @@
       "content": "Successfully added backward compatibility mode to JSONGenerator.generate() method. Added two_tier parameter (default=False) to maintain single-file output by default, preserving existing behavior. When two_tier=True, the method delegates to generate_two_tier() for the new functionality.\n\nChanges made:\n- Added two_tier parameter (bool, default=False) to generate() signature\n- Added detail_dir parameter (str, default='details') to generate() signature\n- Updated docstring to document new parameters and return types\n- Added logic to handle two_tier mode by delegating to generate_two_tier()\n- Added ValueError validation when two_tier=True but output_path not provided\n\nVerification performed:\n- Python syntax check passed\n- Backward compatibility test: Default behavior (two_tier=False) returns dict as before\n- Two-tier mode test: two_tier=True correctly generates summary + detail files\n- Error handling test: Correctly raises ValueError when output_path missing with two_tier=True\n- All tests passed\n\nFiles modified: src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py (updated generate() method signature and logic)",
       "metadata": {},
       "task_id": "task-6-3-2"
+    },
+    {
+      "timestamp": "2025-11-20T23:29:41.969927Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Summary/detail correctness tests",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive test suite for two-tier documentation generation. Tests verify summary/detail correctness, linked references, and backward compatibility.\n\nTest coverage includes:\n- File creation tests: Verify summary and detail files are created correctly\n- Summary correctness: Confirm summary contains signatures only (no docstrings)\n- Detail correctness: Confirm detail files contain full data including docstrings\n- Custom detail directory: Verify custom subdirectory names work correctly\n- Backward compatibility: Verify two_tier=False maintains traditional behavior\n- Error handling: Verify two_tier=True requires output_path\n- Integration: Verify generate() method delegates correctly with two_tier parameter\n- Module mapping: Verify one detail file per module with correct naming\n\nFiles created:\n- src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_two_tier.py (8 tests, 345 lines)\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py (added detail_dir parameter to DetailWriter.write_module_details and updated generate_two_tier to pass it through)\n\nAll 8 tests passed successfully:\n- test_generate_two_tier_creates_files: PASSED\n- test_summary_contains_signatures_only: PASSED  \n- test_detail_files_contain_full_data: PASSED\n- test_custom_detail_directory: PASSED\n- test_generate_with_two_tier_parameter: PASSED\n- test_generate_two_tier_false_maintains_compatibility: PASSED\n- test_two_tier_requires_output_path: PASSED\n- test_detail_files_per_module: PASSED",
+      "metadata": {},
+      "task_id": "task-6-4-1"
     }
   ]
 }

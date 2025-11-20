@@ -390,7 +390,8 @@ class JSONGenerator:
         detail_files = detail_writer.write_module_details(
             output_dir,
             analysis,
-            statistics
+            statistics,
+            detail_dir
         )
 
         return {
@@ -533,7 +534,8 @@ class DetailWriter:
         self,
         output_dir: Path,
         analysis: Dict[str, Any],
-        statistics: Dict[str, Any]
+        statistics: Dict[str, Any],
+        detail_dir: str = 'details'
     ) -> List[Path]:
         """
         Generate detailed documentation files for each module.
@@ -542,11 +544,12 @@ class DetailWriter:
             output_dir: Base output directory (details will be in output_dir/details/)
             analysis: Analyzed codebase data
             statistics: Code statistics
+            detail_dir: Subdirectory name for detail files (default: 'details')
 
         Returns:
             List of paths to generated detail files
         """
-        details_dir = output_dir / "details"
+        details_dir = output_dir / detail_dir
         details_dir.mkdir(parents=True, exist_ok=True)
 
         generated_files = []
