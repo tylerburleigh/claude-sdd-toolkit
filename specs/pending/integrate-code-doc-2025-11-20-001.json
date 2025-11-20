@@ -1,0 +1,297 @@
+{
+  "spec_id": "integrate-code-doc-2025-11-20-001",
+  "generated": "2025-11-20T12:00:00Z",
+  "last_updated": "2025-11-20T13:35:15.518127Z",
+  "title": "Integrate Code-Doc into LLM-Doc-Gen",
+  "metadata": {
+    "title": "Integrate Code-Doc into LLM-Doc-Gen",
+    "description": "Merge the structural analysis capabilities of code-doc into the llm-doc-gen workflow. This ensures that accurate project statistics and structure (codebase.json) are generated alongside the LLM-based narrative documentation, and allows the LLM to use this ground truth data.",
+    "objectives": [
+      "Refactor `code-doc` to `analysis` module within `llm-doc-gen`.",
+      "Integrate `DocumentationGenerator` from `analysis` into `llm-doc-gen`.",
+      "Generate `codebase.json` as part of the `llm-doc-gen` process.",
+      "Enhance LLM prompts with structural data from `codebase.json`.",
+      "Enhance Index with Codebase Stats",
+      "Deprecate and remove the standalone `code-doc` skill and agent definitions.",
+      "Ensure `ProjectData` is populated with real statistics from the analysis."
+    ],
+    "complexity": "medium",
+    "estimated_hours": 2,
+    "owner": "claude-sdd-toolkit-dev",
+    "status": "pending",
+    "assumptions": [
+      "The `code-doc` python module is stable and reusable.",
+      "The user wants `codebase.json` in the parent `docs/` folder or alongside the LLM docs."
+    ],
+    "revision_history": [
+      {
+        "version": "1.0",
+        "date": "2025-11-20T12:00:00Z",
+        "author": "Claude",
+        "changelog": "Initial spec creation",
+        "modified_by": "sdd-cli"
+      }
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "title": "Integrate Code-Doc into LLM-Doc-Gen",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Consolidate documentation tools."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Core Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "task-1-0",
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Connect the two python modules."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-0": {
+      "id": "task-1-0",
+      "type": "task",
+      "title": "Refactor Code-Doc to Analysis Module",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Move the structural analysis engine into the llm-doc-gen package.",
+        "file_path": "src/claude_skills/claude_skills/code_doc/",
+        "changes": "Move `src/claude_skills/claude_skills/code_doc` to `src/claude_skills/claude_skills/llm_doc_gen/analysis`. Update imports.",
+        "details": "Rename the `code_doc` package to `analysis` and move it inside `llm_doc_gen`. Update any internal relative imports within the moved package, and ensure `llm-doc-gen` imports from this new location.",
+        "task_category": "refactoring"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Update Data Collection in LLM-Doc-Gen",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Replace placeholder scanning with `DocumentationGenerator`.",
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/main.py",
+        "changes": "Import `DocumentationGenerator`. Modify `create_project_data_from_scan` to run the generator, save `codebase.json` (if output dir is known), and return populated `ProjectData`.",
+        "details": "The `create_project_data_from_scan` function currently uses hardcoded/placeholder values. We will change it to initialize `DocumentationGenerator` (from the new `analysis` module), run `generate(verbose=False)`, and use the resulting `statistics` and `analysis` to populate `ProjectData`. We will also save the JSON artifact as `codebase.json`. Ensure we explicitly only call `save_json` and DO NOT call `save_markdown`.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Enhance Prompts with Codebase Data",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Provide LLM with ground truth structure from codebase.json.",
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py",
+        "changes": "Update `format_overview_prompt` to accept and include `analysis` data (module list, complexity stats) in the context section.",
+        "details": "Pass the structured analysis data (obtained in Task 1-1) down to the generators. In the prompt, add a section '## Codebase Structure Statistics' that lists top modules by complexity and dependency counts, helping the LLM understand the system's 'shape' before reading individual files.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-3": {
+      "id": "task-1-3",
+      "type": "task",
+      "title": "Enhance Index with Codebase Stats",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add project metrics to the main index page.",
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py",
+        "changes": "Update `generate_index` to accept `statistics` from `ProjectData` (or passed separately). Render a 'Project Vital Signs' section in the markdown including LOC, file count, and top languages.",
+        "details": "Modify the `IndexGenerator` class and its `generate_index` method. It should extract `total_loc`, `file_count`, and `primary_languages` from the data it receives and format them into a nice table or list at the top of `index.md`.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-4": {
+      "id": "task-1-4",
+      "type": "task",
+      "title": "Update CLI Output Defaults",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Streamline output location.",
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
+        "changes": "Change default `output-dir` from `./docs/llm-generated` to `./docs`.",
+        "details": "Update the argparse default value for the `--output-dir` argument so that generated documentation sits at the top level of the documentation folder by default.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-2": {
+      "id": "phase-2",
+      "type": "phase",
+      "title": "Cleanup Standalone Skills",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Remove redundant agent definitions."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "id": "task-2-1",
+      "type": "task",
+      "title": "Remove Code-Doc Agent",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "agents/code-doc.md",
+        "changes": "Delete the file.",
+        "details": "The agent definition is no longer needed as functionality is merged.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-2": {
+      "id": "task-2-2",
+      "type": "task",
+      "title": "Remove Code-Doc Skill Definition",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/code-doc/SKILL.md",
+        "changes": "Delete the file.",
+        "details": "Delete the `skills/code-doc` directory and its contents. The python source in `src` remains.",
+        "task_category": "implementation"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-3": {
+      "id": "phase-3",
+      "type": "phase",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "verify-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure the integration works."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-1": {
+      "id": "verify-3-1",
+      "type": "verify",
+      "title": "Verify Doc Generation",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd llm-doc-gen generate ./src --output-dir ./docs/test-gen --dry-run",
+        "expected": "Should run analysis and indicate that codebase.json would be saved."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    }
+  }
+}
