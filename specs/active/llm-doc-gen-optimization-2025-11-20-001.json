@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:46:01.394161Z",
+  "last_updated": "2025-11-20T19:48:47.447167Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 39,
+    "progress_percentage": 41,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 27,
+      "completed_tasks": 28,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -925,7 +925,7 @@
         "depends": []
       },
       "total_tasks": 9,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "3-8x speedup through multi-core processing",
         "risk_level": "medium",
@@ -944,7 +944,7 @@
         "task-3-4"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1062,7 +1062,7 @@
     "task-3-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-3-1"
@@ -1075,7 +1075,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
         "task_category": "implementation",
@@ -1085,13 +1085,19 @@
     "task-3-3-1": {
       "type": "subtask",
       "title": "Add --parallel and --workers CLI flags",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add --parallel flag (boolean) and --workers N flag to generate subcommand"
+        "details": "Add --parallel flag (boolean) and --workers N flag to generate subcommand",
+        "started_at": "2025-11-20T19:47:29.973438Z",
+        "status_note": "Adding --parallel and --workers CLI flags to generate subcommand",
+        "completed_at": "2025-11-20T19:48:47.435583Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-20T19:48:47.444394Z"
       }
     },
     "task-3-4": {
@@ -2551,6 +2557,15 @@
       "content": "Added parallel=False and num_workers=None parameters to parse_all() method in factory.py. Method now delegates to _parse_all_parallel() when parallel=True. Added ParallelParser import and worker count display in verbose mode. Created _parse_all_parallel() helper method (currently uses sequential fallback with TODO for full parallel implementation in subsequent tasks). Maintains backward compatibility with default sequential behavior. Implementation at factory.py:103-215.",
       "metadata": {},
       "task_id": "task-3-2-1"
+    },
+    {
+      "timestamp": "2025-11-20T19:48:47.444384Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add --parallel and --workers CLI flags",
+      "author": "claude-code",
+      "content": "Added --parallel flag (boolean) and --workers N flag to generate subcommand in cli.py. Updated cmd_generate() to pass args.parallel and args.workers to generator.generate_all(). Updated DocumentationGenerator.generate_all() and generate() methods to accept and forward parallel/num_workers parameters to parser_factory.parse_all(). Complete integration chain: CLI args \u2192 cmd_generate \u2192 generate_all \u2192 generate \u2192 parse_all. Users can now enable parallel parsing with 'sdd doc generate ./src --parallel' or specify workers with '--parallel --workers 4'. Implementation at cli.py:602-603, 227-228 and generator.py:95-117, 386-409.",
+      "metadata": {},
+      "task_id": "task-3-3-1"
     }
   ]
 }

@@ -92,18 +92,29 @@ class DocumentationGenerator:
         self.md_generator = MarkdownGenerator(project_name, version)
         self.json_generator = JSONGenerator(project_name, version)
 
-    def generate(self, verbose: bool = False) -> Dict[str, Any]:
+    def generate(
+        self,
+        verbose: bool = False,
+        parallel: bool = False,
+        num_workers: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Generate complete documentation analysis.
 
         Args:
             verbose: Enable verbose output
+            parallel: Enable parallel parsing (default: False)
+            num_workers: Number of worker processes for parallel parsing (default: auto-detect)
 
         Returns:
             Dictionary containing analysis results and statistics
         """
         # Parse codebase using ParserFactory
-        parse_result = self.parser_factory.parse_all(verbose=verbose)
+        parse_result = self.parser_factory.parse_all(
+            verbose=verbose,
+            parallel=parallel,
+            num_workers=num_workers
+        )
 
         # Resolve cross-references
         self._resolve_references(parse_result)
@@ -376,7 +387,9 @@ class DocumentationGenerator:
         self,
         output_dir: Path,
         format_type: str = 'both',
-        verbose: bool = False
+        verbose: bool = False,
+        parallel: bool = False,
+        num_workers: Optional[int] = None
     ) -> None:
         """
         Generate documentation in specified format(s).
@@ -385,9 +398,15 @@ class DocumentationGenerator:
             output_dir: Directory to save documentation files
             format_type: Output format ('markdown', 'json', or 'both')
             verbose: Enable verbose output
+            parallel: Enable parallel parsing (default: False)
+            num_workers: Number of worker processes for parallel parsing (default: auto-detect)
         """
         # Generate analysis
-        result = self.generate(verbose=verbose)
+        result = self.generate(
+            verbose=verbose,
+            parallel=parallel,
+            num_workers=num_workers
+        )
         analysis = result['analysis']
         statistics = result['statistics']
 

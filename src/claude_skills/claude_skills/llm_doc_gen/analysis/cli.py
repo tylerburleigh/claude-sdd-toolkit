@@ -224,6 +224,8 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             output_dir,
             format_type=args.format,
             verbose=getattr(args, 'verbose', False),
+            parallel=getattr(args, 'parallel', False),
+            num_workers=getattr(args, 'workers', None),
         )
         output_data = {
             "status": "ok",
@@ -597,6 +599,10 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     generate_parser.add_argument('--max-file-size', type=int, help='Maximum file size in bytes (overrides filter-mode default)')
     generate_parser.add_argument('--max-files-per-dir', type=int, help='Maximum files per directory (overrides filter-mode default)')
     generate_parser.add_argument('--sample-rate', type=float, help='Sampling rate 0.0-1.0 for very large projects (overrides filter-mode default)')
+
+    # Parallel processing options
+    generate_parser.add_argument('--parallel', action='store_true', help='Enable parallel parsing using multiprocessing (faster on multi-core systems)')
+    generate_parser.add_argument('--workers', type=int, metavar='N', help='Number of worker processes for parallel parsing (default: auto-detect CPU count - 1)')
 
     generate_parser.set_defaults(func=cmd_generate)
 
