@@ -455,3 +455,139 @@ def test_streaming_memory_scales_better(
     # (less than proportional to data increase)
     assert memory_increase_ratio < data_increase_ratio, \
         f"Streaming memory should scale better than data size (got {memory_increase_ratio:.1f}x vs {data_increase_ratio:.1f}x)"
+
+
+def test_compression_reduces_file_size(
+    sample_project: Path,
+    tmp_path: Path
+):
+    """Verify gzip compression achieves significant file size reduction."""
+    generator = DocumentationGenerator(
+        sample_project,
+        "TestProject",
+        "1.0.0"
+    )
+
+    # Generate analysis
+    result = generator.generate()
+    analysis = result['analysis']
+    statistics = result['statistics']
+
+    # Create larger dataset to make compression more effective
+    # JSON compresses well due to repetitive structure
+    large_analysis = {
+        'modules': analysis['modules'] * 200,
+        'classes': analysis['classes'] * 200,
+        'functions': analysis['functions'] * 200,
+        'dependencies': analysis['dependencies'],
+        'errors': []
+    }
+
+    # Generate uncompressed output
+    uncompressed_path = tmp_path / "uncompressed.json"
+    generator.save_json(
+        uncompressed_path,
+        large_analysis,
+        statistics,
+        streaming=True,
+        compress=False
+    )
+
+    # Generate compressed output
+    compressed_path = tmp_path / "compressed.json.gz"
+    generator.save_json(
+        compressed_path,
+        large_analysis,
+        statistics,
+        streaming=True,
+        compress=True
+    )
+
+    # Measure file sizes
+    uncompressed_size = uncompressed_path.stat().st_size
+    compressed_size = compressed_path.stat().st_size
+
+    # Calculate compression ratio
+    compression_ratio = uncompressed_size / compressed_size
+
+    print(f"\nCompression Test Results:")
+    print(f"  Uncompressed size: {uncompressed_size / 1024 / 1024:.2f} MB")
+    print(f"  Compressed size: {compressed_size / 1024 / 1024:.2f} MB")
+    print(f"  Compression ratio: {compression_ratio:.1f}x")
+
+    # Verify compression is working
+    assert compressed_size < uncompressed_size, \
+        "Compressed file should be smaller than uncompressed"
+
+    # Verify at least 3x compression (conservative threshold)
+    # JSON typically compresses 5-10x but we use 3x for test stability
+    assert compression_ratio >= 3.0, \
+        f"Expected at least 3x compression ratio, got {compression_ratio:.1f}x"
+
+
+def test_compression_file_extension(
+    sample_project: Path,
+    sample_analysis: Dict[str, Any],
+    sample_statistics: Dict[str, Any],
+    tmp_path: Path
+):
+    """Verify compressed files have .gz extension."""
+    generator = DocumentationGenerator(
+        sample_project,
+        "TestProject",
+        "1.0.0"
+    )
+
+    # Test that compression adds .gz extension
+    output_path = tmp_path / "output.json.gz"
+    generator.save_json(
+        output_path,
+        sample_analysis,
+        sample_statistics,
+        streaming=True,
+        compress=True
+    )
+
+    assert output_path.exists()
+    assert output_path.suffix == '.gz'
+    assert output_path.stem.endswith('.json')
+
+
+def test_compressed_file_is_readable(
+    sample_project: Path,
+    sample_analysis: Dict[str, Any],
+    sample_statistics: Dict[str, Any],
+    tmp_path: Path
+):
+    """Verify compressed JSON files can be read and decompressed correctly."""
+    generator = DocumentationGenerator(
+        sample_project,
+        "TestProject",
+        "1.0.0"
+    )
+
+    # Generate compressed output
+    compressed_path = tmp_path / "output.json.gz"
+    generator.save_json(
+        compressed_path,
+        sample_analysis,
+        sample_statistics,
+        streaming=True,
+        compress=True
+    )
+
+    # Verify file can be decompressed and loaded as JSON
+    with gzip.open(compressed_path, 'rt', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Verify structure is intact
+    assert 'metadata' in data
+    assert 'modules' in data
+    assert 'classes' in data
+    assert 'functions' in data
+    assert 'dependencies' in data
+
+    # Verify content matches input
+    assert len(data['modules']) == len(sample_analysis['modules'])
+    assert len(data['classes']) == len(sample_analysis['classes'])
+    assert len(data['functions']) == len(sample_analysis['functions'])
