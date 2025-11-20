@@ -342,35 +342,70 @@ def scan_project_files(project_root: Path, max_files: int = 50) -> Dict[str, Lis
 
 def create_project_data_from_scan(
     project_root: Path,
-    project_name: str
+    project_name: str,
+    output_dir: Optional[Path] = None
 ) -> ProjectData:
     """
-    Create ProjectData from project scan.
+    Create ProjectData from project scan using DocumentationGenerator.
 
     Args:
         project_root: Root directory of project
         project_name: Name of the project
+        output_dir: Optional output directory to save codebase.json
 
     Returns:
-        ProjectData instance
+        ProjectData instance populated with analysis data
     """
+    from .analysis.generator import DocumentationGenerator
+
+    # Initialize DocumentationGenerator
+    generator = DocumentationGenerator(
+        root_path=project_root,
+        project_name=project_name,
+        project_version="1.0.0",
+        output_dir=output_dir or project_root / "docs",
+        exclude_patterns=[]
+    )
+
+    # Run the generator (verbose=False for silent operation)
+    result = generator.generate(verbose=False)
+
+    # Save JSON artifact as codebase.json (DO NOT save markdown)
+    if output_dir:
+        generator.save_json()
+
+    # Extract statistics and analysis from result
+    statistics = result.get("statistics", {})
+
     # Detect structure
     structure = detect_project_structure(project_root)
 
     # Build directory tree
     directory_tree = build_directory_tree(project_root, max_depth=3)
 
-    # Create ProjectData
-    # This is simplified - full implementation would detect actual values
+    # Extract languages from statistics
+    languages_data = statistics.get("languages", {})
+    primary_languages = sorted(
+        languages_data.keys(),
+        key=lambda lang: languages_data[lang].get("lines", 0),
+        reverse=True
+    )[:3] if languages_data else ["Unknown"]
+
+    # Build tech stack from detected info
+    tech_stack = {}
+    if primary_languages:
+        tech_stack["Languages"] = ", ".join(primary_languages)
+
+    # Create ProjectData with actual analysis data
     return ProjectData(
         project_name=project_name,
-        project_type="Software Project",  # Would be detected
+        project_type="Software Project",
         repository_type=structure["repository_type"],
-        primary_languages=["Python"],  # Would be detected
-        tech_stack={"Language": "Python"},  # Would be detected
+        primary_languages=primary_languages,
+        tech_stack=tech_stack,
         directory_structure=directory_tree,
-        file_count=0,  # Would be counted
-        total_loc=0,  # Would be counted
+        file_count=statistics.get("total_files", 0),
+        total_loc=statistics.get("total_lines", 0),
         parts=None  # Would be populated for multi-part
     )
 

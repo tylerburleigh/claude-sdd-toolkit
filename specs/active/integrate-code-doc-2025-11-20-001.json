@@ -1,7 +1,7 @@
 {
   "spec_id": "integrate-code-doc-2025-11-20-001",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-20T14:54:39.502401Z",
+  "last_updated": "2025-11-20T14:56:09.708902Z",
   "title": "Integrate Code-Doc into LLM-Doc-Gen",
   "metadata": {
     "title": "Integrate Code-Doc into LLM-Doc-Gen",
@@ -39,7 +39,7 @@
         "modified_by": "sdd-cli"
       }
     ],
-    "progress_percentage": 11,
+    "progress_percentage": 22,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -55,7 +55,7 @@
         "phase-3"
       ],
       "total_tasks": 9,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Consolidate documentation tools."
       },
@@ -80,7 +80,7 @@
         "task-1-5"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Connect the two python modules."
       },
@@ -124,17 +124,23 @@
       "id": "task-1-1",
       "type": "task",
       "title": "Update Data Collection in LLM-Doc-Gen",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Replace placeholder scanning with `DocumentationGenerator`.",
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/main.py",
         "changes": "Import `DocumentationGenerator`. Modify `create_project_data_from_scan` to run the generator, save `codebase.json` (if output dir is known), and return populated `ProjectData`.",
         "details": "The `create_project_data_from_scan` function currently uses hardcoded/placeholder values. We will change it to initialize `DocumentationGenerator` (from the new `analysis` module), run `generate(verbose=False)`, and use the resulting `statistics` and `analysis` to populate `ProjectData`. We will also save the JSON artifact as `codebase.json`. Ensure we explicitly only call `save_json` and DO NOT call `save_markdown`. If `ProjectData` schema does not support the new analysis fields, extend it.",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-20T14:55:12.163403Z",
+        "status_note": "Replacing placeholder scanning with DocumentationGenerator from analysis module",
+        "completed_at": "2025-11-20T14:56:09.706006Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-20T14:56:09.708162Z"
       },
       "dependencies": {
         "blocks": [
@@ -352,6 +358,15 @@
       "content": "Successfully refactored code_doc module to analysis module within llm_doc_gen package.\n\nAccomplishments:\n- Moved src/claude_skills/claude_skills/code_doc/ to src/claude_skills/claude_skills/llm_doc_gen/analysis/\n- Updated all imports within the analysis module (cli.py, schema.py, parsers/python.py)\n- Updated external imports in:\n  - src/claude_skills/claude_skills/cli/sdd/registry.py (CLI registration)\n  - src/claude_skills/claude_skills/llm_doc_gen/parsers.py (parser wrapper)\n  - src/claude_skills/claude_skills/tests/conftest.py (test fixtures)\n- Removed old code_doc directory\n- Verified imports work correctly with test import\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/python.py\n- src/claude_skills/claude_skills/cli/sdd/registry.py\n- src/claude_skills/claude_skills/llm_doc_gen/parsers.py\n- src/claude_skills/claude_skills/tests/conftest.py\n\nFiles created:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/ (entire directory with 14 files)\n\nFiles deleted:\n- src/claude_skills/claude_skills/code_doc/ (entire directory)\n\nTest verification:\n- Import test passed: from claude_skills.llm_doc_gen.analysis.parsers import Language\n\nNext task: task-1-5 (Migrate Code-Doc Tests) is now unblocked and ready to proceed.",
       "metadata": {},
       "task_id": "task-1-0"
+    },
+    {
+      "timestamp": "2025-11-20T14:56:09.708157Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update Data Collection in LLM-Doc-Gen",
+      "author": "claude-code",
+      "content": "Successfully integrated DocumentationGenerator from analysis module into data collection workflow.\n\nAccomplishments:\n- Replaced placeholder scanning in create_project_data_from_scan with actual DocumentationGenerator\n- Imported DocumentationGenerator from claude_skills.llm_doc_gen.analysis.generator\n- Configured generator with project root, name, version, and output directory\n- Run generator with verbose=False for silent operation\n- Implemented explicit save_json() call (NO markdown generation per spec requirements)\n- Extract statistics from generator result including:\n  - total_files count\n  - total_lines (LOC) count\n  - languages breakdown with line counts\n- Populate ProjectData with real analysis data instead of placeholders\n- Derive primary_languages from statistics (top 3 by line count)\n- Build tech_stack from detected languages\n- Added optional output_dir parameter to function signature\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/main.py (create_project_data_from_scan function)\n\nTest verification:\n- Import test passed: from claude_skills.llm_doc_gen.main import create_project_data_from_scan\n\nNext tasks unblocked:\n- task-1-2 (Enhance Prompts with Codebase Data)\n- task-1-3 (Enhance Index with Codebase Stats)",
+      "metadata": {},
+      "task_id": "task-1-1"
     }
   ]
 }

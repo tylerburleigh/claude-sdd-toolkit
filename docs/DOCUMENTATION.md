@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 09:49:54
+**Generated:** 2025-11-20 09:55:02
 
 ---
 
@@ -195,7 +195,7 @@ Capabilities:
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:252`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:252`
 
 **Description:**
 > Abstract base class for language-specific parsers.
@@ -234,7 +234,7 @@ the required abstract methods.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/css.py:38`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/css.py:38`
 
 **Description:**
 > Parser for CSS files using tree-sitter.
@@ -298,7 +298,7 @@ Usage:
 ### `CallReference`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/schema.py:108`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py:108`
 
 **Description:**
 > Represents a reference to a function call.
@@ -333,7 +333,7 @@ Example:
 ### `CallSite`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:34`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:34`
 
 **Description:**
 > Represents a location where a function/method is called.
@@ -385,7 +385,7 @@ Attributes:
 ### `CodebaseAnalyzer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parser.py:12`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parser.py:12`
 
 **Description:**
 > Analyzes Python codebase and extracts structure.
@@ -698,7 +698,7 @@ to enforce max_tools_per_run limits defined in ai_config.yaml.
 ### `CrossReferenceGraph`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:66`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:66`
 
 **Description:**
 > Bidirectional graph tracking caller/callee relationships and
@@ -980,7 +980,7 @@ Attributes:
 ### `DocumentationGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/generator.py:39`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py:39`
 
 **Description:**
 > Main orchestrator for documentation generation.
@@ -1182,7 +1182,7 @@ Extends WorkflowEngine with documentation-specific protocols and handlers.
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:23`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:23`
 
 **Description:**
 > Dynamic patterns that may affect cross-reference accuracy.
@@ -1192,7 +1192,7 @@ Extends WorkflowEngine with documentation-specific protocols and handlers.
 ### `DynamicPatternWarning`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:56`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:56`
 
 **Description:**
 > Warning about a dynamic pattern that may affect accuracy.
@@ -1556,7 +1556,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/go.py:40`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/go.py:40`
 
 **Description:**
 > Parser for Go files using tree-sitter.
@@ -1607,7 +1607,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/html.py:38`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/html.py:38`
 
 **Description:**
 > Parser for HTML files using tree-sitter.
@@ -1628,7 +1628,7 @@ Attributes:
 ### `ImportReference`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/schema.py:256`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py:256`
 
 **Description:**
 > Represents a location where a class/module is imported.
@@ -1820,7 +1820,7 @@ Example:
 ### `InstantiationReference`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/schema.py:214`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py:214`
 
 **Description:**
 > Represents a location where a class is instantiated.
@@ -1853,7 +1853,7 @@ Example:
 ### `InstantiationSite`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:46`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:46`
 
 **Description:**
 > Represents a location where a class is instantiated.
@@ -1874,7 +1874,7 @@ Example:
 ### `JSONGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/formatter.py:201`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py:201`
 
 **Description:**
 > Generates JSON documentation.
@@ -1889,7 +1889,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/javascript.py:41`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/javascript.py:41`
 
 **Description:**
 > Parser for JavaScript and TypeScript files using tree-sitter.
@@ -1930,7 +1930,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:15`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:15`
 
 **Description:**
 > Supported programming languages.
@@ -2023,7 +2023,7 @@ Example:
 ### `MarkdownGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/formatter.py:18`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py:18`
 
 **Description:**
 > Generates Markdown documentation.
@@ -2362,7 +2362,7 @@ Based on research findings from ai_consultation.py:
 ### `ParseResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:164`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:164`
 
 **Description:**
 > Result of parsing a file or codebase.
@@ -2376,7 +2376,7 @@ Based on research findings from ai_consultation.py:
 ### `ParsedClass`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:102`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:102`
 
 **Description:**
 > Represents a class, struct, or interface in any language.
@@ -2389,7 +2389,7 @@ Based on research findings from ai_consultation.py:
 ### `ParsedFunction`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:60`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:60`
 
 **Description:**
 > Represents a function or method in any language.
@@ -2412,7 +2412,7 @@ Based on research findings from ai_consultation.py:
 ### `ParsedModule`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:134`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:134`
 
 **Description:**
 > Represents a module, file, or compilation unit.
@@ -2425,7 +2425,7 @@ Based on research findings from ai_consultation.py:
 ### `ParsedParameter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:52`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py:52`
 
 **Description:**
 > Represents a function/method parameter.
@@ -2501,7 +2501,7 @@ Attributes:
 ### `ParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:15`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py:15`
 
 **Description:**
 > Factory for creating and managing language-specific parsers.
@@ -3246,7 +3246,7 @@ Usage:
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/python.py:34`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/python.py:34`
 
 **Description:**
 > Parser for Python source files using AST analysis.
@@ -3318,7 +3318,7 @@ Usage:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:14`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:14`
 
 **Description:**
 > Types of cross-references that can be tracked.
@@ -9378,7 +9378,7 @@ Returns:
 ### `_auto_register_parsers(factory) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:249`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py:249`
 **Complexity:** 6
 
 **Description:**
@@ -9395,7 +9395,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_basic_doc_validation(doc) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:100`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:100`
 **Complexity:** 2
 
 **Parameters:**
@@ -9453,7 +9453,7 @@ Args:
 ### `_build_context(doc_type) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:45`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:45`
 **Complexity:** 2
 
 **Parameters:**
@@ -10614,7 +10614,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:113`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:113`
 **Complexity:** 1
 
 **Parameters:**
@@ -10744,7 +10744,7 @@ Returns:
 ### `_exclude_patterns(extra) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:125`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:125`
 **Complexity:** 2
 
 **Parameters:**
@@ -11376,7 +11376,7 @@ Example:
 ### `_handle_error(args, printer, exc) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:129`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:129`
 **Complexity:** 3
 
 **Parameters:**
@@ -12266,7 +12266,7 @@ Extracts issues from sections:
 ### `_parse_model_override(values) -> Optional[object]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:139`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:139`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -12583,7 +12583,7 @@ Args:
 ### `_print_if_json(args, payload, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:118`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:118`
 **Complexity:** 2
 
 **Parameters:**
@@ -13249,7 +13249,7 @@ Returns:
 ### `_schema_warning(printer, args, message) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:106`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:106`
 **Complexity:** 2
 
 **Parameters:**
@@ -13320,7 +13320,7 @@ Returns:
 ### `_should_exclude_path(file_path, exclude_patterns) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:14`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:14`
 **Complexity:** 8
 
 **Description:**
@@ -14305,7 +14305,7 @@ Yields:
 ### `analyze_code_quality(statistics) -> Dict[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:108`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/calculator.py:108`
 **Complexity:** 5
 
 **Description:**
@@ -15067,7 +15067,7 @@ Returns:
 ### `calculate_complexity(node) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:12`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/calculator.py:12`
 **Complexity:** 4
 
 **Description:**
@@ -15087,7 +15087,7 @@ Returns:
 ### `calculate_language_statistics(modules, functions) -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:66`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/calculator.py:66`
 **Complexity:** 5
 
 **Description:**
@@ -15168,7 +15168,7 @@ Returns:
 ### `calculate_statistics(modules, functions) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:31`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/calculator.py:31`
 **Complexity:** 1
 
 **Description:**
@@ -15961,7 +15961,7 @@ Example:
 ### `cmd_analyze(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:337`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:337`
 **Complexity:** 10
 
 **Parameters:**
@@ -15988,7 +15988,7 @@ Example:
 ### `cmd_analyze_with_ai(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:395`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:395`
 ⚠️ **Complexity:** 17 (High)
 
 **Parameters:**
@@ -16637,7 +16637,7 @@ Returns:
 ### `cmd_generate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:179`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:179`
 **Complexity:** 9
 
 **Parameters:**
@@ -17503,7 +17503,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:236`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:236`
 ⚠️ **Complexity:** 23 (High)
 
 **Parameters:**
@@ -17782,7 +17782,7 @@ Returns:
 ### `compose_ai_context_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:346`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:346`
 **Complexity:** 1
 
 **Description:**
@@ -17806,7 +17806,7 @@ Returns:
 ### `compose_architecture_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:294`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:294`
 **Complexity:** 1
 
 **Description:**
@@ -17927,10 +17927,36 @@ Raises:
 
 ---
 
+### `consult_multi_agent(prompt, providers, timeout, verbose) -> Dict[str, ConsultationResult]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:236`
+**Complexity:** 9
+
+**Description:**
+> Consult multiple AI providers in parallel.
+
+Args:
+    prompt: Formatted prompt for LLMs
+    providers: List of providers to use (auto-selected if None)
+    timeout: Timeout in seconds per provider
+    verbose: Enable verbose output
+
+Returns:
+    Dictionary mapping provider names to ConsultationResults
+
+**Parameters:**
+- `prompt`: str
+- `providers`: Optional[list[str]]
+- `timeout`: int
+- `verbose`: bool
+
+---
+
 ### `consult_multi_agent(doc_type, prompt, agents, dry_run, verbose, printer, model_override) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:492`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:492`
 ⚠️ **Complexity:** 26 (High)
 
 **Description:**
@@ -17956,32 +17982,6 @@ Returns:
 - `verbose`: bool
 - `printer`: Optional['PrettyPrinter']
 - `model_override`: Any
-
----
-
-### `consult_multi_agent(prompt, providers, timeout, verbose) -> Dict[str, ConsultationResult]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:236`
-**Complexity:** 9
-
-**Description:**
-> Consult multiple AI providers in parallel.
-
-Args:
-    prompt: Formatted prompt for LLMs
-    providers: List of providers to use (auto-selected if None)
-    timeout: Timeout in seconds per provider
-    verbose: Enable verbose output
-
-Returns:
-    Dictionary mapping provider names to ConsultationResults
-
-**Parameters:**
-- `prompt`: str
-- `providers`: Optional[list[str]]
-- `timeout`: int
-- `verbose`: bool
 
 ---
 
@@ -18284,7 +18284,7 @@ Example:
 ### `create_context_summary(framework_info, key_files, layers, statistics, readme_content) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:381`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:381`
 **Complexity:** 9
 
 **Description:**
@@ -18312,7 +18312,7 @@ Returns:
 ### `create_cross_reference_graph() -> CrossReferenceGraph`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ast_analysis.py:317`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py:317`
 **Complexity:** 1
 
 **Description:**
@@ -18441,7 +18441,7 @@ Returns:
 ### `create_parser_factory(project_root, exclude_patterns, languages) -> ParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:288`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py:288`
 **Complexity:** 1
 
 **Description:**
@@ -19125,7 +19125,7 @@ Returns:
 ### `detect_framework(modules) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:120`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:120`
 **Complexity:** 9
 
 **Description:**
@@ -19165,7 +19165,7 @@ Returns:
 ### `detect_languages(project_root, exclude_patterns) -> Set[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:52`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:52`
 **Complexity:** 7
 
 **Description:**
@@ -19187,7 +19187,7 @@ Returns:
 ### `detect_layers(modules) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:256`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:256`
 **Complexity:** 10
 
 **Description:**
@@ -19418,7 +19418,7 @@ Args:
 ### `enhance_class_with_usage_tracking(cls, instantiated_by, imported_by, instantiation_count) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/schema.py:297`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py:297`
 **Complexity:** 4
 
 **Description:**
@@ -19444,7 +19444,7 @@ Returns:
     - instantiation_count: optional integer (only if provided)
 
 Example:
-    >>> from claude_skills.code_doc.parsers.python import PythonParser
+    >>> from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
     >>> parser = PythonParser(root_path, [])
     >>> result = parser.parse_file("models.py")
     >>> cls = result.classes[0]
@@ -19479,7 +19479,7 @@ Note:
 ### `enhance_function_with_cross_refs(func, callers, calls, call_count) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/schema.py:149`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py:149`
 **Complexity:** 4
 
 **Description:**
@@ -19505,7 +19505,7 @@ Returns:
     - call_count: optional integer (only if provided)
 
 Example:
-    >>> from claude_skills.code_doc.parsers.python import PythonParser
+    >>> from claude_skills.llm_doc_gen.analysis.parsers.python import PythonParser
     >>> parser = PythonParser(root_path, [])
     >>> result = parser.parse_file("example.py")
     >>> func = result.functions[0]
@@ -20277,7 +20277,7 @@ Example:
 ### `extract_readme(project_root) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:359`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:359`
 **Complexity:** 4
 
 **Description:**
@@ -20958,7 +20958,7 @@ Returns:
 ### `format_ai_context_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:213`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:213`
 **Complexity:** 2
 
 **Description:**
@@ -20982,7 +20982,7 @@ Returns:
 ### `format_architecture_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:127`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:127`
 **Complexity:** 3
 
 **Description:**
@@ -22265,7 +22265,7 @@ Raises:
 ### `generate_ai_context_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer, model_override) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:754`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:754`
 **Complexity:** 4
 
 **Description:**
@@ -22300,7 +22300,7 @@ Returns:
 ### `generate_architecture_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer, model_override) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:696`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:696`
 **Complexity:** 4
 
 **Description:**
@@ -22980,7 +22980,7 @@ Returns:
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:85`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:85`
 **Complexity:** 1
 
 **Description:**
@@ -23021,7 +23021,7 @@ Example:
 ### `get_best_tool(doc_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:97`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:97`
 **Complexity:** 6
 
 **Description:**
@@ -23733,7 +23733,7 @@ Example:
 ### `get_language_for_extension(extension) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:90`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:90`
 **Complexity:** 1
 
 **Description:**
@@ -23764,7 +23764,7 @@ Returns:
 ### `get_model_for_tool(tool, doc_type, override) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:51`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:51`
 **Complexity:** 1
 
 **Description:**
@@ -25109,7 +25109,7 @@ Returns:
 ### `identify_key_files(modules, project_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:183`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:183`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -27608,7 +27608,7 @@ Args:
 ### `register_code_doc(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:563`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py:563`
 **Complexity:** 1
 
 **Description:**
@@ -28290,22 +28290,6 @@ Returns:
 
 ---
 
-### `resolve_models_for_tools(tools, doc_type, override) -> Dict[str, Optional[str]]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:68`
-**Complexity:** 1
-
-**Description:**
-> Resolve models for multiple tools while preserving order.
-
-**Parameters:**
-- `tools`: Sequence[str]
-- `doc_type`: Optional[str]
-- `override`: Any
-
----
-
 ### `resolve_models_for_tools(skill_name, tools, override, context) -> 'OrderedDict[str, Optional[str]]'`
 
 **Language:** python
@@ -28329,6 +28313,22 @@ Returns:
 - `tools`: Iterable[str]
 - `override`: Any
 - `context`: Optional[Mapping[str, Any]]
+
+---
+
+### `resolve_models_for_tools(tools, doc_type, override) -> Dict[str, Optional[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:68`
+**Complexity:** 1
+
+**Description:**
+> Resolve models for multiple tools while preserving order.
+
+**Parameters:**
+- `tools`: Sequence[str]
+- `doc_type`: Optional[str]
+- `override`: Any
 
 ---
 
@@ -28540,7 +28540,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, verbose, printer, doc_type, model_override, tracker) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:397`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py:397`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -30016,7 +30016,7 @@ Common mappings from issues to modifications:
 ### `suggest_reading_order(key_files, framework_info) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:310`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py:310`
 **Complexity:** 7
 
 **Description:**
@@ -37198,254 +37198,6 @@ Returns:
 - `sys`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/__init__.py`
-
-- `calculator.calculate_complexity`
-- `calculator.calculate_statistics`
-- `formatter.JSONGenerator`
-- `formatter.MarkdownGenerator`
-- `generator.DocumentationGenerator`
-- `parser.CodebaseAnalyzer`
-
-### `src/claude_skills/claude_skills/code_doc/ai_consultation.py`
-
-- `claude_skills.common.ai_config`
-- `claude_skills.common.ai_config.ALL_SUPPORTED_TOOLS`
-- `claude_skills.common.ai_tools.ToolStatus`
-- `claude_skills.common.ai_tools.detect_available_tools`
-- `claude_skills.common.ai_tools.execute_tool_with_fallback`
-- `claude_skills.common.ai_tools.execute_tools_parallel`
-- `claude_skills.common.ai_tools.get_enabled_and_available_tools`
-- `claude_skills.common.consultation_limits`
-- `pathlib.Path`
-- `sys`
-- `time`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Sequence`
-- `typing.Tuple`
-
-### `src/claude_skills/claude_skills/code_doc/ast_analysis.py`
-
-- `dataclasses.dataclass`
-- `dataclasses.field`
-- `enum.Enum`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Set`
-
-### `src/claude_skills/claude_skills/code_doc/calculator.py`
-
-- `ast`
-- `collections.defaultdict`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-
-### `src/claude_skills/claude_skills/code_doc/cli.py`
-
-- `__future__.annotations`
-- `argparse`
-- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_ESSENTIAL`
-- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_STANDARD`
-- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_ESSENTIAL`
-- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_STANDARD`
-- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_ESSENTIAL`
-- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_STANDARD`
-- `claude_skills.cli.sdd.output_utils.prepare_output`
-- `claude_skills.code_doc.ai_consultation.compose_ai_context_doc`
-- `claude_skills.code_doc.ai_consultation.compose_architecture_doc`
-- `claude_skills.code_doc.ai_consultation.generate_ai_context_docs`
-- `claude_skills.code_doc.ai_consultation.generate_architecture_docs`
-- `claude_skills.code_doc.ai_consultation.get_available_tools`
-- `claude_skills.code_doc.calculator.calculate_statistics`
-- `claude_skills.code_doc.detectors.create_context_summary`
-- `claude_skills.code_doc.detectors.detect_framework`
-- `claude_skills.code_doc.detectors.detect_layers`
-- `claude_skills.code_doc.detectors.extract_readme`
-- `claude_skills.code_doc.detectors.identify_key_files`
-- `claude_skills.code_doc.detectors.suggest_reading_order`
-- `claude_skills.code_doc.generator.DocumentationGenerator`
-- `claude_skills.code_doc.parsers.Language`
-- `claude_skills.code_doc.parsers.create_parser_factory`
-- `claude_skills.common.PrettyPrinter`
-- `claude_skills.common.metrics.track_metrics`
-- `claude_skills.common.schema_loader.load_json_schema`
-- `json`
-- `pathlib.Path`
-- `sys`
-- `traceback`
-- `typing.Iterable`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/detectors.py`
-
-- `collections.defaultdict`
-- `fnmatch`
-- `pathlib.Path`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Set`
-
-### `src/claude_skills/claude_skills/code_doc/formatter.py`
-
-- `collections.defaultdict`
-- `datetime.datetime`
-- `datetime.timezone`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-
-### `src/claude_skills/claude_skills/code_doc/generator.py`
-
-- `json`
-- `pathlib.Path`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parser.py`
-
-- `ast`
-- `collections.defaultdict`
-- `pathlib.Path`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/__init__.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedClass`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `base.ParsedParameter`
-- `factory.ParserFactory`
-- `factory.create_parser_factory`
-- `python.PythonParser`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/base.py`
-
-- `abc.ABC`
-- `abc.abstractmethod`
-- `dataclasses.dataclass`
-- `dataclasses.field`
-- `enum.Enum`
-- `pathlib.Path`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/css.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `pathlib.Path`
-- `sys`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/factory.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `collections.defaultdict`
-- `pathlib.Path`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Set`
-- `typing.Type`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/go.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedClass`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `base.ParsedParameter`
-- `pathlib.Path`
-- `sys`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/html.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `pathlib.Path`
-- `sys`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/javascript.py`
-
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedClass`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `base.ParsedParameter`
-- `pathlib.Path`
-- `sys`
-- `typing.List`
-- `typing.Optional`
-
-### `src/claude_skills/claude_skills/code_doc/parsers/python.py`
-
-- `ast`
-- `ast_analysis.CallSite`
-- `ast_analysis.CrossReferenceGraph`
-- `ast_analysis.DynamicPattern`
-- `ast_analysis.DynamicPatternWarning`
-- `ast_analysis.InstantiationSite`
-- `ast_analysis.ReferenceType`
-- `ast_analysis.create_cross_reference_graph`
-- `base.BaseParser`
-- `base.Language`
-- `base.ParseResult`
-- `base.ParsedClass`
-- `base.ParsedFunction`
-- `base.ParsedModule`
-- `base.ParsedParameter`
-- `collections.defaultdict`
-- `pathlib.Path`
-- `sys`
-- `typing.List`
-
-### `src/claude_skills/claude_skills/code_doc/schema.py`
-
-- `dataclasses.dataclass`
-- `dataclasses.field`
-- `parsers.base.ParsedClass`
-- `parsers.base.ParsedFunction`
-- `typing.Any`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-
 ### `src/claude_skills/claude_skills/common/__init__.py`
 
 - `ai_config.get_agent_command`
@@ -38514,6 +38266,254 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/__init__.py`
+
+- `calculator.calculate_complexity`
+- `calculator.calculate_statistics`
+- `formatter.JSONGenerator`
+- `formatter.MarkdownGenerator`
+- `generator.DocumentationGenerator`
+- `parser.CodebaseAnalyzer`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/ai_consultation.py`
+
+- `claude_skills.common.ai_config`
+- `claude_skills.common.ai_config.ALL_SUPPORTED_TOOLS`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tool_with_fallback`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
+- `claude_skills.common.ai_tools.get_enabled_and_available_tools`
+- `claude_skills.common.consultation_limits`
+- `pathlib.Path`
+- `sys`
+- `time`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Sequence`
+- `typing.Tuple`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/calculator.py`
+
+- `ast`
+- `collections.defaultdict`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.metrics.track_metrics`
+- `claude_skills.common.schema_loader.load_json_schema`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.compose_ai_context_doc`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.compose_architecture_doc`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.generate_ai_context_docs`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.generate_architecture_docs`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.get_available_tools`
+- `claude_skills.llm_doc_gen.analysis.calculator.calculate_statistics`
+- `claude_skills.llm_doc_gen.analysis.detectors.create_context_summary`
+- `claude_skills.llm_doc_gen.analysis.detectors.detect_framework`
+- `claude_skills.llm_doc_gen.analysis.detectors.detect_layers`
+- `claude_skills.llm_doc_gen.analysis.detectors.extract_readme`
+- `claude_skills.llm_doc_gen.analysis.detectors.identify_key_files`
+- `claude_skills.llm_doc_gen.analysis.detectors.suggest_reading_order`
+- `claude_skills.llm_doc_gen.analysis.generator.DocumentationGenerator`
+- `claude_skills.llm_doc_gen.analysis.parsers.Language`
+- `claude_skills.llm_doc_gen.analysis.parsers.create_parser_factory`
+- `json`
+- `pathlib.Path`
+- `sys`
+- `traceback`
+- `typing.Iterable`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/detectors.py`
+
+- `collections.defaultdict`
+- `fnmatch`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py`
+
+- `collections.defaultdict`
+- `datetime.datetime`
+- `datetime.timezone`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py`
+
+- `json`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parser.py`
+
+- `ast`
+- `collections.defaultdict`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/__init__.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedClass`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `base.ParsedParameter`
+- `factory.ParserFactory`
+- `factory.create_parser_factory`
+- `python.PythonParser`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py`
+
+- `abc.ABC`
+- `abc.abstractmethod`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/css.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `pathlib.Path`
+- `sys`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `collections.defaultdict`
+- `pathlib.Path`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `typing.Type`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/go.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedClass`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `base.ParsedParameter`
+- `pathlib.Path`
+- `sys`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/html.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `pathlib.Path`
+- `sys`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/javascript.py`
+
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedClass`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `base.ParsedParameter`
+- `pathlib.Path`
+- `sys`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/python.py`
+
+- `ast`
+- `ast_analysis.CallSite`
+- `ast_analysis.CrossReferenceGraph`
+- `ast_analysis.DynamicPattern`
+- `ast_analysis.DynamicPatternWarning`
+- `ast_analysis.InstantiationSite`
+- `ast_analysis.ReferenceType`
+- `ast_analysis.create_cross_reference_graph`
+- `base.BaseParser`
+- `base.Language`
+- `base.ParseResult`
+- `base.ParsedClass`
+- `base.ParsedFunction`
+- `base.ParsedModule`
+- `base.ParsedParameter`
+- `collections.defaultdict`
+- `pathlib.Path`
+- `sys`
+- `typing.List`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `parsers.base.ParsedClass`
+- `parsers.base.ParsedFunction`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/data_collector.py`
 
