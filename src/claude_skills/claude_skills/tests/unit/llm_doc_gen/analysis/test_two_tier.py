@@ -364,3 +364,204 @@ def test_detail_files_per_module(
     filenames = [f.name for f in result['detail_files']]
     assert 'module.py.json' in filenames
     assert 'utils.py.json' in filenames
+
+
+def test_summary_size_reduction(
+    sample_analysis: Dict[str, Any],
+    sample_statistics: Dict[str, Any],
+    tmp_path: Path
+):
+    """Verify summary file is significantly smaller than full JSON."""
+    generator = JSONGenerator('TestProject', '1.0.0')
+
+    # Create a larger dataset to make size difference more apparent
+    large_analysis = {
+        'modules': sample_analysis['modules'] * 50,
+        'classes': sample_analysis['classes'] * 50,
+        'functions': sample_analysis['functions'] * 50,
+        'dependencies': sample_analysis['dependencies']
+    }
+
+    # Generate full JSON
+    full_json = generator.generate(large_analysis, sample_statistics)
+    full_path = tmp_path / 'full.json'
+    with open(full_path, 'w', encoding='utf-8') as f:
+        json.dump(full_json, f, indent=2, ensure_ascii=False)
+
+    # Generate two-tier
+    result = generator.generate_two_tier(
+        tmp_path,
+        large_analysis,
+        sample_statistics
+    )
+
+    # Measure file sizes
+    full_size = full_path.stat().st_size
+    summary_size = result['summary_file'].stat().st_size
+
+    # Calculate reduction ratio
+    reduction_ratio = full_size / summary_size
+
+    print(f"\nFile Size Comparison:")
+    print(f"  Full JSON: {full_size / 1024:.2f} KB")
+    print(f"  Summary: {summary_size / 1024:.2f} KB")
+    print(f"  Reduction ratio: {reduction_ratio:.1f}x")
+
+    # Verify summary is significantly smaller
+    # With small docstrings, reduction ratio may be modest (1.2-2x)
+    # The real benefit appears with larger docstrings (see large_dataset test)
+    assert summary_size < full_size, "Summary should be smaller than full JSON"
+    assert reduction_ratio >= 1.2, \
+        f"Expected at least 1.2x reduction, got {reduction_ratio:.1f}x"
+
+
+def test_summary_vs_detail_total_size(
+    sample_analysis: Dict[str, Any],
+    sample_statistics: Dict[str, Any],
+    tmp_path: Path
+):
+    """Verify summary + details combined size is reasonable."""
+    generator = JSONGenerator('TestProject', '1.0.0')
+
+    # Create a larger dataset
+    large_analysis = {
+        'modules': sample_analysis['modules'] * 20,
+        'classes': sample_analysis['classes'] * 20,
+        'functions': sample_analysis['functions'] * 20,
+        'dependencies': sample_analysis['dependencies']
+    }
+
+    # Generate full JSON
+    full_json = generator.generate(large_analysis, sample_statistics)
+    full_path = tmp_path / 'full.json'
+    with open(full_path, 'w', encoding='utf-8') as f:
+        json.dump(full_json, f, indent=2, ensure_ascii=False)
+
+    # Generate two-tier
+    result = generator.generate_two_tier(
+        tmp_path,
+        large_analysis,
+        sample_statistics
+    )
+
+    # Measure file sizes
+    full_size = full_path.stat().st_size
+    summary_size = result['summary_file'].stat().st_size
+    detail_total_size = sum(f.stat().st_size for f in result['detail_files'])
+    two_tier_total_size = summary_size + detail_total_size
+
+    print(f"\nTotal Size Comparison:")
+    print(f"  Full JSON: {full_size / 1024:.2f} KB")
+    print(f"  Summary: {summary_size / 1024:.2f} KB")
+    print(f"  Details total: {detail_total_size / 1024:.2f} KB")
+    print(f"  Two-tier total: {two_tier_total_size / 1024:.2f} KB")
+    print(f"  Overhead: {((two_tier_total_size / full_size) - 1) * 100:.1f}%")
+
+    # Two-tier creates duplication (summary + details both have the data)
+    # This is expected - the benefit is loading efficiency, not disk space
+    # Just verify that the combined size is reasonable (not exponentially larger)
+    # Detail files create per-module separation which adds metadata overhead
+    assert two_tier_total_size > full_size, \
+        "Two-tier should be larger due to duplication and metadata"
+    # Verify overhead is not excessive (allow up to 20x for per-module metadata)
+    assert two_tier_total_size < full_size * 20, \
+        "Two-tier overhead should be reasonable"
+
+
+def test_large_dataset_size_reduction(
+    sample_analysis: Dict[str, Any],
+    sample_statistics: Dict[str, Any],
+    tmp_path: Path
+):
+    """Verify significant size reduction with large datasets."""
+    generator = JSONGenerator('TestProject', '1.0.0')
+
+    # Create a very large dataset with more detailed docstrings
+    modules = []
+    classes = []
+    functions = []
+
+    for i in range(100):
+        modules.append({
+            'path': f'module_{i}.py',
+            'language': 'python',
+            'lines': 200,
+            'classes': [f'Class{i}'],
+            'functions': [f'func{i}']
+        })
+
+        classes.append({
+            'name': f'Class{i}',
+            'file': f'module_{i}.py',
+            'line': 10,
+            'bases': ['object'],
+            'docstring': f'Very detailed docstring for Class{i}. ' * 20,  # Large docstring
+            'methods': [
+                {
+                    'name': 'method1',
+                    'signature': 'method1(self, x: int) -> str',
+                    'line': 15,
+                    'parameters': [{'name': 'x', 'type': 'int'}],
+                    'return_type': 'str',
+                    'docstring': f'Detailed method documentation for Class{i}.method1. ' * 10
+                }
+            ],
+            'properties': []
+        })
+
+        functions.append({
+            'name': f'func{i}',
+            'signature': f'func{i}(x: int) -> str',
+            'file': f'module_{i}.py',
+            'line': 5,
+            'parameters': [{'name': 'x', 'type': 'int'}],
+            'return_type': 'str',
+            'docstring': f'Very detailed function documentation for func{i}. ' * 15,  # Large docstring
+            'decorators': [],
+            'complexity': 1,
+            'is_async': False
+        })
+
+    large_analysis = {
+        'modules': modules,
+        'classes': classes,
+        'functions': functions,
+        'dependencies': {'os': ['path'], 'sys': ['argv']}
+    }
+
+    large_stats = {
+        'total_files': 100,
+        'total_lines': 20000,
+        'total_classes': 100,
+        'total_functions': 100
+    }
+
+    # Generate full JSON
+    full_json = generator.generate(large_analysis, large_stats)
+    full_path = tmp_path / 'large_full.json'
+    with open(full_path, 'w', encoding='utf-8') as f:
+        json.dump(full_json, f, indent=2, ensure_ascii=False)
+
+    # Generate two-tier
+    result = generator.generate_two_tier(
+        tmp_path,
+        large_analysis,
+        large_stats
+    )
+
+    # Measure file sizes
+    full_size = full_path.stat().st_size
+    summary_size = result['summary_file'].stat().st_size
+    reduction_ratio = full_size / summary_size
+
+    print(f"\nLarge Dataset Size Reduction:")
+    print(f"  Full JSON: {full_size / 1024:.2f} KB ({full_size / 1024 / 1024:.2f} MB)")
+    print(f"  Summary: {summary_size / 1024:.2f} KB")
+    print(f"  Reduction ratio: {reduction_ratio:.1f}x")
+    print(f"  Space saved: {(full_size - summary_size) / 1024:.2f} KB")
+
+    # With large docstrings, summary should be significantly smaller
+    # Docstrings are removed but signatures/structure remain
+    # Realistic target: at least 3x reduction
+    assert reduction_ratio >= 3.0, \
+        f"Expected at least 3x reduction for large dataset, got {reduction_ratio:.1f}x"
