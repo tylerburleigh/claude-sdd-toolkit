@@ -67,6 +67,9 @@ class IndexData:
     existing_docs: Optional[List[ExistingDoc]] = None
     ui_part_id: Optional[str] = None  # For multi-part: which part is UI
     api_part_id: Optional[str] = None  # For multi-part: which part is API
+    file_count: Optional[int] = None  # Total files in project
+    total_loc: Optional[int] = None  # Total lines of code
+    primary_languages: Optional[List[str]] = None  # Top languages by usage
 
 
 class IndexGenerator:
@@ -193,6 +196,23 @@ class IndexGenerator:
         lines.append(f"**Architecture:** {data.architecture_type}")
         lines.append(f"**Last Updated:** {date}")
         lines.append("")
+
+        # Project Vital Signs section (if statistics are available)
+        if data.file_count is not None or data.total_loc is not None or data.primary_languages:
+            lines.append("## Project Vital Signs")
+            lines.append("")
+            lines.append("| Metric | Value |")
+            lines.append("|--------|-------|")
+
+            if data.total_loc is not None:
+                lines.append(f"| **Lines of Code** | {data.total_loc:,} |")
+            if data.file_count is not None:
+                lines.append(f"| **Total Files** | {data.file_count:,} |")
+            if data.primary_languages:
+                languages_str = ", ".join(data.primary_languages[:5])  # Top 5 languages
+                lines.append(f"| **Top Languages** | {languages_str} |")
+
+            lines.append("")
 
         return "\n".join(lines)
 

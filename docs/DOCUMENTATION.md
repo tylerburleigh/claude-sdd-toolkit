@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 09:56:32
+**Generated:** 2025-11-20 09:58:13
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 349
-- **Total Lines:** 123369
+- **Total Lines:** 123412
 - **Total Classes:** 498
 - **Total Functions:** 1580
 - **Avg Complexity:** 4.58
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 348
-- **Lines:** 123072
+- **Lines:** 123115
 - **Classes:** 498
 - **Functions:** 1573
 - **Avg Complexity:** 4.59
@@ -2341,7 +2341,7 @@ Example:
 ### `OverviewGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py:28`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py:29`
 
 **Description:**
 > Generates project overview documentation using structured LLM prompts.
@@ -18375,7 +18375,7 @@ Returns:
 ### `create_index_data_from_project(project_data, project_description) -> IndexData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:413`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:418`
 **Complexity:** 1
 
 **Description:**

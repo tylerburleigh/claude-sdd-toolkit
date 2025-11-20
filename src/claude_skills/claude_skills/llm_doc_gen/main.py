@@ -439,5 +439,8 @@ def create_index_data_from_project(
         entry_point="main.py",  # Would be detected
         architecture_pattern="Layered",  # Would be detected
         is_multi_part=project_data.repository_type in ["monorepo", "multi-part"],
-        parts_count=len(project_data.parts) if project_data.parts else 0
+        parts_count=len(project_data.parts) if project_data.parts else 0,
+        file_count=project_data.file_count,  # Pass statistics from ProjectData
+        total_loc=project_data.total_loc,  # Pass LOC count
+        primary_languages=project_data.primary_languages  # Pass language list
     )
