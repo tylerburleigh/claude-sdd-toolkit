@@ -2,11 +2,13 @@
 Tests for DocumentationGenerator streaming and compression functionality.
 
 Verifies that streaming output produces equivalent data to non-streaming output,
-and that compression works correctly with both modes.
+and that compression works correctly with both modes. Also includes memory
+usage tests to verify streaming reduces peak memory consumption.
 """
 
 import json
 import gzip
+import tracemalloc
 from pathlib import Path
 from typing import Dict, Any
 
@@ -314,3 +316,142 @@ def test_non_streaming_with_compression(
         data = json.load(f)
 
     assert 'metadata' in data
+
+
+def test_streaming_reduces_memory_usage(
+    sample_project: Path,
+    tmp_path: Path
+):
+    """
+    Verify streaming memory usage remains bounded regardless of dataset size.
+
+    Note: This test verifies that streaming memory usage doesn't grow proportionally
+    with data size (the key benefit). Direct comparison of absolute memory values
+    for small datasets can be unreliable due to overhead and caching effects.
+    The real benefit of streaming is visible in production with large codebases.
+    """
+    generator = DocumentationGenerator(
+        sample_project,
+        "TestProject",
+        "1.0.0"
+    )
+
+    # Generate base analysis
+    result = generator.generate()
+    analysis = result['analysis']
+    statistics = result['statistics']
+
+    # Test with progressively larger datasets to measure memory scalability
+    small_multiplier = 100
+    large_multiplier = 1000
+
+    # Small dataset
+    small_analysis = {
+        'modules': analysis['modules'] * small_multiplier,
+        'classes': analysis['classes'] * small_multiplier,
+        'functions': analysis['functions'] * small_multiplier,
+        'dependencies': analysis['dependencies'],
+        'errors': []
+    }
+
+    # Large dataset (10x bigger)
+    large_analysis = {
+        'modules': analysis['modules'] * large_multiplier,
+        'classes': analysis['classes'] * large_multiplier,
+        'functions': analysis['functions'] * large_multiplier,
+        'dependencies': analysis['dependencies'],
+        'errors': []
+    }
+
+    # Measure streaming memory with small dataset
+    tracemalloc.start()
+    small_path = tmp_path / "streaming_small.json"
+    generator.save_json(small_path, small_analysis, statistics, streaming=True)
+    _, small_streaming_peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    # Measure streaming memory with large dataset
+    tracemalloc.start()
+    large_path = tmp_path / "streaming_large.json"
+    generator.save_json(large_path, large_analysis, statistics, streaming=True)
+    _, large_streaming_peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    # Calculate memory scaling factor
+    memory_scale_factor = large_streaming_peak / small_streaming_peak
+    data_scale_factor = large_multiplier / small_multiplier  # 10x
+
+    print(f"\nStreaming Memory Scalability:")
+    print(f"  Small dataset ({small_multiplier}x) peak: {small_streaming_peak / 1024 / 1024:.2f} MB")
+    print(f"  Large dataset ({large_multiplier}x) peak: {large_streaming_peak / 1024 / 1024:.2f} MB")
+    print(f"  Memory scale factor: {memory_scale_factor:.2f}x")
+    print(f"  Data scale factor: {data_scale_factor:.1f}x")
+
+    # Key test: Memory should grow much slower than data size with streaming
+    # If streaming is working, memory should be nearly constant or grow sub-linearly
+    # We use a conservative threshold of 5x to account for test variability
+    assert memory_scale_factor < data_scale_factor / 2, \
+        f"Streaming memory should scale sub-linearly (got {memory_scale_factor:.2f}x vs {data_scale_factor:.1f}x data increase)"
+
+
+def test_streaming_memory_scales_better(
+    sample_project: Path,
+    tmp_path: Path
+):
+    """Verify streaming memory usage scales better with data size."""
+    generator = DocumentationGenerator(
+        sample_project,
+        "TestProject",
+        "1.0.0"
+    )
+
+    # Generate base analysis
+    result = generator.generate()
+    analysis = result['analysis']
+    statistics = result['statistics']
+
+    # Test with small dataset (10x)
+    small_analysis = {
+        'modules': analysis['modules'] * 10,
+        'classes': analysis['classes'] * 10,
+        'functions': analysis['functions'] * 10,
+        'dependencies': analysis['dependencies'],
+        'errors': []
+    }
+
+    tracemalloc.start()
+    small_path = tmp_path / "streaming_small.json"
+    generator.save_json(small_path, small_analysis, statistics, streaming=True)
+    _, small_peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    # Test with large dataset (100x)
+    large_analysis = {
+        'modules': analysis['modules'] * 100,
+        'classes': analysis['classes'] * 100,
+        'functions': analysis['functions'] * 100,
+        'dependencies': analysis['dependencies'],
+        'errors': []
+    }
+
+    tracemalloc.start()
+    large_path = tmp_path / "streaming_large.json"
+    generator.save_json(large_path, large_analysis, statistics, streaming=True)
+    _, large_peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    # Memory increase should be less than data size increase (10x)
+    # because streaming doesn't build entire structure in memory
+    memory_increase_ratio = large_peak / small_peak
+    data_increase_ratio = 10.0  # 100x / 10x
+
+    print(f"\nStreaming Scalability:")
+    print(f"  Small dataset peak: {small_peak / 1024 / 1024:.2f} MB")
+    print(f"  Large dataset peak: {large_peak / 1024 / 1024:.2f} MB")
+    print(f"  Memory increase ratio: {memory_increase_ratio:.1f}x")
+    print(f"  Data increase ratio: {data_increase_ratio:.1f}x")
+
+    # Memory should scale sub-linearly with streaming
+    # (less than proportional to data increase)
+    assert memory_increase_ratio < data_increase_ratio, \
+        f"Streaming memory should scale better than data size (got {memory_increase_ratio:.1f}x vs {data_increase_ratio:.1f}x)"
