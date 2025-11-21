@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:27:56
+**Generated:** 2025-11-21 09:32:54
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 365
-- **Total Lines:** 132791
-- **Total Classes:** 539
-- **Total Functions:** 1658
+- **Total Files:** 366
+- **Total Lines:** 133428
+- **Total Classes:** 544
+- **Total Functions:** 1659
 - **Avg Complexity:** 4.48
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -32,14 +32,48 @@
 
 ### PYTHON
 
-- **Files:** 364
-- **Lines:** 132494
-- **Classes:** 539
-- **Functions:** 1651
+- **Files:** 365
+- **Lines:** 133131
+- **Classes:** 544
+- **Functions:** 1652
 - **Avg Complexity:** 4.49
 
 
 ## 🏛️ Classes
+
+### `ABTestFramework`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:333`
+
+**Description:**
+> Framework for running A/B tests on documentation generation.
+
+Coordinates test execution, documentation generation, and result collection.
+
+**Methods:**
+- `__init__()`
+- `run_test()`
+- `save_result()`
+- `load_result()`
+- `generate_report()`
+- `export_rubric()`
+
+---
+
+### `ABTestResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:141`
+
+**Description:**
+> Results from a single A/B test run.
+
+**Methods:**
+- `determine_winner()`
+- `to_dict()`
+
+---
 
 ### `AIConfigSetupResult`
 
@@ -1423,6 +1457,43 @@ Attributes:
     executive_summary_agent: AI agent to use for summary (None = auto)
     max_insights: Maximum number of insights to include (0 = all)
     insight_severity_threshold: Minimum severity level to include
+
+---
+
+### `EvaluationMetrics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:30`
+
+**Description:**
+> Metrics for evaluating documentation quality.
+
+Each metric is scored on a scale of 1-5:
+- 1: Poor
+- 2: Below Average
+- 3: Average
+- 4: Good
+- 5: Excellent
+
+**Methods:**
+- `compute_composites()`
+- `to_dict()`
+
+---
+
+### `EvaluationRubric`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:208`
+
+**Description:**
+> Rubric for evaluating documentation quality.
+
+Provides structured guidance for scoring each metric consistently.
+
+**Methods:**
+- `default_rubric()`
+- `to_dict()`
 
 ---
 
@@ -10036,6 +10107,17 @@ Attributes:
 - `test_apply_modifications_with_invalid_json()`
 - `test_apply_modifications_with_nonexistent_file()`
 - `test_complex_rollback_scenario()`
+
+---
+
+### `TestVariant`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:23`
+
+**Description:**
+> A/B test variants.
 
 ---
 
@@ -19715,6 +19797,20 @@ Returns:
 - `exclude_patterns`: Optional[List[str]]
 - `languages`: Optional[List[Language]]
 - `verbose`: bool
+
+---
+
+### `create_example_test() -> ABTestResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py:585`
+**Complexity:** 1
+
+**Description:**
+> Create an example test result for documentation purposes.
+
+Returns:
+    Example ABTestResult with sample data
 
 ---
 
@@ -40685,6 +40781,20 @@ Returns:
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowState`
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowStep`
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowVariable`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/ab_testing.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `enum.Enum`
+- `json`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py`
 
