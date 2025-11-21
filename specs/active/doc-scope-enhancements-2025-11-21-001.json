@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:43:43.120826Z",
+  "last_updated": "2025-11-21T16:44:54.967174Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -622,7 +622,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "description": "Update SKILL.md files to guide agents on using the new scope command",
         "risk_level": "low"
@@ -631,7 +631,7 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1",
@@ -639,8 +639,12 @@
         "task-3-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:44:54.961038Z",
+        "journaled_at": "2025-11-21T16:44:54.967153Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-3-verify"
@@ -764,7 +768,7 @@
     "task-3-3": {
       "type": "task",
       "title": "skills/sdd-next/SKILL.md",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -773,12 +777,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "skills/sdd-next/SKILL.md",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "description": "Add usage recommendations for scope --implement during task implementation"
+        "description": "Add usage recommendations for scope --implement during task implementation",
+        "started_at": "2025-11-21T16:44:06.796749Z",
+        "status_note": "Adding scope --implement usage recommendations to sdd-next skill",
+        "completed_at": "2025-11-21T16:44:54.960883Z",
+        "needs_journaling": false,
+        "actual_hours": 0.013,
+        "journaled_at": "2025-11-21T16:44:54.964403Z"
       }
     },
     "phase-3-verify": {
@@ -1012,7 +1022,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 70,
+    "progress_percentage": 75,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -1231,6 +1241,24 @@
       "content": "Added comprehensive fallback criteria section explaining when to use existing commands (describe-module, complexity, dependencies) instead of scope --plan. Included decision matrix with use cases, timing guidance, and clear selection criteria. Content added to skills/sdd-plan/SKILL.md at line 282-302.",
       "metadata": {},
       "task_id": "task-3-2-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:44:54.964397Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: skills/sdd-next/SKILL.md",
+      "author": "claude-code",
+      "content": "Added comprehensive section on using 'sdd doc scope --implement' during implementation phase. Included detailed guidance on when to use it (starting implementation, understanding patterns, refactoring), when NOT to use it (planning phase, quick edits, context limits), example workflow, and optimization tips. Content added to skills/sdd-next/SKILL.md at lines 315-357 in the Implementation Handoff section.",
+      "metadata": {},
+      "task_id": "task-3-3"
+    },
+    {
+      "timestamp": "2025-11-21T16:44:54.967147Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-3-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-3-files"
     }
   ]
 }

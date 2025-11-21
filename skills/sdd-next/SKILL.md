@@ -312,6 +312,50 @@ sdd update-status {spec-id} {task-id} in_progress --note "context"
 - Follow execution plan
 - Document any deviations immediately
 
+**Using `sdd doc scope --implement` During Implementation:**
+
+When documentation is available and you need detailed implementation context for a file, use:
+```bash
+sdd doc scope <file-path> --implement
+```
+
+This provides implementation-focused context including:
+- Detailed function signatures and parameters
+- Full implementation logic and patterns
+- Code examples from the actual file
+- Dependencies and imports
+- Usage examples and patterns
+
+**When to use `scope --implement`:**
+- **Starting implementation of a task** - Get comprehensive context before writing code
+- **Understanding existing patterns** - See how current code works before extending it
+- **Refactoring tasks** - Review full implementation details before restructuring
+- **Complex file modifications** - Need deep understanding of current implementation
+- **Following established patterns** - Extract patterns from existing code to maintain consistency
+
+**When NOT to use `scope --implement`:**
+- **During planning phase** - Use `scope --plan` instead (lighter context)
+- **Quick edits or trivial changes** - Direct file reading may be faster
+- **Documentation unavailable** - Fall back to Read tool
+- **Context limits approaching** - Avoid heavy payloads near 85% threshold
+
+**Example workflow:**
+```bash
+# 1. Task started, need implementation context
+sdd doc scope src/services/auth.ts --implement
+
+# 2. Review detailed implementation patterns and signatures
+# (command returns comprehensive implementation context)
+
+# 3. Implement changes following discovered patterns
+# 4. Mark task complete with journal entry
+```
+
+**Optimization tips:**
+- Use `scope --implement` at task start, not repeatedly during coding
+- Cache insights from output rather than re-running
+- Switch to targeted `Read` calls for specific line ranges if context is tight
+
 **After implementation:**
 
 Mark task complete using sdd-update subagent (atomically marks complete + creates journal):
