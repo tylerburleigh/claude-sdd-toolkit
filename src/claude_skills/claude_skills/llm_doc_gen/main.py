@@ -161,10 +161,15 @@ class DocumentationWorkflow:
                 file_type_patterns=[],
                 config_files=[]
             )
+
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.component_gen.generate_component_doc(
                 component_data,
                 directories_to_analyze=data.get("source_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Component generation failed: {content}")
