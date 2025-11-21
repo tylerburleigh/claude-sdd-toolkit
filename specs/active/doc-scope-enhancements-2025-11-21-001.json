@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:16:06.210296Z",
+  "last_updated": "2025-11-21T16:17:42.526781Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -37,7 +37,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 8,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Implement the sdd doc scope command with both presets and output formats",
         "risk_level": "medium"
@@ -144,7 +144,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -160,13 +160,13 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-1-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/cli.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -181,7 +181,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
         "task_category": "implementation",
@@ -192,7 +192,7 @@
     "task-1-1-1": {
       "type": "subtask",
       "title": "Implement cmd_scope handler function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -201,9 +201,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Create cmd_scope function that handles both --plan and --implement presets, validates flags, calls appropriate CodebaseQuery methods"
+        "description": "Create cmd_scope function that handles both --plan and --implement presets, validates flags, calls appropriate CodebaseQuery methods",
+        "started_at": "2025-11-21T16:16:25.289413Z",
+        "completed_at": "2025-11-21T16:17:42.521024Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-21T16:17:42.525077Z"
       }
     },
     "task-1-1-2": {
@@ -914,7 +919,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 8,
+    "progress_percentage": 12,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -944,6 +949,15 @@
       "content": "All child tasks in group phase-1-investigation have been completed.",
       "metadata": {},
       "task_id": "phase-1-investigation"
+    },
+    {
+      "timestamp": "2025-11-21T16:17:42.525072Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement cmd_scope handler function",
+      "author": "claude-code",
+      "content": "Implemented cmd_scope function in src/claude_skills/claude_skills/doc_query/cli.py (lines 1168-1256). Function validates preset flags (--plan or --implement), handles module parameter, initializes CodebaseQuery, and calls appropriate methods based on preset. For --plan preset, calls get_module_summary() and get_complex_functions_in_module(). For --implement preset, calls get_instantiated_classes_in_file() with note about additional callers/call-graph commands. Includes proper error handling, JSON output support, and follows existing CLI command patterns. Also registered the command in register_doc_query() function (lines 1390-1394).",
+      "metadata": {},
+      "task_id": "task-1-1-1"
     }
   ]
 }

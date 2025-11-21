@@ -1165,6 +1165,97 @@ def cmd_refactor_candidates(args: argparse.Namespace, printer: PrettyPrinter) ->
     return 0
 
 
+def cmd_scope(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Get scoped documentation for planning or implementing changes to a module."""
+    from claude_skills.doc_query.codebase_query import CodebaseQuery
+
+    # Validate preset
+    preset = getattr(args, 'preset', None)
+    if not preset:
+        error_msg = "Preset is required (--plan or --implement)"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    if preset not in ['plan', 'implement']:
+        error_msg = f"Invalid preset '{preset}'. Must be 'plan' or 'implement'"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Get module path
+    module = getattr(args, 'module', None)
+    if not module:
+        error_msg = "Module path is required"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Initialize CodebaseQuery
+    docs_path = getattr(args, 'docs_path', None)
+    codebase_query = CodebaseQuery(docs_path)
+
+    if not codebase_query.load():
+        error_msg = f"Documentation not found at {codebase_query.query.docs_path}. Run 'sdd doc generate' first."
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Build output based on preset
+    output_sections = []
+
+    try:
+        if preset == 'plan':
+            # Plan preset: module summary + complex functions
+            module_summary = codebase_query.get_module_summary(
+                module,
+                include_complexity=True,
+                include_dependencies=True
+            )
+            output_sections.append(module_summary)
+
+            complex_functions = codebase_query.get_complex_functions_in_module(
+                module,
+                top_n=10,
+                threshold=5
+            )
+            if complex_functions:
+                output_sections.append("\n" + complex_functions)
+
+        elif preset == 'implement':
+            # Implement preset: callers + call graph + instantiated classes
+            # Note: For call graph and callers, we need specific function names
+            # This implementation provides instantiated classes as a starting point
+            instantiated = codebase_query.get_instantiated_classes_in_file(
+                module,
+                top_n=10
+            )
+            output_sections.append(instantiated)
+
+            # TODO: Add function callers and call graph when specific functions are identified
+            output_sections.append("\n**Note:** Use 'sdd doc callers <function>' and 'sdd doc call-graph <function>' for detailed call analysis")
+
+    except Exception as e:
+        error_msg = f"Error generating scope for module '{module}': {str(e)}"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Output results
+    final_output = "\n".join(output_sections)
+
+    if _maybe_json(args, {"preset": preset, "module": module, "output": final_output}):
+        return 0
+
+    print(final_output)
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Unified CLI registration
 # ---------------------------------------------------------------------------
@@ -1295,3 +1386,9 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
         default_fmt_rf = 'text'
     refactor.add_argument('--format', choices=['text', 'json'], default=default_fmt_rf, help=f'Output format (default: {default_fmt_rf} from config)')
     refactor.set_defaults(func=cmd_refactor_candidates)
+
+    scope = subparsers.add_parser('scope', parents=[parent_parser], help='Get scoped documentation for planning or implementing changes')
+    scope.add_argument('module', help='Module path to analyze')
+    scope.add_argument('--plan', dest='preset', action='store_const', const='plan', help='Planning preset: module summary + complex functions')
+    scope.add_argument('--implement', dest='preset', action='store_const', const='implement', help='Implementation preset: callers + call graph + instantiated classes')
+    scope.set_defaults(func=cmd_scope)
