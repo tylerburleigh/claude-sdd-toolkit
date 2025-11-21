@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.6.8-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -230,8 +230,17 @@ All specs are Git-trackable JSON files.
 
 | Skill | Purpose | Example Usage |
 |-------|---------|---------------|
-| **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" |
+| **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" "`sdd doc scope src/auth.py --plan`" |
+| **llm-doc-gen** | AI-powered documentation | "Generate architecture docs" "Create API documentation" |
 | **context-tracker** | Monitor Claude usage | "Show my context consumption" |
+
+**New in 0.7.0:**
+- **`sdd doc scope`** command with preset-based workflows:
+  - `--plan` preset: Module summary, complexity analysis, architectural overview
+  - `--implement` preset: Call graphs, callers, instantiated classes
+  - Example: `sdd doc scope src/module.py --plan` or `sdd doc scope src/module.py --implement --function process_data`
+- **LLM-Doc-Gen Performance**: 49x faster cross-reference resolution, 3-4x faster processing with parallel execution
+- **Analysis Integration**: Real codebase metrics automatically enhance LLM-generated documentation
 
 ### Workflow Commands
 
