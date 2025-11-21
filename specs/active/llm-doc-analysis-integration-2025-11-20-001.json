@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-21T00:31:16.240568Z",
+  "last_updated": "2025-11-21T00:32:42.441123Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,9 +21,9 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 34,
+    "progress_percentage": 36,
     "status": "active",
-    "current_phase": "phase-2"
+    "current_phase": "phase-3"
   },
   "hierarchy": {
     "spec-root": {
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {}
     },
     "phase-1": {
@@ -720,7 +720,7 @@
     "phase-3": {
       "type": "phase",
       "title": "Architecture Generator Integration",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -738,7 +738,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Integrate analysis insights into architecture generator (highest value per consensus)",
         "risk_level": "medium"
@@ -747,7 +747,7 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3",
       "children": [
         "task-3-1",
@@ -755,7 +755,7 @@
         "task-3-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -768,7 +768,7 @@
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -785,7 +785,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py",
         "task_category": "implementation",
@@ -796,18 +796,24 @@
     "task-3-1-1": {
       "type": "subtask",
       "title": "Update format_architecture_prompt() signature",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": [
           "Add optional analysis_data parameter",
           "Import extract_insights_from_analysis, format_insights_for_prompt from analysis_insights",
           "Extract insights with focus='architecture'",
           "Format with generator_type='architecture', max_tokens=450"
-        ]
+        ],
+        "started_at": "2025-11-21T00:31:42.450038Z",
+        "status_note": "Updating architecture generator to integrate analysis insights",
+        "completed_at": "2025-11-21T00:32:42.435425Z",
+        "needs_journaling": false,
+        "actual_hours": 0.017,
+        "journaled_at": "2025-11-21T00:32:42.439544Z"
       }
     },
     "task-3-1-2": {
@@ -1841,6 +1847,15 @@
       "content": "All child tasks in phase phase-2 have been completed.",
       "metadata": {},
       "task_id": "phase-2"
+    },
+    {
+      "timestamp": "2025-11-21T00:32:42.439539Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update format_architecture_prompt() signature",
+      "author": "claude-code",
+      "content": "Updated format_architecture_prompt() signature to include optional analysis_data parameter. Added imports for extract_insights_from_analysis and format_insights_for_prompt from analysis.analysis_insights module. Implemented logic to extract insights when analysis_data path is provided, format with generator_type='architecture', and insert formatted insights into prompt after quality attributes section. Added graceful error handling for insight extraction failures. File modified: src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py.",
+      "metadata": {},
+      "task_id": "task-3-1-1"
     }
   ]
 }

@@ -11,6 +11,10 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
 from ..markdown_validator import sanitize_llm_output
+from ..analysis.analysis_insights import (
+    extract_insights_from_analysis,
+    format_insights_for_prompt
+)
 
 
 @dataclass
@@ -52,7 +56,8 @@ class ArchitectureGenerator:
         self,
         arch_data: ArchitectureData,
         key_files: List[str],
-        max_files: int = 15
+        max_files: int = 15,
+        analysis_data: Optional[Path] = None
     ) -> str:
         """
         Format LLM prompt for architecture analysis.
@@ -67,6 +72,7 @@ class ArchitectureGenerator:
             arch_data: Structured architecture data
             key_files: List of key file paths to analyze
             max_files: Maximum number of files to include in prompt
+            analysis_data: Optional path to documentation.json for codebase insights
 
         Returns:
             Formatted prompt string for LLM
@@ -134,6 +140,23 @@ class ArchitectureGenerator:
             for attr in arch_data.quality_attributes:
                 prompt_parts.append(f"- `{attr}`")
             prompt_parts.append("")
+
+        # Add codebase analysis insights if available
+        if analysis_data and analysis_data.exists():
+            try:
+                insights = extract_insights_from_analysis(analysis_data)
+                formatted_insights = format_insights_for_prompt(
+                    insights,
+                    generator_type='architecture',
+                    docs_path=analysis_data
+                )
+                prompt_parts.append("### Codebase Analysis Insights")
+                prompt_parts.append("")
+                prompt_parts.append(formatted_insights)
+                prompt_parts.append("")
+            except Exception as e:
+                # Gracefully handle any errors in insight extraction
+                pass
 
         # Key files to analyze
         prompt_parts.append("## Key Files to Analyze")
