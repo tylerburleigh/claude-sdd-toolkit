@@ -527,7 +527,7 @@ DESCRIBE_MODULE_STANDARD = {
 
 # scope command (doc_query)
 SCOPE_ESSENTIAL = {'preset', 'module', 'output'}
-SCOPE_STANDARD = {'preset', 'module', 'output'}
+SCOPE_STANDARD = {'preset', 'module', 'function', 'output'}
 
 # stats command (doc_query)
 STATS_DOC_QUERY_ESSENTIAL = {
