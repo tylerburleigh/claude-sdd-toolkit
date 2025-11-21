@@ -279,6 +279,28 @@ When documentation is available, these commands accelerate codebase analysis and
 
 This gives you module summary, complexity analysis, and architectural overview in a single command.
 
+**When to Use Existing Commands Instead:**
+
+While `scope --plan` provides comprehensive context, use individual commands when you need focused, specific information:
+
+| Use Case | Recommended Command | When to Choose This |
+|----------|---------------------|---------------------|
+| **Quick module overview** | `sdd doc describe-module <path>` | You only need a summary without complexity/dependency details |
+| **Complexity-focused analysis** | `sdd doc complexity <file>` | Planning refactoring or assessing technical debt for a specific file |
+| **Dependency mapping** | `sdd doc dependencies <file>` | Impact analysis or understanding integration points |
+| **Reverse dependency check** | `sdd doc dependencies --reverse <file>` | Breaking change impact assessment |
+
+Choose individual commands when:
+- You need targeted information quickly (avoid information overload)
+- Working within strict context limits
+- Performing specific analysis tasks (complexity assessment, impact analysis)
+- Documentation is stale/incomplete and you need just one aspect
+
+Choose `scope --plan` when:
+- Starting a new feature or major change (comprehensive context needed)
+- Need balanced view of module for task planning
+- Want architectural patterns + complexity + dependencies together
+
 **Additional Commands:**
 
 | Command | Purpose | Example Usage |

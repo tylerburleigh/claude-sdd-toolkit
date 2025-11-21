@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:41:29.412636Z",
+  "last_updated": "2025-11-21T16:43:43.120826Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -622,7 +622,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Update SKILL.md files to guide agents on using the new scope command",
         "risk_level": "low"
@@ -639,7 +639,7 @@
         "task-3-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -696,7 +696,7 @@
     "task-3-2": {
       "type": "task",
       "title": "skills/sdd-plan/SKILL.md",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-2-1",
@@ -708,7 +708,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "skills/sdd-plan/SKILL.md",
         "task_category": "implementation",
@@ -741,7 +741,7 @@
     "task-3-2-2": {
       "type": "subtask",
       "title": "Add fallback criteria for when to use existing commands",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -750,9 +750,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Document when to use describe-module, complexity, dependencies instead of scope"
+        "description": "Document when to use describe-module, complexity, dependencies instead of scope",
+        "started_at": "2025-11-21T16:43:04.510048Z",
+        "status_note": "Starting work on documenting when to use existing commands instead of scope",
+        "completed_at": "2025-11-21T16:43:43.115632Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-21T16:43:43.119626Z"
       }
     },
     "task-3-3": {
@@ -1006,7 +1012,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 66,
+    "progress_percentage": 70,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -1216,6 +1222,15 @@
       "content": "Added scope --plan as recommended baseline in skills/sdd-plan/SKILL.md Phase 1.2 Analyze the Codebase section (lines 274-291). Created \"Recommended Starting Point\" subsection featuring scope --plan command with description. Repositioned existing commands under \"Additional Commands\" heading. Scope --plan now positioned as the preferred entry point for codebase analysis during planning phase.",
       "metadata": {},
       "task_id": "task-3-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:43:43.119617Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add fallback criteria for when to use existing commands",
+      "author": "claude-code",
+      "content": "Added comprehensive fallback criteria section explaining when to use existing commands (describe-module, complexity, dependencies) instead of scope --plan. Included decision matrix with use cases, timing guidance, and clear selection criteria. Content added to skills/sdd-plan/SKILL.md at line 282-302.",
+      "metadata": {},
+      "task_id": "task-3-2-2"
     }
   ]
 }
