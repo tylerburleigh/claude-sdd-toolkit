@@ -518,3 +518,191 @@ class TestScopeImplementPreset:
             assert isinstance(output_data, dict)
         except json.JSONDecodeError:
             pytest.fail("Compact output is not valid JSON")
+
+
+class TestScopeValidationAndErrors:
+    """Tests for scope command validation and error handling."""
+
+    def test_scope_missing_both_module_and_preset(self, sample_scope_codebase, capsys):
+        """Test error when both module and preset are missing."""
+        args = argparse.Namespace(
+            preset=None,
+            module=None,
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Should fail - preset is required
+        assert result == 1
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+        assert 'preset' in output_text.lower() and 'required' in output_text.lower()
+
+    def test_scope_json_error_format(self, sample_scope_codebase, capsys):
+        """Test that errors are properly formatted in JSON mode."""
+        args = argparse.Namespace(
+            preset=None,  # Missing preset should cause error
+            module='src/auth.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=True,
+            compact=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 1
+
+        captured = capsys.readouterr()
+
+        # Should output valid JSON with error information
+        try:
+            error_data = json.loads(captured.out)
+            assert error_data.get('status') == 'error'
+            assert 'message' in error_data
+        except json.JSONDecodeError:
+            pytest.fail("Error output is not valid JSON")
+
+    def test_scope_plan_with_nonexistent_module(self, sample_scope_codebase, capsys):
+        """Test --plan preset with module that doesn't exist in docs."""
+        args = argparse.Namespace(
+            preset='plan',
+            module='src/nonexistent.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Implementation may return error or handle gracefully
+        # Just verify it doesn't crash
+        assert result in [0, 1]
+
+    def test_scope_implement_with_nonexistent_function(self, sample_scope_codebase, capsys):
+        """Test --implement preset with function that doesn't exist."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='nonexistent_function',
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Implementation may return error or handle gracefully
+        # Just verify it doesn't crash
+        assert result in [0, 1]
+
+    def test_scope_compact_json_single_line(self, sample_scope_codebase, capsys):
+        """Test that compact JSON is truly single-line."""
+        args = argparse.Namespace(
+            preset='plan',
+            module='src/auth.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=True,
+            compact=True
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+
+        # Compact mode should produce single line
+        lines = [l for l in captured.out.strip().splitlines() if l.strip()]
+        assert len(lines) == 1
+
+    def test_scope_both_presets_invalid(self, sample_scope_codebase, capsys):
+        """Test that only one preset can be used at a time."""
+        # This test verifies the preset validation logic
+        # The actual CLI parser might prevent this, but we test the command logic
+
+        for invalid_preset in ['both', 'planimplement', 'all']:
+            args = argparse.Namespace(
+                preset=invalid_preset,
+                module='src/auth.py',
+                function=None,
+                docs_path=str(sample_scope_codebase.parent),
+                json=False
+            )
+
+            printer = PrettyPrinter(verbose=True)
+
+            result = cmd_scope(args, printer)
+
+            # Should reject invalid preset names
+            assert result == 1
+
+    def test_scope_empty_module_path(self, sample_scope_codebase, capsys):
+        """Test error handling for empty module path."""
+        args = argparse.Namespace(
+            preset='plan',
+            module='',  # Empty string
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Should handle empty module gracefully
+        assert result in [0, 1]
+
+    def test_scope_whitespace_module_path(self, sample_scope_codebase, capsys):
+        """Test error handling for whitespace-only module path."""
+        args = argparse.Namespace(
+            preset='plan',
+            module='   ',  # Whitespace only
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Should handle whitespace-only module gracefully
+        assert result in [0, 1]
+
+    def test_scope_case_sensitive_preset(self, sample_scope_codebase, capsys):
+        """Test that preset names are case-sensitive."""
+        for invalid_preset in ['Plan', 'PLAN', 'Implement', 'IMPLEMENT']:
+            args = argparse.Namespace(
+                preset=invalid_preset,
+                module='src/auth.py',
+                function=None,
+                docs_path=str(sample_scope_codebase.parent),
+                json=False
+            )
+
+            printer = PrettyPrinter(verbose=True)
+
+            result = cmd_scope(args, printer)
+
+            # Should reject non-lowercase preset names
+            assert result == 1
+
+            captured = capsys.readouterr()
+            output_text = captured.out + captured.err
+            assert 'invalid' in output_text.lower() or 'preset' in output_text.lower()

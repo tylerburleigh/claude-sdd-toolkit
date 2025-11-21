@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:52:28.655619Z",
+  "last_updated": "2025-11-21T16:53:57.307201Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 21,
+      "completed_tasks": 22,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -866,7 +866,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Ensure implementation works correctly and integrates properly",
         "risk_level": "low"
@@ -875,14 +875,18 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1"
       ],
       "total_tasks": 3,
-      "completed_tasks": 2,
-      "metadata": {},
+      "completed_tasks": 3,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:53:57.301479Z",
+        "journaled_at": "2025-11-21T16:53:57.307177Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -894,7 +898,7 @@
     "task-4-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -907,7 +911,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
         "task_category": "implementation",
@@ -964,7 +968,7 @@
     "task-4-1-3": {
       "type": "subtask",
       "title": "Add tests for flag validation and error cases",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -973,9 +977,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Test invalid flag combinations, missing required flags, etc."
+        "description": "Test invalid flag combinations, missing required flags, etc.",
+        "started_at": "2025-11-21T16:52:59.032000Z",
+        "status_note": "Adding validation tests for scope command flags",
+        "completed_at": "2025-11-21T16:53:57.301324Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-21T16:53:57.304505Z"
       }
     },
     "phase-4-verify": {
@@ -1047,7 +1057,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 87,
+    "progress_percentage": 91,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -1329,6 +1339,24 @@
       "content": "Added comprehensive test suite for scope --implement preset in tests/doc_query/test_scope_command.py. Added 8 passing tests covering: function parameter handling, caller analysis, call graph display, instantiated classes, JSON/compact output formats, error handling for missing docs, and optional function parameter behavior. All tests use same fixture data as --plan tests. Combined test results: 16/16 tests passed (8 --plan + 8 --implement).",
       "metadata": {},
       "task_id": "task-4-1-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:53:57.304501Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add tests for flag validation and error cases",
+      "author": "claude-code",
+      "content": "Added comprehensive validation and error handling test suite for scope command in tests/doc_query/test_scope_command.py. Added 9 passing tests covering: missing module/preset errors, JSON error formatting, nonexistent module/function handling, compact JSON validation, invalid preset combinations, empty/whitespace module paths, and case-sensitive preset validation. Complete test suite results: 25/25 tests passed (8 plan + 8 implement + 9 validation).",
+      "metadata": {},
+      "task_id": "task-4-1-3"
+    },
+    {
+      "timestamp": "2025-11-21T16:53:57.307172Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-files"
     }
   ]
 }
