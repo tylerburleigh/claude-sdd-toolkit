@@ -71,15 +71,105 @@ class AnalysisInsights:
         }
 
 
-# Global cache for loaded documentation JSON
-_documentation_cache: Optional[Dict[str, Any]] = None
-_cache_path: Optional[Path] = None
+# Global cache for loaded documentation JSON with freshness tracking
+@dataclass
+class CacheEntry:
+    """Cache entry with freshness tracking."""
+    data: Dict[str, Any]
+    path: Path
+    load_time: float  # Unix timestamp
+    file_mtime: float  # File modification time
+
+    def is_fresh(self) -> bool:
+        """Check if cached data is still fresh (file hasn't changed)."""
+        try:
+            current_mtime = self.path.stat().st_mtime
+            return current_mtime == self.file_mtime
+        except (OSError, FileNotFoundError):
+            return False
+
+    def age_hours(self) -> float:
+        """Get age of cache entry in hours."""
+        import time
+        return (time.time() - self.load_time) / 3600
+
+
+@dataclass
+class CacheMetrics:
+    """Cache performance metrics."""
+    hits: int = 0
+    misses: int = 0
+    invalidations: int = 0
+
+    def hit_rate(self) -> float:
+        """Calculate cache hit rate."""
+        total = self.hits + self.misses
+        return self.hits / total if total > 0 else 0.0
+
+
+# Global cache singleton
+_documentation_cache: Optional[CacheEntry] = None
+_cache_metrics = CacheMetrics()
+
+
+def _load_and_cache(docs_path: Path) -> Dict[str, Any]:
+    """
+    Load documentation.json and create cache entry.
+
+    Args:
+        docs_path: Path to documentation.json
+
+    Returns:
+        Loaded JSON data
+    """
+    global _documentation_cache
+    import time
+
+    with open(docs_path, 'r') as f:
+        data = json.load(f)
+
+    # Get file modification time
+    file_mtime = docs_path.stat().st_mtime
+
+    # Create cache entry
+    _documentation_cache = CacheEntry(
+        data=data,
+        path=docs_path,
+        load_time=time.time(),
+        file_mtime=file_mtime
+    )
+
+    return data
+
+
+def get_cache_metrics() -> CacheMetrics:
+    """
+    Get current cache performance metrics.
+
+    Returns:
+        CacheMetrics object with hit/miss/invalidation counts
+    """
+    global _cache_metrics
+    return _cache_metrics
+
+
+def reset_cache_metrics() -> None:
+    """Reset cache metrics to zero."""
+    global _cache_metrics
+    _cache_metrics = CacheMetrics()
+
+
+def clear_cache() -> None:
+    """Clear the documentation cache."""
+    global _documentation_cache
+    _documentation_cache = None
 
 
 def extract_insights_from_analysis(
     docs_path: Path,
     codebase_size: Optional[int] = None,
-    use_cache: bool = True
+    use_cache: bool = True,
+    warn_stale: bool = True
 ) -> AnalysisInsights:
     """
     Extract analysis insights from documentation.json.
@@ -93,6 +183,7 @@ def extract_insights_from_analysis(
         docs_path: Path to documentation.json file
         codebase_size: Number of files in codebase (auto-detected if None)
         use_cache: Whether to use global cache for loaded JSON
+        warn_stale: Whether to log warnings for stale data (>24 hours)
 
     Returns:
         AnalysisInsights object with extracted metrics
@@ -101,21 +192,42 @@ def extract_insights_from_analysis(
         FileNotFoundError: If documentation.json doesn't exist
         json.JSONDecodeError: If documentation.json is invalid
     """
-    global _documentation_cache, _cache_path
+    global _documentation_cache, _cache_metrics
+    import time
+    import logging
 
-    # Load documentation.json with caching
-    if use_cache and _cache_path == docs_path and _documentation_cache is not None:
-        data = _documentation_cache
+    # Check if file exists
+    if not docs_path.exists():
+        raise FileNotFoundError(f"Documentation file not found: {docs_path}")
+
+    # Load documentation.json with freshness-aware caching
+    if use_cache and _documentation_cache is not None:
+        # Check if cache is for the same file and still fresh
+        if _documentation_cache.path == docs_path and _documentation_cache.is_fresh():
+            _cache_metrics.hits += 1
+            data = _documentation_cache.data
+
+            # Check for staleness warning (>24 hours old)
+            if warn_stale and _documentation_cache.age_hours() > 24:
+                logging.warning(
+                    f"Documentation cache is {_documentation_cache.age_hours():.1f} hours old. "
+                    "Consider regenerating documentation for up-to-date insights."
+                )
+        else:
+            # Cache invalid (file changed or different path)
+            if _documentation_cache is not None:
+                _cache_metrics.invalidations += 1
+            _cache_metrics.misses += 1
+            data = _load_and_cache(docs_path)
     else:
-        if not docs_path.exists():
-            raise FileNotFoundError(f"Documentation file not found: {docs_path}")
-
-        with open(docs_path, 'r') as f:
-            data = json.load(f)
-
+        # Cache disabled or first load
+        _cache_metrics.misses += 1
         if use_cache:
-            _documentation_cache = data
-            _cache_path = docs_path
+            data = _load_and_cache(docs_path)
+        else:
+            # Load without caching
+            with open(docs_path, 'r') as f:
+                data = json.load(f)
 
     # Auto-detect codebase size if not provided
     if codebase_size is None:
