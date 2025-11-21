@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-21T00:10:28.916358Z",
+  "last_updated": "2025-11-21T00:11:49.665393Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,7 +21,7 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 17,
+    "progress_percentage": 19,
     "status": "active",
     "current_phase": "phase-2"
   },
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {}
     },
     "phase-1": {
@@ -325,7 +325,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Create analysis_insights.py module with extraction, formatting, and caching capabilities",
         "risk_level": "medium"
@@ -344,7 +344,7 @@
         "task-2-5"
       ],
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -357,7 +357,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis_insights.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -375,7 +375,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis_insights.py",
         "task_category": "implementation",
@@ -441,11 +441,11 @@
     "task-2-1-3": {
       "type": "subtask",
       "title": "Implement format_insights_for_prompt()",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": [
           "Implement generator-specific formatting (architecture, component, overview)",
@@ -454,7 +454,13 @@
           "Priority-based truncation when over budget",
           "Add file path reference with framing: 'available for reference'",
           "Include example queries in file path reference"
-        ]
+        ],
+        "started_at": "2025-11-21T00:10:52.235982Z",
+        "status_note": "Implementing format_insights_for_prompt() function",
+        "completed_at": "2025-11-21T00:11:49.659730Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-21T00:11:49.663792Z"
       }
     },
     "task-2-2": {
@@ -1683,6 +1689,15 @@
       "content": "Implemented extract_insights_from_analysis() function with all required features: Priority 1 metrics (most called functions, high complexity, entry points, cross-module dependencies), Priority 2 metrics (instantiated classes, fan-out analysis), caching mechanism for loaded JSON, adaptive scaling based on codebase size (<100=10 items, 100-500=20 items, >500=30 items), integration points detection, language breakdown, and module statistics. File updated at src/claude_skills/claude_skills/llm_doc_gen/analysis/analysis_insights.py (442 lines total).",
       "metadata": {},
       "task_id": "task-2-1-2"
+    },
+    {
+      "timestamp": "2025-11-21T00:11:49.663785Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement format_insights_for_prompt()",
+      "author": "claude-code",
+      "content": "Implemented format_insights_for_prompt() function with generator-specific formatting (architecture/component/overview), table format for 30% token savings, adaptive token budgets (Architecture 450, Component 350, Overview 250), priority-based truncation when over budget, file path reference with 'available for reference' framing, and example queries. Helper functions _truncate_to_budget() and _truncate_section() also implemented. File updated at src/claude_skills/claude_skills/llm_doc_gen/analysis/analysis_insights.py (643 lines total).",
+      "metadata": {},
+      "task_id": "task-2-1-3"
     }
   ]
 }

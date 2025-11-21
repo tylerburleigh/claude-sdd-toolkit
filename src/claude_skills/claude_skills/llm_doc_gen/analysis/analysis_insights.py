@@ -439,3 +439,204 @@ def _calculate_module_statistics(data: Dict[str, Any]) -> Dict[str, int]:
         'total_classes': len(classes),
         'total_dependencies': len(data.get('dependencies', {}))
     }
+
+
+def format_insights_for_prompt(
+    insights: AnalysisInsights,
+    generator_type: str,
+    docs_path: Optional[Path] = None
+) -> str:
+    """
+    Format analysis insights for inclusion in AI consultation prompts.
+
+    Uses table format for 30% token savings. Implements adaptive token budgets
+    and priority-based truncation.
+
+    Token budgets per generator type:
+    - architecture: 450 tokens
+    - component: 350 tokens
+    - overview: 250 tokens
+
+    Args:
+        insights: AnalysisInsights object to format
+        generator_type: One of 'architecture', 'component', 'overview'
+        docs_path: Optional path to documentation.json for reference
+
+    Returns:
+        Formatted string ready for prompt inclusion
+    """
+    # Determine token budget based on generator type
+    token_budgets = {
+        'architecture': 450,
+        'component': 350,
+        'overview': 250
+    }
+    budget = token_budgets.get(generator_type, 350)
+
+    # Build sections with priority ordering
+    sections = []
+
+    # Section 1: Module Statistics (always included, ~50 tokens)
+    if insights.module_statistics:
+        stats = insights.module_statistics
+        sections.append(
+            f"**Codebase Overview:**\n"
+            f"Modules: {stats.get('total_modules', 0)} | "
+            f"Functions: {stats.get('total_functions', 0)} | "
+            f"Classes: {stats.get('total_classes', 0)} | "
+            f"Dependencies: {stats.get('total_dependencies', 0)}"
+        )
+
+    # Section 2: Priority 1 - Most Called Functions (high priority)
+    if insights.most_called_functions:
+        table_rows = [f"{func['name']} ({func.get('file', 'N/A')}) | {func['call_count']} calls"
+                      for func in insights.most_called_functions[:10]]
+        sections.append(
+            f"**Most Called Functions:**\n" + "\n".join(table_rows)
+        )
+
+    # Section 3: Priority 1 - Entry Points (high priority)
+    if insights.entry_points:
+        table_rows = [f"{ep['name']} ({ep.get('type', 'N/A')}) | {ep.get('file', 'N/A')}"
+                      for ep in insights.entry_points[:8]]
+        sections.append(
+            f"**Entry Points:**\n" + "\n".join(table_rows)
+        )
+
+    # Section 4: Priority 1 - Cross-Module Dependencies (high priority for architecture)
+    if insights.cross_module_dependencies and generator_type == 'architecture':
+        table_rows = [f"{dep['from_module']} → {dep['to_module']} | {dep['dependency_count']} refs"
+                      for dep in insights.cross_module_dependencies[:8]]
+        sections.append(
+            f"**Cross-Module Dependencies:**\n" + "\n".join(table_rows)
+        )
+
+    # Section 5: High Complexity Functions (medium priority)
+    if insights.high_complexity_functions:
+        func_list = ", ".join(insights.high_complexity_functions[:8])
+        sections.append(
+            f"**High Complexity Functions:**\n{func_list}"
+        )
+
+    # Section 6: Priority 2 - Most Instantiated Classes (lower priority)
+    if insights.most_instantiated_classes and generator_type in ['architecture', 'component']:
+        table_rows = [f"{cls['name']} ({cls.get('file', 'N/A')}) | {cls['instantiation_count']} instances"
+                      for cls in insights.most_instantiated_classes[:6]]
+        sections.append(
+            f"**Most Used Classes:**\n" + "\n".join(table_rows)
+        )
+
+    # Section 7: Fan-Out Analysis (lower priority, mainly for architecture)
+    if insights.fan_out_analysis and generator_type == 'architecture':
+        table_rows = [f"{func['name']} | calls {func['calls_count']} functions"
+                      for func in insights.fan_out_analysis[:5]]
+        sections.append(
+            f"**Orchestration Functions (High Fan-Out):**\n" + "\n".join(table_rows)
+        )
+
+    # Section 8: Integration Points (lower priority)
+    if insights.integration_points:
+        lib_list = ", ".join([ip['name'] for ip in insights.integration_points[:10]])
+        sections.append(
+            f"**External Integrations:**\n{lib_list}"
+        )
+
+    # Combine sections and check budget
+    formatted_text = "\n\n".join(sections)
+
+    # Rough token estimation (1 token ≈ 4 characters)
+    estimated_tokens = len(formatted_text) // 4
+
+    # If over budget, truncate lower priority sections
+    if estimated_tokens > budget:
+        formatted_text = _truncate_to_budget(sections, budget)
+
+    # Add file path reference if provided
+    if docs_path:
+        file_ref = (
+            f"\n\n**Full Analysis Available:**\n"
+            f"Path: `{docs_path}`\n"
+            f"Query examples: Most called functions, entry points, dependency graph"
+        )
+        formatted_text += file_ref
+
+    return formatted_text
+
+
+def _truncate_to_budget(sections: List[str], budget: int) -> str:
+    """
+    Truncate sections to fit within token budget using priority-based approach.
+
+    Priority order (highest to lowest):
+    1. Codebase Overview (always included)
+    2. Most Called Functions
+    3. Entry Points
+    4. Cross-Module Dependencies
+    5. High Complexity Functions
+    6. Most Used Classes
+    7. Orchestration Functions
+    8. External Integrations
+
+    Args:
+        sections: List of formatted section strings (in priority order)
+        budget: Maximum token budget
+
+    Returns:
+        Truncated formatted text within budget
+    """
+    result_sections = []
+    current_tokens = 0
+
+    for section in sections:
+        section_tokens = len(section) // 4
+
+        # Always include first section (Codebase Overview)
+        if not result_sections:
+            result_sections.append(section)
+            current_tokens += section_tokens
+            continue
+
+        # Check if adding this section exceeds budget
+        if current_tokens + section_tokens + 20 <= budget:  # 20 token buffer
+            result_sections.append(section)
+            current_tokens += section_tokens
+        else:
+            # Try to include a truncated version
+            remaining_budget = budget - current_tokens - 20
+            if remaining_budget > 50:  # Minimum 50 tokens to be useful
+                # Truncate section to fit
+                truncated = _truncate_section(section, remaining_budget * 4)
+                result_sections.append(truncated)
+            break
+
+    return "\n\n".join(result_sections)
+
+
+def _truncate_section(section: str, max_chars: int) -> str:
+    """
+    Truncate a section to fit within character limit.
+
+    Args:
+        section: Section text to truncate
+        max_chars: Maximum characters allowed
+
+    Returns:
+        Truncated section with ellipsis if truncated
+    """
+    if len(section) <= max_chars:
+        return section
+
+    # Split by lines and truncate
+    lines = section.split('\n')
+    result_lines = [lines[0]]  # Always keep header
+    current_len = len(lines[0])
+
+    for line in lines[1:]:
+        if current_len + len(line) + 10 <= max_chars:  # 10 char buffer
+            result_lines.append(line)
+            current_len += len(line) + 1
+        else:
+            result_lines.append("... (truncated)")
+            break
+
+    return '\n'.join(result_lines)
