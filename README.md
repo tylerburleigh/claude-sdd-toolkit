@@ -917,6 +917,8 @@ sdd render <spec>
 
 ## Version History
 
+**0.7.0** - New `sdd doc scope` command with `--plan`/`--implement` presets. 49x speedup in llm-doc-gen cross-reference resolution. Analysis integration enhances LLM docs with real codebase metrics. Parallel processing, persistent caching, streaming output. 100+ new tests.
+
 **0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
 
 **0.6.5** - OpenCode AI provider with Node.js integration. Read-only security mode. Comprehensive provider documentation.
