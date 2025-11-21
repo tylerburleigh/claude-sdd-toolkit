@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-21T13:22:01.047726Z",
+  "last_updated": "2025-11-21T13:27:47.477960Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,7 +21,7 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 71,
+    "progress_percentage": 73,
     "status": "active",
     "current_phase": "phase-5"
   },
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 33,
+      "completed_tasks": 34,
       "metadata": {}
     },
     "phase-1": {
@@ -1322,7 +1322,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Extend doc_query to support codebase.json querying and add advanced features from consensus",
         "risk_level": "medium"
@@ -1340,7 +1340,7 @@
         "task-5-4"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1432,7 +1432,7 @@
     "task-5-3": {
       "type": "task",
       "title": "tests/doc_query/test_codebase_query.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-files",
       "children": [],
       "dependencies": {
@@ -1443,12 +1443,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/doc_query/test_codebase_query.py",
         "task_category": "implementation",
         "estimated_hours": 2,
-        "changes": "Test codebase query functionality"
+        "changes": "Test codebase query functionality",
+        "started_at": "2025-11-21T13:22:32.358707Z",
+        "status_note": "Creating tests for CodebaseQuery class",
+        "completed_at": "2025-11-21T13:27:47.465943Z",
+        "needs_journaling": false,
+        "actual_hours": 0.088,
+        "journaled_at": "2025-11-21T13:27:47.474216Z"
       }
     },
     "task-5-4": {
@@ -2164,6 +2170,15 @@
       "content": "Created freshness.py module implementing codebase.json freshness checking. Implementation includes: FreshnessChecker class with auto-detection of codebase.json location, timestamp comparison between generated_at and source file modification times, support for configurable file extensions and exclude patterns, formatted reporting with human-readable output, and convenience functions for easy integration. Manual verification: tested freshness checking correctly identifies stale documentation, tested formatted report displays clear status indicators and detailed timing info, handles missing documentation gracefully, and auto-detects codebase.json in common locations (docs/, .docs/, project root). Files created: src/claude_skills/claude_skills/llm_doc_gen/freshness.py (341 lines). The module is ready for integration into LLM documentation generation workflows to detect when regeneration is needed.",
       "metadata": {},
       "task_id": "task-5-2"
+    },
+    {
+      "timestamp": "2025-11-21T13:27:47.474203Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: tests/doc_query/test_codebase_query.py",
+      "author": "claude-code",
+      "content": "Created comprehensive test suite for CodebaseQuery class with 39 passing tests.\n\nImplementation includes:\n- Test coverage for initialization and loading (6 tests)\n- Complex functions query tests (6 tests)\n- Function callers query tests (4 tests)\n- Instantiated classes query tests (5 tests)\n- Module summary query tests (4 tests)\n- Call graph summary tests (5 tests)\n- Generic format_for_prompt tests (6 tests)\n- LLM prompt formatting tests (3 tests)\n\nAlso updated DocumentationQuery to support both codebase.json and documentation.json file names:\n- Modified _resolve_docs_path to prefer codebase.json over documentation.json\n- Updated _find_documentation_dir to search for both file names\n- Updated docstrings to reflect dual file support\n\nTest results: All 39 tests passing (0.36s runtime)\n\nFiles created:\n- tests/doc_query/test_codebase_query.py (500+ lines, 39 tests)\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/doc_query_lib.py (added codebase.json support)\n\nThe test suite validates all major CodebaseQuery functionality and ensures proper integration with codebase.json format.",
+      "metadata": {},
+      "task_id": "task-5-3"
     }
   ]
 }
