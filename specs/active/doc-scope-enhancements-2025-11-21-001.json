@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:39:39.992589Z",
+  "last_updated": "2025-11-21T16:41:29.412636Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -622,7 +622,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Update SKILL.md files to guide agents on using the new scope command",
         "risk_level": "low"
@@ -639,7 +639,7 @@
         "task-3-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -696,7 +696,7 @@
     "task-3-2": {
       "type": "task",
       "title": "skills/sdd-plan/SKILL.md",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3-files",
       "children": [
         "task-3-2-1",
@@ -708,7 +708,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "skills/sdd-plan/SKILL.md",
         "task_category": "implementation",
@@ -719,7 +719,7 @@
     "task-3-2-1": {
       "type": "subtask",
       "title": "Add scope --plan as preferred baseline for Phase 1.2",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
@@ -728,9 +728,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Document that scope --plan is recommended for codebase analysis during planning"
+        "description": "Document that scope --plan is recommended for codebase analysis during planning",
+        "started_at": "2025-11-21T16:40:13.266271Z",
+        "completed_at": "2025-11-21T16:41:29.407099Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-21T16:41:29.411436Z"
       }
     },
     "task-3-2-2": {
@@ -1001,7 +1006,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 62,
+    "progress_percentage": 66,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -1202,6 +1207,15 @@
       "content": "Updated Quick Start section in skills/doc-query/SKILL.md (lines 24-56) to feature scope command as preferred baseline. Added scope command examples for both --plan and --implement presets at the top, with descriptions of what each provides. Repositioned existing workflow commands (trace-entry, impact, refactor-candidates, trace-data) under \"For deeper analysis\" heading. Scope command now positioned as the primary entry point for module analysis.",
       "metadata": {},
       "task_id": "task-3-1-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:41:29.411426Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add scope --plan as preferred baseline for Phase 1.2",
+      "author": "claude-code",
+      "content": "Added scope --plan as recommended baseline in skills/sdd-plan/SKILL.md Phase 1.2 Analyze the Codebase section (lines 274-291). Created \"Recommended Starting Point\" subsection featuring scope --plan command with description. Repositioned existing commands under \"Additional Commands\" heading. Scope --plan now positioned as the preferred entry point for codebase analysis during planning phase.",
+      "metadata": {},
+      "task_id": "task-3-2-1"
     }
   ]
 }

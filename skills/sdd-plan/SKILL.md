@@ -271,6 +271,16 @@ Generate documentation now? (2-5 minutes)
 
 When documentation is available, these commands accelerate codebase analysis and planning:
 
+**Recommended Starting Point:**
+
+| Command | Purpose | Example Usage |
+|---------|---------|---------------|
+| `sdd doc scope <module> --plan` | **Get focused planning context for a module** (recommended baseline) | `sdd doc scope src/auth/login.ts --plan` |
+
+This gives you module summary, complexity analysis, and architectural overview in a single command.
+
+**Additional Commands:**
+
 | Command | Purpose | Example Usage |
 |---------|---------|---------------|
 | `sdd doc stats` | Check documentation status and metrics | `sdd doc stats` |
