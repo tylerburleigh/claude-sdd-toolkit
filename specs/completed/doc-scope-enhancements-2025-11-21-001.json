@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:57:09.545293Z",
+  "last_updated": "2025-11-21T18:21:04.147378Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -1077,7 +1077,8 @@
     "status": "completed",
     "activated_date": "2025-11-21T16:14:34.003278Z",
     "progress_percentage": 100,
-    "current_phase": "phase-4"
+    "current_phase": "phase-4",
+    "git.branch_name": "doc-query-enhancements"
   },
   "journal": [
     {
