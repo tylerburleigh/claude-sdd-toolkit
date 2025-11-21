@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:32:54
+**Generated:** 2025-11-21 09:36:19
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 366
-- **Total Lines:** 133428
-- **Total Classes:** 544
-- **Total Functions:** 1659
+- **Total Files:** 367
+- **Total Lines:** 133933
+- **Total Classes:** 547
+- **Total Functions:** 1661
 - **Avg Complexity:** 4.48
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -32,10 +32,10 @@
 
 ### PYTHON
 
-- **Files:** 365
-- **Lines:** 133131
-- **Classes:** 544
-- **Functions:** 1652
+- **Files:** 366
+- **Lines:** 133636
+- **Classes:** 547
+- **Functions:** 1654
 - **Avg Complexity:** 4.49
 
 
@@ -297,6 +297,19 @@ the required abstract methods.
 
 **Methods:**
 - `mark_complete()`
+
+---
+
+### `BenchmarkResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py:110`
+
+**Description:**
+> Results from a benchmark run.
+
+**Methods:**
+- `to_dict()`
 
 ---
 
@@ -3071,6 +3084,43 @@ parsing across multiple languages.
 - `get_language_statistics()`
 - `_should_exclude()`
 - `_print_summary()`
+
+---
+
+### `PerformanceBenchmark`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py:130`
+
+**Description:**
+> Performance benchmark suite for analysis insight extraction.
+
+Measures timing, caching efficiency, and memory usage across different
+codebase sizes.
+
+**Methods:**
+- `__init__()`
+- `benchmark_extraction()`
+- `benchmark_multiple_runs()`
+- `benchmark_by_codebase_size()`
+- `save_result()`
+- `load_result()`
+- `generate_report()`
+
+---
+
+### `PerformanceMetrics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py:33`
+
+**Description:**
+> Performance measurement results.
+
+**Methods:**
+- `meets_performance_target()`
+- `speedup_factor()`
+- `to_dict()`
 
 ---
 
@@ -29062,6 +29112,28 @@ Returns:
 
 ---
 
+### `quick_benchmark(docs_path, generator_type) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py:476`
+**Complexity:** 1
+
+**Description:**
+> Quick benchmark for a single documentation file.
+
+Args:
+    docs_path: Path to documentation.json
+    generator_type: Generator type for formatting
+
+Returns:
+    Dictionary with benchmark results
+
+**Parameters:**
+- `docs_path`: Path
+- `generator_type`: str
+
+---
+
 ### `quick_scan(project_path, exclude, verbose) -> ScanResult`
 
 **Language:** python
@@ -39226,6 +39298,28 @@ Returns:
 
 ---
 
+### `validate_performance_target(docs_path, target_seconds) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py:492`
+**Complexity:** 1
+
+**Description:**
+> Check if insight extraction meets performance target.
+
+Args:
+    docs_path: Path to documentation.json
+    target_seconds: Maximum acceptable overhead
+
+Returns:
+    True if performance meets target
+
+**Parameters:**
+- `docs_path`: Path
+- `target_seconds`: float
+
+---
+
 ### `validate_pr_readiness(spec_data, printer) -> bool`
 
 **Language:** python
@@ -41139,6 +41233,25 @@ Returns:
 - `collections.defaultdict`
 - `pathlib.Path`
 - `sys`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/analysis/performance_benchmark.py`
+
+- `analysis_insights.clear_cache`
+- `analysis_insights.extract_insights_from_analysis`
+- `analysis_insights.format_insights_for_prompt`
+- `analysis_insights.get_cache_metrics`
+- `analysis_insights.reset_cache_metrics`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `json`
+- `pathlib.Path`
+- `psutil`
+- `tempfile`
+- `time`
+- `typing.Any`
+- `typing.Dict`
 - `typing.List`
 - `typing.Optional`
 
