@@ -1,0 +1,909 @@
+{
+  "spec_id": "doc-scope-enhancements-2025-11-21-001",
+  "generated": "2025-11-21T16:00:00Z",
+  "last_updated": "2025-11-21T16:06:56.421383Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Plan Query Enhancements (sdd doc scope)",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ],
+      "total_tasks": 24,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
+        "objectives": [
+          "Create single entry point for comprehensive codebase research",
+          "Support two workflow presets: --plan and --implement",
+          "Provide concrete example outputs for review and reference",
+          "Update skill documentation to guide agents on usage"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core CLI Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-investigation",
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Implement the sdd doc scope command with both presets and output formats",
+        "risk_level": "medium"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-investigation": {
+      "type": "group",
+      "title": "Investigation",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-0"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-0": {
+      "type": "task",
+      "title": "Analyze CodebaseQuery methods and CLI command patterns",
+      "status": "pending",
+      "parent": "phase-1-investigation",
+      "children": [
+        "task-1-0-1",
+        "task-1-0-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-1"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "description": "Review CodebaseQuery methods and existing command patterns to design scope implementation"
+      }
+    },
+    "task-1-0-1": {
+      "type": "subtask",
+      "title": "Review CodebaseQuery methods for --plan preset",
+      "status": "pending",
+      "parent": "task-1-0",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Identify which methods to call for --plan: get_module_summary, get_complex_functions_in_module"
+      }
+    },
+    "task-1-0-2": {
+      "type": "subtask",
+      "title": "Review CodebaseQuery methods for --implement preset",
+      "status": "pending",
+      "parent": "task-1-0",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Identify which methods to call for --implement: get_function_callers, get_call_graph_summary, get_instantiated_classes_in_file"
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [
+          "phase-1-investigation"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/doc_query/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-0"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "description": "Add cmd_scope handler function and register scope command"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Implement cmd_scope handler function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Create cmd_scope function that handles both --plan and --implement presets, validates flags, calls appropriate CodebaseQuery methods"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Implement output formatting for both presets",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Format output as Markdown (default) or JSON (with --json flag) for both presets"
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Register scope command in register_doc_query function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add argparse configuration for scope subcommand with --plan, --implement, --module, --function, --json flags"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Add verbosity filtering for scope command output",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "task_category": "implementation",
+          "estimated_hours": 1,
+          "description": "Add essential/standard field sets for scope output in src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+          "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py"
+        }
+
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Manual test of scope command with both presets",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "description": "Run sdd doc scope --plan --module <file> and sdd doc scope --implement --function <name> to verify output",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Example Output Generation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Create concrete example outputs showing both presets in action",
+        "risk_level": "low"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "examples/doc-scope/plan-markdown-example.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "examples/doc-scope/plan-markdown-example.md",
+          "task_category": "implementation",
+          "estimated_hours": 0.5,
+          "description": "Generate deterministic --plan Markdown output; record exact sdd doc scope command, target module, and commit hash at the top of the file"
+        }
+
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "examples/doc-scope/plan-json-example.json",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "examples/doc-scope/plan-json-example.json",
+          "task_category": "implementation",
+          "estimated_hours": 0.5,
+          "description": "Generate deterministic --plan JSON output; include metadata block with command, target module, and commit hash"
+        }
+
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "examples/doc-scope/implement-markdown-example.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "examples/doc-scope/implement-markdown-example.md",
+          "task_category": "implementation",
+          "estimated_hours": 0.5,
+          "description": "Generate deterministic --implement Markdown output; capture command, target function, and commit hash in the header"
+        }
+
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "examples/doc-scope/implement-json-example.json",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "examples/doc-scope/implement-json-example.json",
+          "task_category": "implementation",
+          "estimated_hours": 0.5,
+          "description": "Generate deterministic --implement JSON output; embed command, target function, and commit hash in metadata"
+        }
+
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "examples/doc-scope/README.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "examples/doc-scope/README.md",
+          "task_category": "implementation",
+          "estimated_hours": 0.5,
+          "description": "Create README explaining the example files, when to use each preset, how to regenerate them (include commands + commit hash instructions), and how deterministic inputs are enforced"
+        }
+
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Documentation Updates",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update SKILL.md files to guide agents on using the new scope command",
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "skills/doc-query/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/doc-query/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add sdd doc scope to Quick Start section and add decision tree guidance"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Update Quick Start with scope command as preferred baseline",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add scope command to Quick Start block and position as comprehensive analysis option"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "skills/sdd-plan/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Add integration guidance for Phase 1.2 codebase analysis using scope --plan"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add scope --plan as preferred baseline for Phase 1.2",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Document that scope --plan is recommended for codebase analysis during planning"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Add fallback criteria for when to use existing commands",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Document when to use describe-module, complexity, dependencies instead of scope"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "skills/sdd-next/SKILL.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-next/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add usage recommendations for scope --implement during task implementation"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Testing & Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Ensure implementation works correctly and integrates properly",
+        "risk_level": "low"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+        "metadata": {
+          "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
+          "task_category": "implementation",
+          "estimated_hours": 2,
+          "description": "Create integration tests for scope command using existing sample documentation fixtures (e.g., tests/doc_query/test_codebase_query.py helpers) to avoid filesystem coupling"
+        }
+
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add tests for --plan preset",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "description": "Test scope --plan --module with both markdown and json output using fixture-backed docs (no reliance on repo docs/)"
+        }
+
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Add tests for --implement preset",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+        "metadata": {
+          "description": "Test scope --implement --function with both markdown and json output using the same fixture data"
+        }
+
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Add tests for flag validation and error cases",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Test invalid flag combinations, missing required flags, etc."
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Run integration tests",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py -v",
+        "expected": "All tests pass"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    }
+  }
+}
