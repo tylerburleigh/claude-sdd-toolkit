@@ -1,12 +1,12 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:55:00.411989Z",
+  "last_updated": "2025-11-21T16:57:09.545293Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Plan Query Enhancements (sdd doc scope)",
-      "status": "in_progress",
+      "status": "completed",
       "parent": null,
       "children": [
         "phase-1",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 23,
+      "completed_tasks": 24,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -852,7 +852,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Testing & Verification",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -866,10 +866,13 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "description": "Ensure implementation works correctly and integrates properly",
-        "risk_level": "low"
+        "risk_level": "low",
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:57:09.535174Z",
+        "journaled_at": "2025-11-21T16:57:09.545270Z"
       }
     },
     "phase-4-files": {
@@ -991,7 +994,7 @@
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "verify-4-1",
@@ -1005,8 +1008,12 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
-      "metadata": {}
+      "completed_tasks": 2,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:57:09.535168Z",
+        "journaled_at": "2025-11-21T16:57:09.543113Z"
+      }
     },
     "verify-4-1": {
       "type": "verify",
@@ -1036,7 +1043,7 @@
     "verify-4-2": {
       "type": "verify",
       "title": "Phase 4 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -1045,7 +1052,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "skill": "sdd-fidelity-review",
@@ -1056,14 +1063,20 @@
           "revert_status": "in_progress",
           "continue_on_failure": false
         },
-        "agent": "sdd-fidelity-review"
+        "agent": "sdd-fidelity-review",
+        "started_at": "2025-11-21T16:55:31.615520Z",
+        "status_note": "Starting Phase 4 fidelity review",
+        "completed_at": "2025-11-21T16:57:09.534448Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-21T16:57:09.538949Z"
       }
     }
   },
   "metadata": {
-    "status": "active",
+    "status": "completed",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 95,
+    "progress_percentage": 100,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -1372,6 +1385,33 @@
       "content": "Integration tests verified successfully. Ran comprehensive test suite for scope command in tests/doc_query/test_scope_command.py covering all presets (--plan and --implement) and validation scenarios. Test results: 25/25 tests passed. Tests cover: 8 --plan preset tests, 8 --implement preset tests, and 9 validation/error handling tests. All functionality verified working correctly with fixture-backed documentation.",
       "metadata": {},
       "task_id": "verify-4-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:57:09.538942Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 4 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Phase 4 fidelity review PARTIAL PASS. Testing requirements fully met with comprehensive test coverage (25/25 tests). Minor deviation: test file location differs from spec (tests/doc_query/test_scope_command.py vs specified src/claude_skills/tests/integration/) but justified by better code organization. All functional requirements satisfied. Full report saved to specs/.fidelity-reviews/.",
+      "metadata": {},
+      "task_id": "verify-4-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:57:09.543102Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-verify"
+    },
+    {
+      "timestamp": "2025-11-21T16:57:09.545261Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Testing & Verification",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-4 have been completed.",
+      "metadata": {},
+      "task_id": "phase-4"
     }
   ]
 }
