@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:34:53.986181Z",
+  "last_updated": "2025-11-21T16:36:05.080479Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -388,7 +388,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "description": "Create concrete example outputs showing both presets in action",
         "risk_level": "low"
@@ -397,7 +397,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -407,8 +407,12 @@
         "task-2-5"
       ],
       "total_tasks": 5,
-      "completed_tasks": 4,
-      "metadata": {},
+      "completed_tasks": 5,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:36:05.074105Z",
+        "journaled_at": "2025-11-21T16:36:05.080457Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-verify"
@@ -520,7 +524,7 @@
     "task-2-5": {
       "type": "task",
       "title": "examples/doc-scope/README.md",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "dependencies": {
@@ -529,12 +533,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "examples/doc-scope/README.md",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "description": "Create README explaining the example files, when to use each preset, how to regenerate them (include commands + commit hash instructions), and how deterministic inputs are enforced"
+        "description": "Create README explaining the example files, when to use each preset, how to regenerate them (include commands + commit hash instructions), and how deterministic inputs are enforced",
+        "started_at": "2025-11-21T16:35:22.140212Z",
+        "completed_at": "2025-11-21T16:36:05.073944Z",
+        "needs_journaling": false,
+        "actual_hours": 0.012,
+        "journaled_at": "2025-11-21T16:36:05.077700Z"
       }
     },
     "phase-2-verify": {
@@ -975,7 +984,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 50,
+    "progress_percentage": 54,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -1122,6 +1131,24 @@
       "content": "Created examples/doc-scope/implement-json-example.json with deterministic --implement JSON output. File includes metadata block with command, target module (cli.py), target function (cmd_scope), commit hash (c43903d28fce5b16f7a23db09108a3010d0c86d8), generation date, and explanatory note. JSON structure includes preset, module, function, and output fields matching SCOPE_STANDARD format.",
       "metadata": {},
       "task_id": "task-2-4"
+    },
+    {
+      "timestamp": "2025-11-21T16:36:05.077687Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: examples/doc-scope/README.md",
+      "author": "claude-code",
+      "content": "Created examples/doc-scope/README.md explaining all example files. README includes table of example files, when to use each preset (--plan for planning/architecture, --implement for implementation/dependencies), example use cases, complete regeneration instructions with commit checkout and commands, and explanation of how deterministic inputs are enforced (commit hash, fixed modules/functions, fixed parameters, documentation regeneration). Also documents output formats (JSON and Markdown).",
+      "metadata": {},
+      "task_id": "task-2-5"
+    },
+    {
+      "timestamp": "2025-11-21T16:36:05.080451Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
     }
   ]
 }
