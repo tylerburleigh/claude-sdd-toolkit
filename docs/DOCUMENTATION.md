@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 11:22:57
+**Generated:** 2025-11-21 11:31:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 367
-- **Total Lines:** 134036
+- **Total Lines:** 134070
 - **Total Classes:** 547
 - **Total Functions:** 1662
-- **Avg Complexity:** 4.48
+- **Avg Complexity:** 4.49
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 366
-- **Lines:** 133739
+- **Lines:** 133773
 - **Classes:** 547
 - **Functions:** 1655
 - **Avg Complexity:** 4.49
@@ -18682,7 +18682,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1170`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Get scoped documentation for planning or implementing changes to a module.
@@ -29427,7 +29427,7 @@ Args:
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1266`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1299`
 **Complexity:** 6
 
 **Description:**
