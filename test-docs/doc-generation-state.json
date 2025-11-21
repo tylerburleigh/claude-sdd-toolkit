@@ -1,0 +1,20 @@
+{
+  "project_root": "/home/tyler/Documents/GitHub/claude-sdd-toolkit/src",
+  "output_folder": "/home/tyler/Documents/GitHub/claude-sdd-toolkit/test-docs",
+  "started_at": "2025-11-21T07:17:08.296304",
+  "last_updated": "2025-11-21T07:27:41.386004",
+  "completed_shards": [
+    "project_overview",
+    "architecture",
+    "component_inventory",
+    "index"
+  ],
+  "failed_shards": [],
+  "pending_shards": [],
+  "shard_summaries": {
+    "project_overview": "project_overview generated: 73 lines, ~1405 tokens",
+    "architecture": "architecture generated: 45 lines, ~729 tokens",
+    "component_inventory": "component_inventory generated: 366 lines, ~7096 tokens",
+    "index": "index generated: 62 lines, ~382 tokens"
+  }
+}
