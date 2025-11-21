@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:15:26.777733Z",
+  "last_updated": "2025-11-21T16:16:06.210296Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -37,7 +37,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 8,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Implement the sdd doc scope command with both presets and output formats",
         "risk_level": "medium"
@@ -53,14 +53,18 @@
     "phase-1-investigation": {
       "type": "group",
       "title": "Investigation",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "task-1-0"
       ],
       "total_tasks": 2,
-      "completed_tasks": 1,
-      "metadata": {},
+      "completed_tasks": 2,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:16:06.204788Z",
+        "journaled_at": "2025-11-21T16:16:06.210274Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-1-files"
@@ -72,7 +76,7 @@
     "task-1-0": {
       "type": "task",
       "title": "Analyze CodebaseQuery methods and CLI command patterns",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-investigation",
       "children": [
         "task-1-0-1",
@@ -86,7 +90,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "task_category": "investigation",
         "estimated_hours": 1,
@@ -118,7 +122,7 @@
     "task-1-0-2": {
       "type": "subtask",
       "title": "Review CodebaseQuery methods for --implement preset",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-0",
       "children": [],
       "dependencies": {
@@ -127,9 +131,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Identify which methods to call for --implement: get_function_callers, get_call_graph_summary, get_instantiated_classes_in_file"
+        "description": "Identify which methods to call for --implement: get_function_callers, get_call_graph_summary, get_instantiated_classes_in_file",
+        "started_at": "2025-11-21T16:15:48.160734Z",
+        "completed_at": "2025-11-21T16:16:06.204643Z",
+        "needs_journaling": false,
+        "actual_hours": 0.005,
+        "journaled_at": "2025-11-21T16:16:06.207912Z"
       }
     },
     "phase-1-files": {
@@ -905,7 +914,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 4,
+    "progress_percentage": 8,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -917,6 +926,24 @@
       "content": "Reviewed CodebaseQuery class in src/claude_skills/claude_skills/doc_query/codebase_query.py. Identified two key methods for --plan preset: (1) get_module_summary() which provides comprehensive module overview with statistics, class/function counts, complexity metrics, top complex functions, and dependency info; (2) get_complex_functions_in_module() which returns most complex functions in a module with complexity scores and descriptions. These methods provide the architectural and complexity context needed for planning implementations.",
       "metadata": {},
       "task_id": "task-1-0-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:16:06.207903Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Review CodebaseQuery methods for --implement preset",
+      "author": "claude-code",
+      "content": "Reviewed CodebaseQuery class and confirmed three methods for --implement preset: (1) get_function_callers() which shows what functions call a specific function with file paths and line numbers; (2) get_call_graph_summary() which builds bidirectional call graphs with depth control and metadata; (3) get_instantiated_classes_in_file() which shows which classes are instantiated in a file with usage frequency. These methods reveal runtime relationships, dependencies, and usage patterns essential for implementation work.",
+      "metadata": {},
+      "task_id": "task-1-0-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:16:06.210268Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Investigation",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-investigation have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-investigation"
     }
   ]
 }
