@@ -1,12 +1,12 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:06:56.421383Z",
+  "last_updated": "2025-11-21T16:15:26.777733Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Plan Query Enhancements (sdd doc scope)",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -29,7 +29,7 @@
     "phase-1": {
       "type": "phase",
       "title": "Core CLI Implementation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-investigation",
@@ -37,7 +37,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Implement the sdd doc scope command with both presets and output formats",
         "risk_level": "medium"
@@ -53,13 +53,13 @@
     "phase-1-investigation": {
       "type": "group",
       "title": "Investigation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-0"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -72,7 +72,7 @@
     "task-1-0": {
       "type": "task",
       "title": "Analyze CodebaseQuery methods and CLI command patterns",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-investigation",
       "children": [
         "task-1-0-1",
@@ -86,7 +86,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "investigation",
         "estimated_hours": 1,
@@ -96,7 +96,7 @@
     "task-1-0-1": {
       "type": "subtask",
       "title": "Review CodebaseQuery methods for --plan preset",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-0",
       "children": [],
       "dependencies": {
@@ -105,9 +105,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Identify which methods to call for --plan: get_module_summary, get_complex_functions_in_module"
+        "description": "Identify which methods to call for --plan: get_module_summary, get_complex_functions_in_module",
+        "started_at": "2025-11-21T16:14:58.153305Z",
+        "completed_at": "2025-11-21T16:15:26.774106Z",
+        "needs_journaling": false,
+        "actual_hours": 0.008,
+        "journaled_at": "2025-11-21T16:15:26.776743Z"
       }
     },
     "task-1-0-2": {
@@ -241,13 +246,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "task_category": "implementation",
-          "estimated_hours": 1,
-          "description": "Add essential/standard field sets for scope output in src/claude_skills/claude_skills/cli/sdd/output_utils.py",
-          "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py"
-        }
-
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add essential/standard field sets for scope output in src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py"
+      }
     },
     "phase-1-verify": {
       "type": "group",
@@ -376,13 +380,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "examples/doc-scope/plan-markdown-example.md",
-          "task_category": "implementation",
-          "estimated_hours": 0.5,
-          "description": "Generate deterministic --plan Markdown output; record exact sdd doc scope command, target module, and commit hash at the top of the file"
-        }
-
+      "metadata": {
+        "file_path": "examples/doc-scope/plan-markdown-example.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Generate deterministic --plan Markdown output; record exact sdd doc scope command, target module, and commit hash at the top of the file"
+      }
     },
     "task-2-2": {
       "type": "task",
@@ -397,13 +400,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "examples/doc-scope/plan-json-example.json",
-          "task_category": "implementation",
-          "estimated_hours": 0.5,
-          "description": "Generate deterministic --plan JSON output; include metadata block with command, target module, and commit hash"
-        }
-
+      "metadata": {
+        "file_path": "examples/doc-scope/plan-json-example.json",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Generate deterministic --plan JSON output; include metadata block with command, target module, and commit hash"
+      }
     },
     "task-2-3": {
       "type": "task",
@@ -418,13 +420,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "examples/doc-scope/implement-markdown-example.md",
-          "task_category": "implementation",
-          "estimated_hours": 0.5,
-          "description": "Generate deterministic --implement Markdown output; capture command, target function, and commit hash in the header"
-        }
-
+      "metadata": {
+        "file_path": "examples/doc-scope/implement-markdown-example.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Generate deterministic --implement Markdown output; capture command, target function, and commit hash in the header"
+      }
     },
     "task-2-4": {
       "type": "task",
@@ -439,13 +440,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "examples/doc-scope/implement-json-example.json",
-          "task_category": "implementation",
-          "estimated_hours": 0.5,
-          "description": "Generate deterministic --implement JSON output; embed command, target function, and commit hash in metadata"
-        }
-
+      "metadata": {
+        "file_path": "examples/doc-scope/implement-json-example.json",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Generate deterministic --implement JSON output; embed command, target function, and commit hash in metadata"
+      }
     },
     "task-2-5": {
       "type": "task",
@@ -460,13 +460,12 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "examples/doc-scope/README.md",
-          "task_category": "implementation",
-          "estimated_hours": 0.5,
-          "description": "Create README explaining the example files, when to use each preset, how to regenerate them (include commands + commit hash instructions), and how deterministic inputs are enforced"
-        }
-
+      "metadata": {
+        "file_path": "examples/doc-scope/README.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Create README explaining the example files, when to use each preset, how to regenerate them (include commands + commit hash instructions), and how deterministic inputs are enforced"
+      }
     },
     "phase-2-verify": {
       "type": "group",
@@ -779,13 +778,12 @@
       },
       "total_tasks": 3,
       "completed_tasks": 0,
-        "metadata": {
-          "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
-          "task_category": "implementation",
-          "estimated_hours": 2,
-          "description": "Create integration tests for scope command using existing sample documentation fixtures (e.g., tests/doc_query/test_codebase_query.py helpers) to avoid filesystem coupling"
-        }
-
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create integration tests for scope command using existing sample documentation fixtures (e.g., tests/doc_query/test_codebase_query.py helpers) to avoid filesystem coupling"
+      }
     },
     "task-4-1-1": {
       "type": "subtask",
@@ -800,10 +798,9 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "description": "Test scope --plan --module with both markdown and json output using fixture-backed docs (no reliance on repo docs/)"
-        }
-
+      "metadata": {
+        "description": "Test scope --plan --module with both markdown and json output using fixture-backed docs (no reliance on repo docs/)"
+      }
     },
     "task-4-1-2": {
       "type": "subtask",
@@ -818,10 +815,9 @@
       },
       "total_tasks": 1,
       "completed_tasks": 0,
-        "metadata": {
-          "description": "Test scope --implement --function with both markdown and json output using the same fixture data"
-        }
-
+      "metadata": {
+        "description": "Test scope --implement --function with both markdown and json output using the same fixture data"
+      }
     },
     "task-4-1-3": {
       "type": "subtask",
@@ -905,5 +901,22 @@
         "agent": "sdd-fidelity-review"
       }
     }
-  }
+  },
+  "metadata": {
+    "status": "active",
+    "activated_date": "2025-11-21T16:14:34.003278Z",
+    "progress_percentage": 4,
+    "current_phase": "phase-1"
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-21T16:15:26.776738Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Review CodebaseQuery methods for --plan preset",
+      "author": "claude-code",
+      "content": "Reviewed CodebaseQuery class in src/claude_skills/claude_skills/doc_query/codebase_query.py. Identified two key methods for --plan preset: (1) get_module_summary() which provides comprehensive module overview with statistics, class/function counts, complexity metrics, top complex functions, and dependency info; (2) get_complex_functions_in_module() which returns most complex functions in a module with complexity scores and descriptions. These methods provide the architectural and complexity context needed for planning implementations.",
+      "metadata": {},
+      "task_id": "task-1-0-1"
+    }
+  ]
 }
