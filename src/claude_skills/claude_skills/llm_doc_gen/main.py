@@ -107,10 +107,14 @@ class DocumentationWorkflow:
 
         # Overview shard
         def generate_overview(data: Dict[str, Any]) -> str:
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.overview_gen.generate_overview(
                 project_data,
                 key_files=data.get("key_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Overview generation failed: {content}")
