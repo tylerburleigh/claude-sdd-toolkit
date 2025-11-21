@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:37:53.759123Z",
+  "last_updated": "2025-11-21T16:39:39.992589Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -606,7 +606,7 @@
     "phase-3": {
       "type": "phase",
       "title": "Documentation Updates",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -622,7 +622,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Update SKILL.md files to guide agents on using the new scope command",
         "risk_level": "low"
@@ -631,7 +631,7 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3",
       "children": [
         "task-3-1",
@@ -639,7 +639,7 @@
         "task-3-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -652,7 +652,7 @@
     "task-3-1": {
       "type": "task",
       "title": "skills/doc-query/SKILL.md",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1"
@@ -663,7 +663,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "skills/doc-query/SKILL.md",
         "task_category": "implementation",
@@ -674,7 +674,7 @@
     "task-3-1-1": {
       "type": "subtask",
       "title": "Update Quick Start with scope command as preferred baseline",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -683,9 +683,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Add scope command to Quick Start block and position as comprehensive analysis option"
+        "description": "Add scope command to Quick Start block and position as comprehensive analysis option",
+        "started_at": "2025-11-21T16:38:24.253934Z",
+        "completed_at": "2025-11-21T16:39:39.987720Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-21T16:39:39.991355Z"
       }
     },
     "task-3-2": {
@@ -996,8 +1001,8 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 58,
-    "current_phase": "phase-2"
+    "progress_percentage": 62,
+    "current_phase": "phase-3"
   },
   "journal": [
     {
@@ -1188,6 +1193,15 @@
       "content": "All child tasks in phase phase-2 have been completed.",
       "metadata": {},
       "task_id": "phase-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:39:39.991346Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update Quick Start with scope command as preferred baseline",
+      "author": "claude-code",
+      "content": "Updated Quick Start section in skills/doc-query/SKILL.md (lines 24-56) to feature scope command as preferred baseline. Added scope command examples for both --plan and --implement presets at the top, with descriptions of what each provides. Repositioned existing workflow commands (trace-entry, impact, refactor-candidates, trace-data) under \"For deeper analysis\" heading. Scope command now positioned as the primary entry point for module analysis.",
+      "metadata": {},
+      "task_id": "task-3-1-1"
     }
   ]
 }

@@ -23,7 +23,21 @@ The `Skill(sdd-toolkit:doc-query)` skill provides targeted query capabilities fo
 
 ## Quick Start
 
-New to doc-query? Start with these automated workflow commands that handle the most common use cases:
+New to doc-query? Start with the **scope command** for comprehensive module analysis:
+
+```bash
+# Get focused context for planning a change
+sdd doc scope <module_path> --plan
+
+# Get focused context for implementing a change
+sdd doc scope <module_path> --implement --function <function_name>
+```
+
+The `scope` command provides tailored information for different workflows:
+- **`--plan`**: Module summary, complexity analysis, and architectural overview
+- **`--implement`**: Function callers, call graphs, and class usage patterns
+
+**For deeper analysis**, use these automated workflow commands:
 
 ```bash
 # Understand how a feature works end-to-end
@@ -39,7 +53,7 @@ sdd doc refactor-candidates
 sdd doc trace-data <ClassName>
 ```
 
-These commands combine 6-8 manual steps into single operations with intelligent analysis and risk assessment.
+These workflow commands combine 6-8 manual steps into single operations with intelligent analysis and risk assessment.
 
 **For specific lookups**, use basic commands:
 - `sdd doc find-function <name>` - Locate a function
