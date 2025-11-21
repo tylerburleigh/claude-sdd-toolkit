@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-21 09:36:19
+**Generated:** 2025-11-21 11:20:12
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 367
-- **Total Lines:** 133933
+- **Total Lines:** 134030
 - **Total Classes:** 547
-- **Total Functions:** 1661
+- **Total Functions:** 1662
 - **Avg Complexity:** 4.48
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -33,9 +33,9 @@
 ### PYTHON
 
 - **Files:** 366
-- **Lines:** 133636
+- **Lines:** 133733
 - **Classes:** 547
-- **Functions:** 1654
+- **Functions:** 1655
 - **Avg Complexity:** 4.49
 
 
@@ -18678,6 +18678,21 @@ Returns:
 
 ---
 
+### `cmd_scope(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1168`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Get scoped documentation for planning or implementing changes to a module.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_search(args, printer) -> int`
 
 **Language:** python
@@ -29412,7 +29427,7 @@ Args:
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1173`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1264`
 **Complexity:** 6
 
 **Description:**

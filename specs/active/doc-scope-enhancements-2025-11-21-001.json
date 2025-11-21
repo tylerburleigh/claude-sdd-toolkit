@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:19:19.851635Z",
+  "last_updated": "2025-11-21T16:20:44.929703Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -37,7 +37,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 8,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "description": "Implement the sdd doc scope command with both presets and output formats",
         "risk_level": "medium"
@@ -144,7 +144,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -160,8 +160,12 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {}
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:20:44.924720Z",
+        "journaled_at": "2025-11-21T16:20:44.929682Z"
+      }
     },
     "task-1-1": {
       "type": "task",
@@ -258,7 +262,7 @@
     "task-1-2": {
       "type": "task",
       "title": "Add verbosity filtering for scope command output",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -269,12 +273,17 @@
         ]
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 1,
         "description": "Add essential/standard field sets for scope output in src/claude_skills/claude_skills/cli/sdd/output_utils.py",
-        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py"
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "started_at": "2025-11-21T16:19:39.306971Z",
+        "completed_at": "2025-11-21T16:20:44.924569Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-21T16:20:44.927381Z"
       }
     },
     "phase-1-verify": {
@@ -929,7 +938,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 20,
+    "progress_percentage": 25,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -986,6 +995,24 @@
       "content": "Registration already completed in task-1-1-1. Verified argparse configuration at lines 1390-1394 includes: scope subcommand with 'module' positional argument, --plan flag (sets preset='plan'), --implement flag (sets preset='implement'), inherits --json from parent_parser (standard across all doc commands), and sets default function to cmd_scope. Configuration complete and functional.",
       "metadata": {},
       "task_id": "task-1-1-3"
+    },
+    {
+      "timestamp": "2025-11-21T16:20:44.927372Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add verbosity filtering for scope command output",
+      "author": "claude-code",
+      "content": "Added verbosity filtering constants for scope command in src/claude_skills/claude_skills/cli/sdd/output_utils.py (lines 528-530): SCOPE_ESSENTIAL and SCOPE_STANDARD both include preset, module, and output fields. Updated imports in src/claude_skills/claude_skills/doc_query/cli.py (lines 53-54) to include the new constants. Current implementation already returns structured JSON with these fields when --json flag is used, so no additional filtering logic needed in cmd_scope function. Both ESSENTIAL and STANDARD sets are identical since all fields are necessary for scope output.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-21T16:20:44.929674Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-files"
     }
   ]
 }

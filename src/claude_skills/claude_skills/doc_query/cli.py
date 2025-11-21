@@ -50,6 +50,8 @@ from claude_skills.cli.sdd.output_utils import (
     CONTEXT_DOC_QUERY_STANDARD,
     DESCRIBE_MODULE_ESSENTIAL,
     DESCRIBE_MODULE_STANDARD,
+    SCOPE_ESSENTIAL,
+    SCOPE_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
