@@ -441,20 +441,18 @@ class DocumentationGenerator:
         statistics = result['statistics']
 
         # Save in requested format(s)
-        if format_type in ['markdown', 'both']:
-            md_path = output_dir / 'DOCUMENTATION.md'
-            self.save_markdown(md_path, analysis, statistics, verbose=verbose)
+        if format_type in ['markdown', 'both'] and verbose:
+            print("⚠️ Markdown output deprecated; skipping legacy single-file generation.")
 
-        if format_type in ['json', 'both']:
-            json_path = output_dir / 'codebase.json'
-            self.save_json(
-                json_path,
-                analysis,
-                statistics,
-                verbose=verbose,
-                streaming=streaming,
-                compress=compress
-            )
+        json_path = output_dir / 'codebase.json'
+        self.save_json(
+            json_path,
+            analysis,
+            statistics,
+            verbose=verbose,
+            streaming=streaming,
+            compress=compress
+        )
 
         if verbose:
             print(f"\n🎉 Documentation generation complete!")

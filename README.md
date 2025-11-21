@@ -234,14 +234,6 @@ All specs are Git-trackable JSON files.
 | **llm-doc-gen** | AI-powered documentation | "Generate architecture docs" "Create API documentation" |
 | **context-tracker** | Monitor Claude usage | "Show my context consumption" |
 
-**New in 0.7.0:**
-- **`sdd doc scope`** command with preset-based workflows:
-  - `--plan` preset: Module summary, complexity analysis, architectural overview
-  - `--implement` preset: Call graphs, callers, instantiated classes
-  - Example: `sdd doc scope src/module.py --plan` or `sdd doc scope src/module.py --implement --function process_data`
-- **LLM-Doc-Gen Performance**: 49x faster cross-reference resolution, 3-4x faster processing with parallel execution
-- **Analysis Integration**: Real codebase metrics automatically enhance LLM-generated documentation
-
 ### Workflow Commands
 
 | Command | Purpose |
@@ -372,10 +364,13 @@ sdd doc analyze-with-ai . --name "MyProject" --version "1.0.0"
 ```
 
 **Outputs:**
-- `docs/DOCUMENTATION.md` - Structural reference
-- `docs/documentation.json` - Machine-readable data (AST, dependencies, metrics)
-- `docs/ARCHITECTURE.md` - Architecture overview
-- `docs/AI_CONTEXT.md` - AI assistant reference
+- `docs/index.md` - Structural reference
+- `docs/codebase.json` - Machine-readable data (AST, dependencies, metrics)
+- `docs/project-overview.md` - Executive summary
+- `docs/architecture.md` - Architecture overview
+- `docs/component-inventory.md` - Component catalog
+
+- `docs/index.md` and shard files - Human-readable multi-file docs
 
 **Used By:**
 - `sdd-plan` - Understands existing patterns
@@ -486,10 +481,11 @@ Claude: [Uses llm-doc-gen]
         Consulting cursor-agent and gemini...
 
         Generated:
-        - docs/DOCUMENTATION.md
-        - docs/documentation.json
-        - docs/ARCHITECTURE.md
-        - docs/AI_CONTEXT.md
+        - docs/codebase.json
+        - docs/index.md
+        - docs/project-overview.md
+        - docs/architecture.md
+        - docs/component-inventory.md
 
 You: What classes handle authentication?
 
@@ -605,10 +601,11 @@ your-project/
 │   └── ai_config.yaml         # AI defaults
 │
 ├── docs/                      # Optional
-│   ├── documentation.json
-│   ├── DOCUMENTATION.md
-│   ├── ARCHITECTURE.md
-│   └── AI_CONTEXT.md
+│   ├── codebase.json
+│   ├── index.md
+│   ├── project-overview.md
+│   ├── architecture.md
+│   └── component-inventory.md
 │
 └── [source code]
 ```
@@ -944,9 +941,10 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 - [docs/examples/](docs/examples/) - Workflow examples
 
 ### For Developers
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
-- [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md) - AI assistant reference
-- [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) - Structural reference
+- [docs/index.md](docs/index.md) - Structural reference
+- [docs/architecture.md](docs/architecture.md) - System architecture
+- [docs/project-overview.md](docs/project-overview.md) - Executive summary
+- [docs/component-inventory.md](docs/component-inventory.md) - Component catalog
 
 ### Stats
 - 183 Python modules
@@ -971,7 +969,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 - Issues: [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
 - Docs: [Claude Code Documentation](https://docs.claude.com/claude-code)
-- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Architecture: [docs/architecture.md](docs/architecture.md)
 
 ## Components
 

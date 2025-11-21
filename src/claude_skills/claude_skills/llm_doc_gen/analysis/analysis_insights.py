@@ -3,7 +3,7 @@ Analysis insights data structures for LLM documentation generation.
 
 This module defines data structures for storing extracted codebase analysis
 insights that enhance AI-generated documentation. These insights are extracted
-from documentation.json and formatted for inclusion in AI consultation prompts.
+from codebase.json and formatted for inclusion in AI consultation prompts.
 """
 
 import json
@@ -16,7 +16,7 @@ from collections import defaultdict
 @dataclass
 class AnalysisInsights:
     """
-    Container for codebase analysis insights extracted from documentation.json.
+    Container for codebase analysis insights extracted from codebase.json.
 
     These insights provide high-level codebase metrics and patterns that help
     AI models generate more contextual and accurate documentation.
@@ -114,10 +114,10 @@ _cache_metrics = CacheMetrics()
 
 def _load_and_cache(docs_path: Path) -> Dict[str, Any]:
     """
-    Load documentation.json and create cache entry.
+    Load codebase.json and create cache entry.
 
     Args:
-        docs_path: Path to documentation.json
+        docs_path: Path to codebase.json
 
     Returns:
         Loaded JSON data
@@ -172,7 +172,7 @@ def extract_insights_from_analysis(
     warn_stale: bool = True
 ) -> AnalysisInsights:
     """
-    Extract analysis insights from documentation.json.
+    Extract analysis insights from codebase.json.
 
     Implements adaptive scaling based on codebase size:
     - Small (<100 files): Top 10 items per metric
@@ -180,7 +180,7 @@ def extract_insights_from_analysis(
     - Large (>500 files): Top 30 items per metric
 
     Args:
-        docs_path: Path to documentation.json file
+        docs_path: Path to codebase.json file
         codebase_size: Number of files in codebase (auto-detected if None)
         use_cache: Whether to use global cache for loaded JSON
         warn_stale: Whether to log warnings for stale data (>24 hours)
@@ -189,8 +189,8 @@ def extract_insights_from_analysis(
         AnalysisInsights object with extracted metrics
 
     Raises:
-        FileNotFoundError: If documentation.json doesn't exist
-        json.JSONDecodeError: If documentation.json is invalid
+        FileNotFoundError: If codebase.json doesn't exist
+        json.JSONDecodeError: If codebase.json is invalid
     """
     global _documentation_cache, _cache_metrics
     import time
@@ -200,7 +200,7 @@ def extract_insights_from_analysis(
     if not docs_path.exists():
         raise FileNotFoundError(f"Documentation file not found: {docs_path}")
 
-    # Load documentation.json with freshness-aware caching
+    # Load codebase.json with freshness-aware caching
     if use_cache and _documentation_cache is not None:
         # Check if cache is for the same file and still fresh
         if _documentation_cache.path == docs_path and _documentation_cache.is_fresh():
@@ -572,7 +572,7 @@ def format_insights_for_prompt(
     Args:
         insights: AnalysisInsights object to format
         generator_type: One of 'architecture', 'component', 'overview'
-        docs_path: Optional path to documentation.json for reference
+        docs_path: Optional path to codebase.json for reference
 
     Returns:
         Formatted string ready for prompt inclusion

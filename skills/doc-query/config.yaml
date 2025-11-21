@@ -2,7 +2,7 @@
 
 # Default paths
 default_docs_path: "docs"  # Relative to project root
-documentation_file: "documentation.json"
+documentation_file: "codebase.json"
 
 # Complexity thresholds
 complexity:

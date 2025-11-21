@@ -22,7 +22,7 @@ from claude_skills.llm_doc_gen.analysis.analysis_insights import clear_cache
 
 @pytest.fixture
 def sample_documentation_json():
-    """Create a sample documentation.json for testing."""
+    """Create a sample codebase.json for testing."""
     data = {
         'functions': [
             {
@@ -57,7 +57,7 @@ def sample_documentation_json():
 
 @pytest.fixture
 def docs_path(sample_documentation_json):
-    """Create a temporary documentation.json file."""
+    """Create a temporary codebase.json file."""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         json.dump(sample_documentation_json, f)
         path = Path(f.name)

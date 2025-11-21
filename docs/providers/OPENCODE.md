@@ -626,7 +626,5 @@ Token usage is extracted from the OpenCode response metadata:
 
 ## See Also
 
-- [SDD Toolkit AI Configuration](../AI_CONTEXT.md#6-provider---ai-tool-abstraction)
-- [Provider Architecture](../ARCHITECTURE.md)
-- [Adding New Providers](../AI_CONTEXT.md#adding-a-new-ai-provider)
-- [Multi-Provider Workflows](../AI_CONTEXT.md#multi-provider-workflows)
+- [Documentation Index](../index.md)
+- [Provider Architecture](../architecture.md)

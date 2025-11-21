@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# PreToolUse hook to block Bash commands that directly access codebase.json files
+# Prevents bypassing the Read() hook by using any file I/O method
+
+set -euo pipefail
+
+# Read JSON input from stdin
+input=$(cat)
+
+# Extract command from tool_input using jq (or fall back to grep/sed if jq unavailable)
+if command -v jq &> /dev/null; then
+    bash_command=$(echo "$input" | jq -r '.tool_input.command // empty')
+else
+    # Fallback: simple extraction using grep/sed
+    bash_command=$(echo "$input" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | head -1)
+fi
+
+# If no command found, allow
+if [ -z "$bash_command" ]; then
+    exit 0
+fi
+
+# Check for any pattern that indicates direct codebase.json file access
+# Patterns cover: Python (json.load/open), bash tools (cat/head/tail/etc), jq, and other file I/O
+if echo "$bash_command" | grep -qE "(python.*json\.load.*codebase\.json)|(python.*open\(['\"].*codebase\.json)|((cat|head|tail|less|more|sed|awk|grep).*codebase\.json)|(jq.*codebase\.json)"; then
+    cat >&2 <<'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                ⛔ CODEBASE.JSON ACCESS BLOCKED                         ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+WHAT: You attempted to directly access a codebase.json file via Bash command.
+
+WHY: This bypasses the Read() hook and wastes massive amounts of context tokens.
+     codebase.json files are extremely large (often 5-10+ MB). The doc-query
+     skill provides optimized tools for querying codebase documentation efficiently.
+
+HOW TO FIX:
+  Use doc-query CLI commands to query specific information from the
+  codebase documentation without accessing the JSON file.
+
+  Available commands:
+
+  - Find classes by name or pattern:
+    Bash(doc-query find-class <pattern>)
+    Example: doc-query find-class "SpecValidator"
+
+  - Find functions by name or pattern:
+    Bash(doc-query find-function <pattern>)
+    Example: doc-query find-function "parse_spec"
+
+  - Get detailed information about a specific class:
+    Bash(doc-query get-class <class-name>)
+    Example: doc-query get-class "SpecificationValidator"
+
+  - Get detailed information about a specific function:
+    Bash(doc-query get-function <function-name>)
+    Example: doc-query get-function "validate_specification"
+
+  - Find dependencies of a module:
+    Bash(doc-query get-dependencies <module-path>)
+    Example: doc-query get-dependencies "src/lib/validator.py"
+
+  - Find call graph (who calls what):
+    Bash(doc-query get-call-graph <function-name>)
+    Example: doc-query get-call-graph "validate_spec"
+
+  - List all available classes:
+    Bash(doc-query list-classes [--limit N])
+
+  - List all available functions:
+    Bash(doc-query list-functions [--limit N])
+
+EXAMPLES:
+  Instead of: cat docs/codebase.json | jq '.classes'
+  Use: Bash(doc-query list-classes)
+
+  Instead of: python -c "import json; ..." with codebase.json
+  Use: Bash(doc-query find-function "my_function")
+
+  Instead of: grep "some_class" docs/codebase.json
+  Use: Bash(doc-query find-class "some_class")
+
+⚠️  CRITICAL: ALL codebase.json access must go through doc-query CLI commands.
+   If Read() is blocked, Bash file I/O is also blocked. Use doc-query commands.
+
+This hook enforces efficient codebase querying and prevents token waste.
+
+EOF
+    exit 2
+fi
+
+# Allow all other bash commands
+exit 0

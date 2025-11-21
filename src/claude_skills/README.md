@@ -5,7 +5,7 @@ Professional Python package implementing Spec-Driven Development (SDD) workflows
 ## 📚 Documentation
 
 - **[Complete Installation Guide](../../INSTALLATION.md)** - Setup for both Python package and Claude Code integration
-- **[Architecture Documentation](../../docs/ARCHITECTURE.md)** - System design and implementation details
+- **[Architecture Documentation](../../docs/architecture.md)** - System design and implementation details
 - **[Best Practices](../../docs/BEST_PRACTICES.md)** - Development guidelines and patterns
 
 **New user?** Start with [../../INSTALLATION.md](../../INSTALLATION.md) for complete setup instructions.

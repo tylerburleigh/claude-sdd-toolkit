@@ -31,7 +31,7 @@ class TestPromptFormatting:
         prompt = format_architecture_research_prompt(context_summary, key_files, temp_project_dir)
 
         # Should have task header
-        assert "# Task:" in prompt or "ARCHITECTURE.md" in prompt
+        assert "# Task:" in prompt or "architecture.md" in prompt
 
         # Should include context
         assert "FastAPI" in prompt
@@ -41,7 +41,7 @@ class TestPromptFormatting:
 
         # Should have required sections
         assert "System Overview" in prompt
-        assert "Architecture" in prompt
+        assert "Architecture" in prompt or "architecture.md" in prompt
         assert "Component" in prompt or "Data Flow" in prompt
 
     def test_format_architecture_prompt_key_files(self, temp_project_dir):
@@ -66,7 +66,7 @@ class TestPromptFormatting:
         prompt = format_ai_context_research_prompt(context_summary, key_files, temp_project_dir)
 
         # Should have task header
-        assert "AI_CONTEXT.md" in prompt
+        assert "AI Context Research" in prompt
 
         # Should have required sections
         assert "Project Overview" in prompt

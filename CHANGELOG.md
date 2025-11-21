@@ -596,4 +596,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 For installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 For usage guide, see [README.md](README.md).
-For architecture details, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+For architecture details, see [docs/architecture.md](docs/architecture.md).

@@ -162,7 +162,7 @@ class PerformanceBenchmark:
         5. Cache hit rates
 
         Args:
-            docs_path: Path to documentation.json file
+            docs_path: Path to codebase.json file
             benchmark_id: Optional custom ID (auto-generated if None)
             generator_type: Generator type for formatting ('architecture', 'component', 'overview')
 
@@ -268,7 +268,7 @@ class PerformanceBenchmark:
         Run multiple benchmark iterations to get statistical data.
 
         Args:
-            docs_path: Path to documentation.json
+            docs_path: Path to codebase.json
             num_runs: Number of benchmark iterations
             generator_type: Generator type for formatting
 
@@ -478,7 +478,7 @@ def quick_benchmark(docs_path: Path, generator_type: str = 'architecture') -> Di
     Quick benchmark for a single documentation file.
 
     Args:
-        docs_path: Path to documentation.json
+        docs_path: Path to codebase.json
         generator_type: Generator type for formatting
 
     Returns:
@@ -494,7 +494,7 @@ def validate_performance_target(docs_path: Path, target_seconds: float = 2.0) ->
     Check if insight extraction meets performance target.
 
     Args:
-        docs_path: Path to documentation.json
+        docs_path: Path to codebase.json
         target_seconds: Maximum acceptable overhead
 
     Returns:

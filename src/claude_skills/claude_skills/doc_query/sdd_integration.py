@@ -21,7 +21,7 @@ class SDDContextGatherer:
         Initialize the context gatherer.
 
         Args:
-            docs_path: Path to documentation.json or docs directory
+            docs_path: Path to codebase.json or docs directory
         """
         self.query = DocumentationQuery(docs_path)
         if not self.query.load():

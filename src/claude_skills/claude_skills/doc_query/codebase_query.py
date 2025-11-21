@@ -20,7 +20,7 @@ class CodebaseQuery:
     inclusion in AI documentation generation prompts.
 
     Features:
-    - Auto-detects codebase.json (documentation.json) in docs/ directory
+    - Auto-detects codebase.json in docs/ directory
     - Returns formatted text responses for LLM prompts
     - Supports complexity queries, call graphs, and instantiation queries
 
@@ -35,7 +35,7 @@ class CodebaseQuery:
         Initialize codebase query interface.
 
         Args:
-            docs_path: Path to documentation.json or its directory.
+            docs_path: Path to codebase.json or its directory.
                       If None, auto-detects in common locations.
         """
         self.query = DocumentationQuery(docs_path)
@@ -435,7 +435,7 @@ def create_codebase_query(docs_path: Optional[str] = None) -> CodebaseQuery:
     Convenience function to create and load a CodebaseQuery instance.
 
     Args:
-        docs_path: Path to documentation.json or its directory
+        docs_path: Path to codebase.json or its directory
 
     Returns:
         Loaded CodebaseQuery instance

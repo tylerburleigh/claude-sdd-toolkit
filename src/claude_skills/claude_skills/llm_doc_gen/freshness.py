@@ -57,18 +57,16 @@ class FreshnessChecker:
         if docs_path:
             path = Path(docs_path)
             if path.is_dir():
-                # Look for codebase.json or documentation.json in directory
-                for name in ["codebase.json", "documentation.json"]:
-                    candidate = path / name
-                    if candidate.exists():
-                        return candidate
+                # Look for codebase.json in directory
+                candidate = path / "codebase.json"
+                if candidate.exists():
+                    return candidate
             elif path.exists():
                 return path
 
         # Auto-detect in common locations
         common_locations = [
             self.project_root / "docs" / "codebase.json",
-            self.project_root / "docs" / "documentation.json",
             self.project_root / ".docs" / "codebase.json",
             self.project_root / "codebase.json",
         ]
