@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-21T12:40:50.442754Z",
+  "last_updated": "2025-11-21T12:44:35.954401Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,7 +21,7 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 56,
+    "progress_percentage": 58,
     "status": "active",
     "current_phase": "phase-4"
   },
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 26,
+      "completed_tasks": 27,
       "metadata": {}
     },
     "phase-1": {
@@ -1029,7 +1029,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Extend analysis insights to component and overview generators",
         "risk_level": "low"
@@ -1047,7 +1047,7 @@
         "task-4-4"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1156,7 +1156,7 @@
     "task-4-3": {
       "type": "task",
       "title": "tests/llm_doc_gen/test_component_generator.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1167,12 +1167,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/llm_doc_gen/test_component_generator.py",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "changes": "Test component generator with insights"
+        "changes": "Test component generator with insights",
+        "started_at": "2025-11-21T12:42:17.573473Z",
+        "status_note": "Starting test implementation for component generator with insights",
+        "completed_at": "2025-11-21T12:44:35.941844Z",
+        "needs_journaling": false,
+        "actual_hours": 0.038,
+        "journaled_at": "2025-11-21T12:44:35.950469Z"
       }
     },
     "task-4-4": {
@@ -2021,6 +2027,15 @@
       "content": "Successfully expanded existing statistics section in overview generator with analysis insights. Changes made:\n1. Added imports for extract_insights_from_analysis and format_insights_for_prompt in overview_generator.py\n2. Added analysis_data parameter to format_overview_prompt() method\n3. Added \"Codebase Analysis Insights\" section after existing Language Breakdown section using format_insights_for_prompt with generator_type='overview' (250 token budget)\n4. Updated generate_overview() to accept and pass through analysis_data parameter\n5. Updated main.py to determine codebase.json path and pass analysis_data_path to overview_gen.generate_overview()\n\nAll changes compile successfully. Overview generator now integrates analysis insights (most referenced functions, core classes, entry points) alongside existing module and language statistics within the 250 token budget.",
       "metadata": {},
       "task_id": "task-4-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T12:44:35.950449Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: tests/llm_doc_gen/test_component_generator.py",
+      "author": "claude-code",
+      "content": "Created comprehensive test file for component generator with insights integration at tests/llm_doc_gen/test_component_generator.py. All 24 tests passing, covering:\n\n1. Basic generator initialization and ComponentData defaults\n2. Prompt formatting for single-part and multi-part projects\n3. Directory limit enforcement\n4. Research section completeness\n5. Source tree inclusion\n6. **Insights integration** (NEW - core focus):\n   - Prompt formatting with insights enabled\n   - Backward compatibility without insights\n   - Graceful handling of nonexistent insight files\n   - Correct positioning of insights in prompts\n   - Full workflow with insights integration\n   - Proper format validation for component generator type\n7. Document composition for single/multi-part projects\n8. Full workflow with LLM consultation (success and failure)\n9. Read-only emphasis, table templates, output format guidance\n10. Multi-part integration section inclusion\n11. Asset location handling\n12. Specs directory ignore directive\n\nTests verify insights are properly extracted from documentation.json, formatted for component generator type (350 token budget), positioned correctly in prompts (after source tree, before directories), and integrated into the full generation workflow.\n\nTest file: tests/llm_doc_gen/test_component_generator.py (479 lines, 24 tests)\nTest execution: All 24 tests pass in 0.34s",
+      "metadata": {},
+      "task_id": "task-4-3"
     }
   ]
 }
