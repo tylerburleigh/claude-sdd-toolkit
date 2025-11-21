@@ -525,6 +525,10 @@ DESCRIBE_MODULE_STANDARD = {
     'docstring', 'line_count', 'complexity'
 }
 
+# scope command (doc_query)
+SCOPE_ESSENTIAL = {'preset', 'module', 'output'}
+SCOPE_STANDARD = {'preset', 'module', 'function', 'output'}
+
 # stats command (doc_query)
 STATS_DOC_QUERY_ESSENTIAL = {
     'total_files', 'total_modules', 'total_classes', 'total_functions',

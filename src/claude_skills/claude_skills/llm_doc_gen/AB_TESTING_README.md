@@ -46,7 +46,7 @@ def my_generator(analysis_data_path):
     Your generator function that produces documentation.
 
     Args:
-        analysis_data_path: Path to documentation.json (None for control variant)
+        analysis_data_path: Path to codebase.json (None for control variant)
 
     Returns:
         tuple[bool, str]: (success, documentation_output)
@@ -63,7 +63,7 @@ def my_generator(analysis_data_path):
 result = framework.run_test(
     generator_type='architecture',  # or 'component', 'overview'
     generator_fn=my_generator,
-    analysis_data_path=Path('./documentation.json')  # Optional
+    analysis_data_path=Path('./codebase.json')  # Optional
 )
 
 # Save result
@@ -350,7 +350,7 @@ test_ids = []
 
 for codebase_path in glob.glob('./codebases/*'):
     codebase = Path(codebase_path)
-    analysis_data = codebase / 'documentation.json'
+    analysis_data = codebase / 'codebase.json'
 
     # Define generator for this codebase
     def codebase_generator(analysis_path):

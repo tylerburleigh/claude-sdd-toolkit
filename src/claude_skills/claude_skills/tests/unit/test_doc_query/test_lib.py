@@ -72,7 +72,7 @@ def test_context_for_area_includes_docstrings_and_stats(doc_query_samples):
 def test_get_callers_with_v2_schema(tmp_path):
     """Test get_callers() with schema v2.0 cross-reference data."""
     # Create test documentation with v2.0 schema
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -105,7 +105,7 @@ def test_get_callers_with_v2_schema(tmp_path):
 
 def test_get_callers_exclude_file(tmp_path):
     """Test get_callers() with include_file=False."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -133,7 +133,7 @@ def test_get_callers_exclude_file(tmp_path):
 
 def test_get_callers_exclude_line(tmp_path):
     """Test get_callers() with include_line=False."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -161,7 +161,7 @@ def test_get_callers_exclude_line(tmp_path):
 
 def test_get_callers_function_not_found(tmp_path):
     """Test get_callers() returns empty list when function not found."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text('{"functions": [], "classes": [], "modules": []}')
 
     query = DocumentationQuery(str(tmp_path))
@@ -173,7 +173,7 @@ def test_get_callers_function_not_found(tmp_path):
 
 def test_get_callers_no_callers(tmp_path):
     """Test get_callers() returns empty list when function has no callers."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {"name": "isolated", "file": "mod.py", "line": 1, "callers": []}
@@ -191,7 +191,7 @@ def test_get_callers_no_callers(tmp_path):
 
 def test_get_callees_with_v2_schema(tmp_path):
     """Test get_callees() with schema v2.0 cross-reference data."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -224,7 +224,7 @@ def test_get_callees_with_v2_schema(tmp_path):
 
 def test_get_callees_exclude_file(tmp_path):
     """Test get_callees() with include_file=False."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -250,7 +250,7 @@ def test_get_callees_exclude_file(tmp_path):
 
 def test_get_callees_function_not_found(tmp_path):
     """Test get_callees() returns empty list when function not found."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text('{"functions": [], "classes": [], "modules": []}')
 
     query = DocumentationQuery(str(tmp_path))
@@ -262,7 +262,7 @@ def test_get_callees_function_not_found(tmp_path):
 
 def test_get_call_count_with_value(tmp_path):
     """Test get_call_count() returns count when available."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {"name": "popular", "file": "mod.py", "line": 1, "call_count": 42}
@@ -280,7 +280,7 @@ def test_get_call_count_with_value(tmp_path):
 
 def test_get_call_count_none(tmp_path):
     """Test get_call_count() returns None when not available."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {"name": "unknown", "file": "mod.py", "line": 1}
@@ -298,7 +298,7 @@ def test_get_call_count_none(tmp_path):
 
 def test_get_call_count_function_not_found(tmp_path):
     """Test get_call_count() returns None when function not found."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text('{"functions": [], "classes": [], "modules": []}')
 
     query = DocumentationQuery(str(tmp_path))
@@ -310,7 +310,7 @@ def test_get_call_count_function_not_found(tmp_path):
 
 def test_normalize_v2_schema_fields(tmp_path):
     """Test that v2.0 schema fields are properly normalized."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -359,7 +359,7 @@ def test_normalize_v2_schema_fields(tmp_path):
 
 def test_build_call_graph_callees_only(tmp_path):
     """Test build_call_graph() with direction='callees'."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -399,7 +399,7 @@ def test_build_call_graph_callees_only(tmp_path):
 
 def test_build_call_graph_callers_only(tmp_path):
     """Test build_call_graph() with direction='callers'."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -439,7 +439,7 @@ def test_build_call_graph_callers_only(tmp_path):
 
 def test_build_call_graph_both_directions(tmp_path):
     """Test build_call_graph() with direction='both'."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -473,7 +473,7 @@ def test_build_call_graph_both_directions(tmp_path):
 
 def test_build_call_graph_max_depth(tmp_path):
     """Test build_call_graph() respects max_depth."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -520,7 +520,7 @@ def test_build_call_graph_max_depth(tmp_path):
 
 def test_build_call_graph_handles_cycles(tmp_path):
     """Test build_call_graph() handles circular dependencies."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -560,7 +560,7 @@ def test_build_call_graph_handles_cycles(tmp_path):
 
 def test_build_call_graph_function_not_found(tmp_path):
     """Test build_call_graph() with non-existent function."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text('{"functions": [], "classes": [], "modules": []}')
 
     query = DocumentationQuery(str(tmp_path))
@@ -576,7 +576,7 @@ def test_build_call_graph_function_not_found(tmp_path):
 
 def test_build_call_graph_isolated_function(tmp_path):
     """Test build_call_graph() with function that has no callers or callees."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {"name": "isolated", "file": "iso.py", "line": 1, "callers": [], "calls": []}
@@ -598,7 +598,7 @@ def test_build_call_graph_isolated_function(tmp_path):
 
 def test_build_call_graph_include_metadata(tmp_path):
     """Test build_call_graph() includes metadata when requested."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -633,7 +633,7 @@ def test_build_call_graph_include_metadata(tmp_path):
 
 def test_build_call_graph_without_metadata(tmp_path):
     """Test build_call_graph() excludes metadata when not requested."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -664,7 +664,7 @@ def test_build_call_graph_without_metadata(tmp_path):
 
 def test_build_call_graph_depth_values(tmp_path):
     """Test build_call_graph() assigns correct depth values."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text("""{
         "functions": [
             {
@@ -701,7 +701,7 @@ def test_build_call_graph_depth_values(tmp_path):
 
 def test_build_call_graph_invalid_direction(tmp_path):
     """Test build_call_graph() raises error for invalid direction."""
-    doc_file = tmp_path / "documentation.json"
+    doc_file = tmp_path / "codebase.json"
     doc_file.write_text('{"functions": [], "classes": [], "modules": []}')
 
     query = DocumentationQuery(str(tmp_path))

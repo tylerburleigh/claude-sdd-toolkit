@@ -362,7 +362,7 @@ class ABTestFramework:
             generator_type: Type of generator ('architecture', 'component', 'overview')
             generator_fn: Function that generates documentation
                          Signature: (analysis_data_path: Optional[Path]) -> tuple[success, output]
-            analysis_data_path: Path to documentation.json (for treatment variant)
+            analysis_data_path: Path to codebase.json (for treatment variant)
             test_id: Optional custom test ID (auto-generated if None)
 
         Returns:

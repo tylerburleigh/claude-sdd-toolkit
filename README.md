@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.6.8-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -230,7 +230,8 @@ All specs are Git-trackable JSON files.
 
 | Skill | Purpose | Example Usage |
 |-------|---------|---------------|
-| **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" |
+| **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" "`sdd doc scope src/auth.py --plan`" |
+| **llm-doc-gen** | AI-powered documentation | "Generate architecture docs" "Create API documentation" |
 | **context-tracker** | Monitor Claude usage | "Show my context consumption" |
 
 ### Workflow Commands
@@ -363,10 +364,13 @@ sdd doc analyze-with-ai . --name "MyProject" --version "1.0.0"
 ```
 
 **Outputs:**
-- `docs/DOCUMENTATION.md` - Structural reference
-- `docs/documentation.json` - Machine-readable data (AST, dependencies, metrics)
-- `docs/ARCHITECTURE.md` - Architecture overview
-- `docs/AI_CONTEXT.md` - AI assistant reference
+- `docs/index.md` - Structural reference
+- `docs/codebase.json` - Machine-readable data (AST, dependencies, metrics)
+- `docs/project-overview.md` - Executive summary
+- `docs/architecture.md` - Architecture overview
+- `docs/component-inventory.md` - Component catalog
+
+- `docs/index.md` and shard files - Human-readable multi-file docs
 
 **Used By:**
 - `sdd-plan` - Understands existing patterns
@@ -477,10 +481,11 @@ Claude: [Uses llm-doc-gen]
         Consulting cursor-agent and gemini...
 
         Generated:
-        - docs/DOCUMENTATION.md
-        - docs/documentation.json
-        - docs/ARCHITECTURE.md
-        - docs/AI_CONTEXT.md
+        - docs/codebase.json
+        - docs/index.md
+        - docs/project-overview.md
+        - docs/architecture.md
+        - docs/component-inventory.md
 
 You: What classes handle authentication?
 
@@ -596,10 +601,11 @@ your-project/
 │   └── ai_config.yaml         # AI defaults
 │
 ├── docs/                      # Optional
-│   ├── documentation.json
-│   ├── DOCUMENTATION.md
-│   ├── ARCHITECTURE.md
-│   └── AI_CONTEXT.md
+│   ├── codebase.json
+│   ├── index.md
+│   ├── project-overview.md
+│   ├── architecture.md
+│   └── component-inventory.md
 │
 └── [source code]
 ```
@@ -908,6 +914,8 @@ sdd render <spec>
 
 ## Version History
 
+**0.7.0** - New `sdd doc scope` command with `--plan`/`--implement` presets. 49x speedup in llm-doc-gen cross-reference resolution. Analysis integration enhances LLM docs with real codebase metrics. Parallel processing, persistent caching, streaming output. 100+ new tests.
+
 **0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
 
 **0.6.5** - OpenCode AI provider with Node.js integration. Read-only security mode. Comprehensive provider documentation.
@@ -933,9 +941,10 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 - [docs/examples/](docs/examples/) - Workflow examples
 
 ### For Developers
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
-- [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md) - AI assistant reference
-- [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) - Structural reference
+- [docs/index.md](docs/index.md) - Structural reference
+- [docs/architecture.md](docs/architecture.md) - System architecture
+- [docs/project-overview.md](docs/project-overview.md) - Executive summary
+- [docs/component-inventory.md](docs/component-inventory.md) - Component catalog
 
 ### Stats
 - 183 Python modules
@@ -960,7 +969,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 - Issues: [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
 - Docs: [Claude Code Documentation](https://docs.claude.com/claude-code)
-- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Architecture: [docs/architecture.md](docs/architecture.md)
 
 ## Components
 

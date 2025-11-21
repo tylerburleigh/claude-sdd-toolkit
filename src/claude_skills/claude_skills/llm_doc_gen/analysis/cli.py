@@ -9,23 +9,23 @@ Usage:
     sdd doc analyze <project_directory> [options]
 
 Subcommands:
-    generate    Generate documentation (Markdown/JSON)
+    generate    Generate codebase analysis JSON
     validate    Validate generated JSON against schema
     analyze     Analyze codebase and print statistics only
-
+ 
 Options for generate:
-    --output-dir DIR     Output directory for documentation (default: ./docs)
-    --format FORMAT      Output format: markdown, json, or both (default: both)
+    --output-dir DIR     Output directory for analysis data (default: ./docs)
     --name NAME          Project name (default: directory name)
     --version VERSION    Project version (default: 1.0.0)
     --language LANG      Filter by language (python, javascript, go, etc.)
     --exclude PATTERN    Exclude files matching pattern
     --verbose, -v        Verbose output
 
+
 Examples:
     sdd doc generate ./src
     sdd doc generate ./src --name MyProject --version 0.1.0
-    sdd doc generate ./src --format json --output-dir ./docs
+    sdd doc generate ./src --output-dir ./docs
     sdd doc analyze ./src --verbose
     sdd doc validate ./docs/codebase.json
 """
@@ -238,7 +238,6 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     try:
         generator.generate_all(
             output_dir,
-            format_type=args.format,
             verbose=getattr(args, 'verbose', False),
             parallel=getattr(args, 'parallel', False),
             num_workers=getattr(args, 'workers', None),
@@ -249,7 +248,7 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             "status": "ok",
             "project": project_name,
             "output_dir": str(output_dir.resolve()),
-            "format": args.format,
+            "format": "json",
         }
         output_data = prepare_output(output_data, args, DOC_GENERATE_ESSENTIAL, DOC_GENERATE_STANDARD)
         if _print_if_json(args, output_data, printer):
@@ -480,11 +479,9 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
             printer.detail("   - codex: npm install -g @anthropic/codex")
 
             output_dir.mkdir(parents=True, exist_ok=True)
-            md_path = output_dir / 'DOCUMENTATION.md'
             json_path = output_dir / 'codebase.json'
-            generator.save_markdown(md_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
             generator.save_json(json_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
-            printer.success(f"Structural documentation saved to {output_dir}")
+            printer.success(f"Structural analysis saved to {json_path}")
             return 0
 
         printer.detail(f"   Available tools: {', '.join(available_tools)}")
@@ -541,14 +538,11 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
             return 0
 
         # Always write structural documentation
-        printer.detail(f"\n💾 Saving structural documentation to {output_dir}...")
+        printer.detail(f"\n💾 Saving structural analysis to {output_dir}...")
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        md_path = output_dir / 'DOCUMENTATION.md'
         json_path = output_dir / 'codebase.json'
-        generator.save_markdown(md_path, analysis, statistics, verbose=False)
         generator.save_json(json_path, analysis, statistics, verbose=False)
-        printer.success(f"   ✅ {md_path}")
         printer.success(f"   ✅ {json_path}")
 
         # Return JSON with separate AI responses for main agent synthesis
@@ -578,8 +572,8 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         printer.detail("   1. Parse JSON output from stdout")
         printer.detail("   2. Synthesize architecture_research from all AI tools")
         printer.detail("   3. Synthesize ai_context_research from all AI tools")
-        printer.detail("   4. Write ARCHITECTURE.md to output_dir")
-        printer.detail("   5. Write AI_CONTEXT.md to output_dir")
+        printer.detail("   4. Use architecture_research to generate architecture.md and related shards")
+        printer.detail("   5. Apply ai_context_research insights when composing index.md and guidance sections")
 
         return 0
 
@@ -597,12 +591,6 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     )
     generate_parser.add_argument('directory', help='Project directory to analyze')
     generate_parser.add_argument('--output-dir', default='./docs', help='Output directory (default: ./docs)')
-    generate_parser.add_argument(
-        '--format',
-        choices=['markdown', 'json', 'both'],
-        default='both',
-        help='Output format (default: both)',
-    )
     generate_parser.add_argument('--name', help='Project name (default: directory name)')
     generate_parser.add_argument('--version', default='1.0.0', help='Project version (default: 1.0.0)')
     generate_parser.add_argument('--language', help='Filter by language (python, javascript, typescript, go, html, css)')
@@ -671,7 +659,7 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
         help='Override model selection (repeat for per-tool overrides, e.g., gemini=gemini-pro)',
     )
     analyze_ai_parser.add_argument('--single-agent', action='store_true', help='Use single agent instead of multi-agent consultation')
-    analyze_ai_parser.add_argument('--skip-architecture', action='store_true', help='Skip ARCHITECTURE.md generation')
-    analyze_ai_parser.add_argument('--skip-ai-context', action='store_true', help='Skip AI_CONTEXT.md generation')
+    analyze_ai_parser.add_argument('--skip-architecture', action='store_true', help='Skip architecture.md shard generation')
+    analyze_ai_parser.add_argument('--skip-ai-context', action='store_true', help='Skip AI context research')
     analyze_ai_parser.add_argument('--dry-run', action='store_true', help='Show what would be generated without running AI')
     analyze_ai_parser.set_defaults(func=cmd_analyze_with_ai)

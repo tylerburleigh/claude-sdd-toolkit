@@ -23,7 +23,7 @@ from claude_skills.llm_doc_gen.analysis.analysis_insights import (
 
 @pytest.fixture
 def sample_documentation_data():
-    """Sample documentation.json data for testing."""
+    """Sample codebase.json data for testing."""
     return {
         "functions": [
             {
@@ -88,7 +88,7 @@ def sample_documentation_data():
 
 @pytest.fixture
 def temp_doc_file(sample_documentation_data):
-    """Create temporary documentation.json file."""
+    """Create temporary codebase.json file."""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         json.dump(sample_documentation_data, f)
         path = Path(f.name)
@@ -116,7 +116,7 @@ def test_analysis_insights_dataclass():
 
 
 def test_extract_insights_basic(temp_doc_file):
-    """Test basic extraction from documentation.json."""
+    """Test basic extraction from codebase.json."""
     clear_cache()  # Start fresh
     reset_cache_metrics()
 

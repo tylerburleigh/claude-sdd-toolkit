@@ -8,7 +8,7 @@ import pytest
 @pytest.fixture
 def doc_query_samples(tmp_path: Path) -> Dict[str, Path]:
     """Create sample documentation payloads for doc_query tests."""
-    modern = tmp_path / "modern" / "documentation.json"
+    modern = tmp_path / "modern" / "codebase.json"
     modern.parent.mkdir(parents=True, exist_ok=True)
     modern_payload = {
         "metadata": {
@@ -87,7 +87,7 @@ def doc_query_samples(tmp_path: Path) -> Dict[str, Path]:
     }
     modern.write_text(json.dumps(modern_payload, indent=2))
 
-    legacy = tmp_path / "legacy" / "documentation.json"
+    legacy = tmp_path / "legacy" / "codebase.json"
     legacy.parent.mkdir(parents=True, exist_ok=True)
     legacy_payload = {
         "generated_at": "2024-01-01T00:00:00",

@@ -383,7 +383,7 @@ class TestABTestFramework:
             framework = ABTestFramework(results_dir=results_dir)
 
             # Create mock analysis data
-            analysis_path = Path(tmpdir) / 'documentation.json'
+            analysis_path = Path(tmpdir) / 'codebase.json'
             analysis_data = {
                 'functions': [
                     {'name': 'func1', 'file': 'file1.py'},

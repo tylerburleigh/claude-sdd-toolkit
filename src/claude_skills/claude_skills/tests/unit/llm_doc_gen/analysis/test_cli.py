@@ -48,7 +48,7 @@ def _make_args(json_path: str) -> Namespace:
 
 
 def test_validate_uses_schema_loader(monkeypatch: pytest.MonkeyPatch, tmp_path, capsys):
-    doc_path = tmp_path / "documentation.json"
+    doc_path = tmp_path / "codebase.json"
     doc_path.write_text(json.dumps(_doc_payload()))
 
     schema = {"type": "object"}
@@ -81,7 +81,7 @@ def test_validate_uses_schema_loader(monkeypatch: pytest.MonkeyPatch, tmp_path, 
 
 
 def test_validate_handles_missing_schema(monkeypatch: pytest.MonkeyPatch, tmp_path, capsys):
-    doc_path = tmp_path / "documentation.json"
+    doc_path = tmp_path / "codebase.json"
     doc_path.write_text(json.dumps(_doc_payload()))
 
     monkeypatch.setattr(cli, "load_json_schema", lambda name: (None, None, "schema not found"))
@@ -102,7 +102,7 @@ def test_validate_handles_missing_schema(monkeypatch: pytest.MonkeyPatch, tmp_pa
 
 
 def test_validate_missing_keys_fails(monkeypatch: pytest.MonkeyPatch, tmp_path, capsys):
-    doc_path = tmp_path / "documentation.json"
+    doc_path = tmp_path / "codebase.json"
     invalid_payload = _doc_payload()
     invalid_payload.pop("statistics")
     doc_path.write_text(json.dumps(invalid_payload))
@@ -123,7 +123,7 @@ def test_validate_missing_keys_fails(monkeypatch: pytest.MonkeyPatch, tmp_path, 
 
 
 def test_validate_missing_jsonschema_uses_basic_checks(monkeypatch: pytest.MonkeyPatch, tmp_path, capsys):
-    doc_path = tmp_path / "documentation.json"
+    doc_path = tmp_path / "codebase.json"
     doc_path.write_text(json.dumps(_doc_payload()))
 
     monkeypatch.setattr(cli, "load_json_schema", lambda name: ({"type": "object"}, "package://schema", None))

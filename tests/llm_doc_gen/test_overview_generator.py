@@ -63,8 +63,8 @@ def multipart_project_data():
 
 @pytest.fixture
 def sample_analysis_data(tmp_path):
-    """Create sample documentation.json for insights testing."""
-    analysis_path = tmp_path / "documentation.json"
+    """Create sample codebase.json for insights testing."""
+    analysis_path = tmp_path / "codebase.json"
     analysis_data = {
         "functions": [
             {

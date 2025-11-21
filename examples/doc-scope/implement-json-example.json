@@ -1,0 +1,15 @@
+{
+  "_metadata": {
+    "description": "Example output from 'sdd doc scope --implement --function' command",
+    "command": "sdd doc scope src/claude_skills/claude_skills/doc_query/cli.py --implement --function cmd_scope",
+    "target_module": "src/claude_skills/claude_skills/doc_query/cli.py",
+    "target_function": "cmd_scope",
+    "commit_hash": "c43903d28fce5b16f7a23db09108a3010d0c86d8",
+    "generated": "2025-11-21",
+    "note": "The --implement preset with --function provides function callers, call graph, and instantiated classes for implementation work"
+  },
+  "preset": "implement",
+  "module": "src/claude_skills/claude_skills/doc_query/cli.py",
+  "function": "cmd_scope",
+  "output": "No callers found for function: cmd_scope\n\n**Call Graph for cmd_scope:**\n\nDirection: both\nMax Depth: 2\nTotal Nodes: 92\nTotal Edges: 114\n*Note: Graph truncated at max depth*\n\n**Callees (what this calls):**\n- cmd_scope → getattr\n- cmd_scope → _maybe_json\n- cmd_scope → error\n- cmd_scope → load\n- cmd_scope → get_module_summary\n- cmd_scope → append\n- cmd_scope → get_complex_functions_in_module\n- cmd_scope → get_function_callers\n- cmd_scope → get_call_graph_summary\n- cmd_scope → get_instantiated_classes_in_file\n- cmd_scope → str\n- cmd_scope → join\n- cmd_scope → prepare_output\n- cmd_scope → print\n\n\n**Classes instantiated in src/claude_skills/claude_skills/doc_query/cli.py:**\n\n1. PrettyPrinter (98 instantiations)\n   Location: src/claude_skills/claude_skills/common/printer.py:30\n   Purpose: Utility for consistent, pretty console output optimized for Claude Code.\n\n2. PrettyPrinter (98 instantiations)\n   Location: src/claude_skills/claude_skills/sdd_fidelity_review/report.py:18\n   Purpose: Pretty printer for console output with optional color support.\n\n3. ToolResponse (72 instantiations)\n   Location: src/claude_skills/claude_skills/common/ai_tools.py:48\n   Purpose: Standardized response from AI tool consultation.\n\n4. ProviderHooks (62 instantiations)\n   Location: src/claude_skills/claude_skills/common/providers/base.py:194\n   Purpose: Optional lifecycle hooks wired by the registry.\n\n5. FakeProcess (62 instantiations)\n   Location: src/claude_skills/claude_skills/tests/unit/test_providers/test_claude_provider.py:27\n\n6. FakeProcess (62 instantiations)\n   Location: src/claude_skills/claude_skills/tests/unit/test_providers/test_codex_provider.py:25\n\n7. FakeProcess (62 instantiations)\n   Location: src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:25\n\n8. FakeProcess (62 instantiations)\n   Location: src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:25\n\n9. FakeProcess (62 instantiations)\n   Location: src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:31\n\n10. GenerationRequest (49 instantiations)\n   Location: src/claude_skills/claude_skills/common/providers/base.py:138\n   Purpose: Normalized request payload for provider execution.\n"
+}

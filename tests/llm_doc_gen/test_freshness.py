@@ -119,12 +119,12 @@ class TestFreshnessCheckerInitialization:
         assert checker.docs_path == codebase_file
 
     def test_auto_detection_docs_documentation_json(self, tmp_path, monkeypatch):
-        """Test auto-detection of docs/documentation.json."""
+        """Test auto-detection of docs/codebase.json."""
         monkeypatch.chdir(tmp_path)
 
         docs_path = tmp_path / "docs"
         docs_path.mkdir()
-        doc_file = docs_path / "documentation.json"
+        doc_file = docs_path / "codebase.json"
         doc_file.write_text('{"metadata": {}}')
 
         checker = FreshnessChecker()

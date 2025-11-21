@@ -235,7 +235,7 @@ sdd llm-doc-gen resume ./docs
 
 **Check for analysis data:**
 
-1. Look for `documentation.json` in the project root
+1. Look for `codebase.json` in the project root
 2. If found: Analysis insights will be automatically integrated into documentation generation
 3. If missing: Generation continues without insights (graceful degradation - still produces quality docs)
 
@@ -243,22 +243,22 @@ sdd llm-doc-gen resume ./docs
 
 **Always tell the user about insights status:**
 
-**If `documentation.json` exists:**
+**If `codebase.json` exists:**
 ```
-✅ Found codebase analysis data (documentation.json)
+✅ Found codebase analysis data (codebase.json)
 📊 Using factual metrics to enhance documentation quality
 ```
 
-**If `documentation.json` is missing:**
+**If `codebase.json` is missing:**
 ```
-ℹ️  No analysis data found (documentation.json)
+ℹ️  No analysis data found (codebase.json)
 💡 Tip: Run `sdd doc generate` first for better results with factual insights
 📝 Continuing with AI reasoning only
 ```
 
 ### What Happens Automatically
 
-When `documentation.json` exists, the generators automatically:
+When `codebase.json` exists, the generators automatically:
 - Extract high-value metrics (most-called functions, entry points, complexity, dependencies)
 - Format insights within token budgets (250-450 tokens depending on generator type)
 - Include formatted insights in LLM prompts for factual grounding
@@ -449,9 +449,10 @@ docs/
    - Skipping initialization breaks checkpoint recovery
 
 3. **Never mix monolithic and sharded output**
-   - Stick to sharded documentation structure
-   - Don't create single DOCUMENTATION.md files
-   - Organized topics are more maintainable
+    - Stick to sharded documentation structure
+    - Avoid reintroducing a single-file Markdown export
+    - Organized topics are more maintainable
+
 
 4. **Never ignore timeout/failure**
    - LLM calls can hang or fail

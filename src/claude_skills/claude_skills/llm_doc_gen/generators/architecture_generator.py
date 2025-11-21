@@ -72,7 +72,7 @@ class ArchitectureGenerator:
             arch_data: Structured architecture data
             key_files: List of key file paths to analyze
             max_files: Maximum number of files to include in prompt
-            analysis_data: Optional path to documentation.json for codebase insights
+            analysis_data: Optional path to codebase.json for codebase insights
 
         Returns:
             Formatted prompt string for LLM
@@ -416,7 +416,7 @@ class ArchitectureGenerator:
             key_files: List of key files to analyze
             llm_consultation_fn: Function to call LLM (signature: (prompt: str) -> tuple[bool, str])
             max_files: Maximum files to include in prompt
-            analysis_data: Optional path to documentation.json for codebase insights
+            analysis_data: Optional path to codebase.json for codebase insights
 
         Returns:
             Tuple of (success: bool, documentation: str)

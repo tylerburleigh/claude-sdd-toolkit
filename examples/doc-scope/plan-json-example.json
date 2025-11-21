@@ -1,0 +1,13 @@
+{
+  "_metadata": {
+    "description": "Example output from 'sdd doc scope --plan' command",
+    "command": "sdd doc scope src/claude_skills/claude_skills/doc_query/codebase_query.py --plan",
+    "target_module": "src/claude_skills/claude_skills/doc_query/codebase_query.py",
+    "commit_hash": "c43903d28fce5b16f7a23db09108a3010d0c86d8",
+    "generated": "2025-11-21",
+    "note": "The --plan preset provides module summary, statistics, and complexity analysis for planning implementations"
+  },
+  "preset": "plan",
+  "module": "src/claude_skills/claude_skills/doc_query/codebase_query.py",
+  "output": "**Module: codebase_query**\n\n*CodebaseQuery: LLM-friendly interface for querying codebase analysis. This module extends DocumentationQuery to provide formatted responses specifically...*\n\n**Statistics:**\n- Classes: 1\n- Functions: 1\n- Avg Complexity: 1.0\n- Max Complexity: 1\n- High Complexity Functions: 0\n- Dependencies: 7\n- Reverse Dependencies: 0\n\n**Top Complex Functions:**\n- create_codebase_query (complexity: 1)\n  Convenience function to create and load a CodebaseQuery instance. Args: docs_path: Path to documentation.json or its directory Returns: Loaded CodebaseQuery...\n\n\nNo complex functions found in src/claude_skills/claude_skills/doc_query/codebase_query.py (threshold: 5)"
+}

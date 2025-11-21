@@ -21,7 +21,7 @@ def run_doc_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def _write_sample_docs(tmp_path: Path) -> Path:
-    """Create a minimal documentation.json payload for doc CLI tests."""
+    """Create a minimal codebase.json payload for doc CLI tests."""
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -91,7 +91,7 @@ def _write_sample_docs(tmp_path: Path) -> Path:
             "calculator.py": ["external.math"]
         }
     }
-    (docs_dir / "documentation.json").write_text(json.dumps(payload, indent=2))
+    (docs_dir / "codebase.json").write_text(json.dumps(payload, indent=2))
     return docs_dir
 
 

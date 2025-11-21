@@ -2,7 +2,7 @@
 AI Consultation for Documentation Generation
 
 Shells out to external AI CLI tools to generate contextual documentation
-(ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
+(e.g., architecture.md and supporting guidance) based on structural analysis.
 
 Uses shared AI tool utilities from claude_skills.common.ai_tools and the
 provider abstraction so consultations are routed through a consistent
@@ -204,7 +204,7 @@ def format_architecture_research_prompt(
     prompt_parts.append("Use markdown formatting for readability (headers, lists, code references).")
     prompt_parts.append("Be specific and reference actual code when making observations.")
     prompt_parts.append("")
-    prompt_parts.append("**DO NOT write files or attempt to create ARCHITECTURE.md yourself.**")
+    prompt_parts.append("**DO NOT write files or attempt to create architecture.md yourself.**")
     prompt_parts.append("Just return your research findings as text output.")
 
     return "\n".join(prompt_parts)
@@ -232,7 +232,7 @@ def format_ai_context_research_prompt(
     prompt_parts.append("")
     prompt_parts.append("**IMPORTANT: You have READ-ONLY access. Do not attempt to write files.**")
     prompt_parts.append("Analyze this codebase and identify key information that would help AI coding assistants.")
-    prompt_parts.append("Your findings will be used by another agent to compose the final AI_CONTEXT.md.")
+    prompt_parts.append("Your findings will be used by another agent to compose the final AI context guidance.")
     prompt_parts.append("")
 
     # Add context
@@ -285,7 +285,7 @@ def format_ai_context_research_prompt(
     prompt_parts.append("Keep it concise - this is a quick reference, not comprehensive documentation.")
     prompt_parts.append("Use markdown formatting for readability.")
     prompt_parts.append("")
-    prompt_parts.append("**DO NOT write files or attempt to create AI_CONTEXT.md yourself.**")
+    prompt_parts.append("**DO NOT write files or attempt to create dedicated AI context docs yourself.**")
     prompt_parts.append("Just return your research findings as text output.")
 
     return "\n".join(prompt_parts)
@@ -297,7 +297,7 @@ def compose_architecture_doc(
     version: str = "1.0.0"
 ) -> str:
     """
-    Compose ARCHITECTURE.md from research findings.
+    Compose architecture.md from research findings.
 
     Args:
         research_findings: Raw research output from AI consultation
@@ -305,7 +305,7 @@ def compose_architecture_doc(
         version: Project version
 
     Returns:
-        Formatted ARCHITECTURE.md content
+        Formatted architecture.md content
     """
     from datetime import datetime
 
@@ -349,7 +349,7 @@ def compose_ai_context_doc(
     version: str = "1.0.0"
 ) -> str:
     """
-    Compose AI_CONTEXT.md from research findings.
+    Compose AI context guidance from research findings.
 
     Args:
         research_findings: Raw research output from AI consultation
@@ -357,7 +357,7 @@ def compose_ai_context_doc(
         version: Project version
 
     Returns:
-        Formatted AI_CONTEXT.md content
+        Formatted AI context guidance content
     """
     from datetime import datetime
 
