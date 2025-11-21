@@ -131,10 +131,15 @@ class DocumentationWorkflow:
                 total_loc=project_data.total_loc,
                 directory_structure=project_data.directory_structure
             )
+
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.architecture_gen.generate_architecture_doc(
                 arch_data,
                 key_files=data.get("key_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Architecture generation failed: {content}")

@@ -400,7 +400,8 @@ class ArchitectureGenerator:
         arch_data: ArchitectureData,
         key_files: List[str],
         llm_consultation_fn: Any,
-        max_files: int = 15
+        max_files: int = 15,
+        analysis_data: Optional[Path] = None
     ) -> tuple[bool, str]:
         """
         Generate architecture documentation.
@@ -415,6 +416,7 @@ class ArchitectureGenerator:
             key_files: List of key files to analyze
             llm_consultation_fn: Function to call LLM (signature: (prompt: str) -> tuple[bool, str])
             max_files: Maximum files to include in prompt
+            analysis_data: Optional path to documentation.json for codebase insights
 
         Returns:
             Tuple of (success: bool, documentation: str)
@@ -422,7 +424,7 @@ class ArchitectureGenerator:
         from datetime import datetime
 
         # Format prompt
-        prompt = self.format_architecture_prompt(arch_data, key_files, max_files)
+        prompt = self.format_architecture_prompt(arch_data, key_files, max_files, analysis_data)
 
         # Consult LLM
         success, findings = llm_consultation_fn(prompt)
