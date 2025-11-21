@@ -244,6 +244,11 @@ Decision logs and notes:
 - Challenges and solutions
 - Implementation rationale
 
+**CLI Command:**
+```bash
+sdd get-journal <spec-id> [--task-id <task-id>]
+```
+
 ### 5. Git Diff
 Actual code changes:
 - Full diff or file-level summary
