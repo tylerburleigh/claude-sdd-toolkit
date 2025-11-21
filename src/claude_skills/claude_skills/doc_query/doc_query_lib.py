@@ -31,8 +31,9 @@ class DocumentationQuery:
         Initialize the query engine.
 
         Args:
-            docs_path: Path to the documentation.json file or its directory.
+            docs_path: Path to the codebase.json/documentation.json file or its directory.
                       If None, will search for docs/ in current directory.
+                      Prefers codebase.json if both exist.
         """
         self.docs_path = self._resolve_docs_path(docs_path)
         self.data: Optional[Dict] = None
@@ -50,9 +51,14 @@ class DocumentationQuery:
         else:
             docs_path = Path(docs_path)
 
-        # If it's a directory, append documentation.json
+        # If it's a directory, look for codebase.json or documentation.json
         if docs_path.is_dir():
-            docs_path = docs_path / "documentation.json"
+            # Prefer codebase.json, fall back to documentation.json
+            codebase_json = docs_path / "codebase.json"
+            if codebase_json.exists():
+                docs_path = codebase_json
+            else:
+                docs_path = docs_path / "documentation.json"
 
         return docs_path
 
@@ -70,8 +76,13 @@ class DocumentationQuery:
             Path.home() / ".claude" / "docs",        # Claude home
         ]
 
-        # Search for existing documentation.json
+        # Search for existing codebase.json or documentation.json
         for location in search_locations:
+            # Prefer codebase.json
+            codebase_json = location / "codebase.json"
+            if codebase_json.exists():
+                return location
+            # Fall back to documentation.json
             doc_json = location / "documentation.json"
             if doc_json.exists():
                 return location

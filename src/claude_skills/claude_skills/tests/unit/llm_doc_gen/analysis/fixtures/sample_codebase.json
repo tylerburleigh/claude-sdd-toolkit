@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "project_name": "sample-project",
+    "version": "1.0.0",
+    "generated_at": "2025-01-20T00:00:00Z",
+    "schema_version": "2.0"
+  },
+  "functions": [
+    {
+      "name": "main",
+      "file": "src/main.py",
+      "line": 10,
+      "signature": "main() -> int",
+      "parameters": [],
+      "return_type": "int",
+      "docstring": "Main entry point for the application",
+      "complexity": 5,
+      "is_async": false,
+      "callers": [],
+      "calls": [
+        {"name": "setup_logging", "file": "src/utils/logging.py", "line": 42, "call_type": "function_call"},
+        {"name": "load_config", "file": "src/config.py", "line": 15, "call_type": "function_call"},
+        {"name": "run_application", "file": "src/app.py", "line": 25, "call_type": "function_call"}
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "process_data",
+      "file": "src/processing/data_processor.py",
+      "line": 50,
+      "signature": "process_data(data: List[Dict], config: Config) -> ProcessedData",
+      "parameters": [
+        {"name": "data", "type": "List[Dict]"},
+        {"name": "config", "type": "Config"}
+      ],
+      "return_type": "ProcessedData",
+      "docstring": "Process raw data using configuration",
+      "complexity": 18,
+      "is_async": false,
+      "callers": [
+        {"name": "run_application", "file": "src/app.py", "line": 45, "call_type": "function_call"},
+        {"name": "batch_process", "file": "src/processing/batch.py", "line": 30, "call_type": "function_call"}
+      ],
+      "calls": [
+        {"name": "validate_data", "file": "src/validation/validator.py", "line": 20, "call_type": "function_call"},
+        {"name": "transform_data", "file": "src/processing/transformer.py", "line": 35, "call_type": "function_call"},
+        {"name": "aggregate_results", "file": "src/processing/aggregator.py", "line": 60, "call_type": "function_call"}
+      ],
+      "call_count": 150
+    },
+    {
+      "name": "orchestrate_workflow",
+      "file": "src/orchestration/orchestrator.py",
+      "line": 100,
+      "signature": "orchestrate_workflow(tasks: List[Task]) -> WorkflowResult",
+      "parameters": [{"name": "tasks", "type": "List[Task]"}],
+      "return_type": "WorkflowResult",
+      "docstring": "Orchestrate execution of multiple tasks",
+      "complexity": 22,
+      "is_async": true,
+      "callers": [
+        {"name": "run_application", "file": "src/app.py", "line": 50, "call_type": "function_call"}
+      ],
+      "calls": [
+        {"name": "validate_task", "file": "src/orchestration/validator.py", "line": 10, "call_type": "function_call"},
+        {"name": "schedule_task", "file": "src/orchestration/scheduler.py", "line": 25, "call_type": "function_call"},
+        {"name": "execute_task", "file": "src/orchestration/executor.py", "line": 40, "call_type": "function_call"},
+        {"name": "monitor_task", "file": "src/orchestration/monitor.py", "line": 15, "call_type": "function_call"},
+        {"name": "collect_results", "file": "src/orchestration/collector.py", "line": 30, "call_type": "function_call"},
+        {"name": "handle_errors", "file": "src/orchestration/error_handler.py", "line": 20, "call_type": "function_call"},
+        {"name": "log_metrics", "file": "src/utils/metrics.py", "line": 50, "call_type": "function_call"},
+        {"name": "notify_completion", "file": "src/utils/notifier.py", "line": 35, "call_type": "function_call"}
+      ],
+      "call_count": 45
+    },
+    {
+      "name": "api_handler",
+      "file": "src/api/handlers.py",
+      "line": 25,
+      "signature": "api_handler(request: Request) -> Response",
+      "parameters": [{"name": "request", "type": "Request"}],
+      "return_type": "Response",
+      "docstring": "Handle API requests",
+      "complexity": 12,
+      "is_async": true,
+      "callers": [],
+      "calls": [
+        {"name": "validate_request", "file": "src/api/validation.py", "line": 15, "call_type": "function_call"},
+        {"name": "process_data", "file": "src/processing/data_processor.py", "line": 50, "call_type": "function_call"}
+      ],
+      "call_count": 0
+    },
+    {
+      "name": "cli_main",
+      "file": "src/cli/commands.py",
+      "line": 10,
+      "signature": "cli_main() -> None",
+      "parameters": [],
+      "return_type": "None",
+      "docstring": "CLI entry point",
+      "complexity": 8,
+      "is_async": false,
+      "callers": [],
+      "calls": [
+        {"name": "parse_args", "file": "src/cli/parser.py", "line": 20, "call_type": "function_call"}
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "validate_data",
+      "file": "src/validation/validator.py",
+      "line": 20,
+      "signature": "validate_data(data: Any, schema: Schema) -> ValidationResult",
+      "parameters": [
+        {"name": "data", "type": "Any"},
+        {"name": "schema", "type": "Schema"}
+      ],
+      "return_type": "ValidationResult",
+      "docstring": "Validate data against schema",
+      "complexity": 15,
+      "is_async": false,
+      "callers": [
+        {"name": "process_data", "file": "src/processing/data_processor.py", "line": 52, "call_type": "function_call"},
+        {"name": "api_handler", "file": "src/api/handlers.py", "line": 30, "call_type": "function_call"}
+      ],
+      "calls": [],
+      "call_count": 200
+    }
+  ],
+  "classes": [
+    {
+      "name": "Config",
+      "file": "src/config.py",
+      "line": 15,
+      "docstring": "Application configuration",
+      "bases": [],
+      "methods": [
+        {
+          "name": "__init__",
+          "signature": "__init__(self, config_path: str) -> None",
+          "parameters": [{"name": "config_path", "type": "str"}],
+          "return_type": "None",
+          "docstring": "Initialize configuration from file",
+          "complexity": 5,
+          "is_async": false
+        },
+        {
+          "name": "load",
+          "signature": "load(self) -> Dict[str, Any]",
+          "parameters": [],
+          "return_type": "Dict[str, Any]",
+          "docstring": "Load configuration data",
+          "complexity": 8,
+          "is_async": false
+        }
+      ],
+      "properties": ["config_path", "data"],
+      "instantiated_by": [
+        {"instantiator": "main", "file": "src/main.py", "line": 15, "context": "function"},
+        {"instantiator": "load_config", "file": "src/config.py", "line": 100, "context": "function"}
+      ],
+      "imported_by": [
+        {"importer": "src/main.py", "line": 5, "import_type": "from"},
+        {"importer": "src/app.py", "line": 3, "import_type": "from"}
+      ],
+      "instantiation_count": 250
+    },
+    {
+      "name": "DataProcessor",
+      "file": "src/processing/data_processor.py",
+      "line": 20,
+      "docstring": "Process and transform data",
+      "bases": ["BaseProcessor"],
+      "methods": [
+        {
+          "name": "__init__",
+          "signature": "__init__(self, config: Config) -> None",
+          "parameters": [{"name": "config", "type": "Config"}],
+          "return_type": "None",
+          "docstring": "Initialize processor with configuration",
+          "complexity": 3,
+          "is_async": false
+        },
+        {
+          "name": "process",
+          "signature": "process(self, data: List[Dict]) -> ProcessedData",
+          "parameters": [{"name": "data", "type": "List[Dict]"}],
+          "return_type": "ProcessedData",
+          "docstring": "Process data",
+          "complexity": 12,
+          "is_async": false
+        }
+      ],
+      "properties": ["config", "cache"],
+      "instantiated_by": [
+        {"instantiator": "run_application", "file": "src/app.py", "line": 30, "context": "function"}
+      ],
+      "imported_by": [
+        {"importer": "src/app.py", "line": 8, "import_type": "from"}
+      ],
+      "instantiation_count": 100
+    },
+    {
+      "name": "TaskOrchestrator",
+      "file": "src/orchestration/orchestrator.py",
+      "line": 50,
+      "docstring": "Orchestrate task execution",
+      "bases": [],
+      "methods": [
+        {
+          "name": "__init__",
+          "signature": "__init__(self, workers: int = 4) -> None",
+          "parameters": [{"name": "workers", "type": "int"}],
+          "return_type": "None",
+          "docstring": "Initialize orchestrator with worker pool",
+          "complexity": 4,
+          "is_async": false
+        },
+        {
+          "name": "run",
+          "signature": "async run(self, tasks: List[Task]) -> List[Result]",
+          "parameters": [{"name": "tasks", "type": "List[Task]"}],
+          "return_type": "List[Result]",
+          "docstring": "Run tasks concurrently",
+          "complexity": 18,
+          "is_async": true
+        }
+      ],
+      "properties": ["workers", "queue"],
+      "instantiated_by": [
+        {"instantiator": "main", "file": "src/main.py", "line": 25, "context": "function"}
+      ],
+      "imported_by": [
+        {"importer": "src/main.py", "line": 8, "import_type": "from"}
+      ],
+      "instantiation_count": 75
+    }
+  ],
+  "dependencies": {
+    "src/main.py": ["src/config.py", "src/app.py", "src/utils/logging.py", "src/orchestration/orchestrator.py"],
+    "src/app.py": ["src/config.py", "src/processing/data_processor.py", "src/orchestration/orchestrator.py"],
+    "src/processing/data_processor.py": ["src/validation/validator.py", "src/processing/transformer.py", "src/processing/aggregator.py"],
+    "src/orchestration/orchestrator.py": [
+      "src/orchestration/validator.py",
+      "src/orchestration/scheduler.py",
+      "src/orchestration/executor.py",
+      "src/orchestration/monitor.py",
+      "src/orchestration/collector.py",
+      "src/orchestration/error_handler.py",
+      "src/utils/metrics.py",
+      "src/utils/notifier.py"
+    ],
+    "src/api/handlers.py": ["src/api/validation.py", "src/processing/data_processor.py", "fastapi", "pydantic"],
+    "src/validation/validator.py": ["pydantic", "jsonschema"],
+    "src/utils/logging.py": ["logging", "structlog"],
+    "src/utils/metrics.py": ["prometheus_client"],
+    "src/cli/commands.py": ["click", "src/cli/parser.py"]
+  }
+}

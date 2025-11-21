@@ -227,6 +227,66 @@ sdd llm-doc-gen resume ./docs
 
 ---
 
+## Using Codebase Analysis Insights
+
+**CRITICAL: The llm-doc-gen skill automatically integrates analysis insights when available.**
+
+### Before Generating Documentation
+
+**Check for analysis data:**
+
+1. Look for `documentation.json` in the project root
+2. If found: Analysis insights will be automatically integrated into documentation generation
+3. If missing: Generation continues without insights (graceful degradation - still produces quality docs)
+
+### Informing the User
+
+**Always tell the user about insights status:**
+
+**If `documentation.json` exists:**
+```
+✅ Found codebase analysis data (documentation.json)
+📊 Using factual metrics to enhance documentation quality
+```
+
+**If `documentation.json` is missing:**
+```
+ℹ️  No analysis data found (documentation.json)
+💡 Tip: Run `sdd doc generate` first for better results with factual insights
+📝 Continuing with AI reasoning only
+```
+
+### What Happens Automatically
+
+When `documentation.json` exists, the generators automatically:
+- Extract high-value metrics (most-called functions, entry points, complexity, dependencies)
+- Format insights within token budgets (250-450 tokens depending on generator type)
+- Include formatted insights in LLM prompts for factual grounding
+- Use insights to improve architectural pattern identification and accuracy
+
+**You don't need to pass special flags or parameters.** The integration is automatic.
+
+### Error Handling
+
+**If insight extraction fails:**
+- Generation continues without insights
+- Log a warning but don't fail the operation
+- Inform user: "Warning: Could not load analysis insights, continuing with AI reasoning only"
+
+**Never fail documentation generation due to missing or corrupt analysis data.** Graceful degradation is built-in.
+
+### Expected Improvements
+
+When insights are used, expect documentation to include:
+- Specific function/class names with actual call counts and usage metrics
+- Identified entry points and critical code paths
+- Real module dependency relationships with reference counts
+- Complexity metrics for refactoring guidance
+
+For details about the integration architecture, performance, and best practices, see `docs/llm-doc-gen/ANALYSIS_INTEGRATION.md`.
+
+---
+
 ## Tool Verification
 
 **Before using this skill**, verify that LLM tools are available:

@@ -499,3 +499,104 @@ def test_synthesize_multi_model_findings(tmp_path, sample_arch_data):
     assert "Consensus Patterns" in synthesis
     assert "Unique Insights" in synthesis
     assert "Recommended Next Steps" in synthesis
+
+
+def test_format_architecture_prompt_with_analysis_insights(tmp_path, sample_arch_data):
+    """Test architecture prompt with codebase analysis insights."""
+    import json
+
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["src/main.py"]
+
+    # Create a mock codebase.json analysis file
+    analysis_file = tmp_path / "codebase.json"
+    mock_analysis = {
+        "statistics": {
+            "total_files": 150,
+            "total_lines": 12000,
+            "by_language": {
+                "Python": {"files": 120, "lines": 10000},
+                "TypeScript": {"files": 30, "lines": 2000}
+            }
+        },
+        "analysis": {
+            "modules": [
+                {
+                    "name": "main",
+                    "path": "src/main.py",
+                    "functions": [{"name": "app_startup", "lines": 50}],
+                    "classes": []
+                }
+            ]
+        }
+    }
+    analysis_file.write_text(json.dumps(mock_analysis))
+
+    # Generate prompt with analysis insights
+    prompt = generator.format_architecture_prompt(
+        sample_arch_data,
+        key_files,
+        max_files=15,
+        analysis_data=analysis_file
+    )
+
+    # Verify insights section is included
+    assert "### Codebase Analysis Insights" in prompt
+
+    # Basic structure should still be present
+    assert "# Task: Architecture Analysis Research (Read-Only)" in prompt
+    assert sample_arch_data.project_name in prompt
+
+
+def test_format_architecture_prompt_with_missing_analysis_file(tmp_path, sample_arch_data):
+    """Test that missing analysis file is handled gracefully."""
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["src/main.py"]
+
+    # Point to non-existent file
+    non_existent_file = tmp_path / "nonexistent.json"
+
+    # Should not raise exception
+    prompt = generator.format_architecture_prompt(
+        sample_arch_data,
+        key_files,
+        max_files=15,
+        analysis_data=non_existent_file
+    )
+
+    # Should generate prompt without insights section
+    assert "# Task: Architecture Analysis Research (Read-Only)" in prompt
+    assert "### Codebase Analysis Insights" not in prompt
+
+
+def test_generate_architecture_doc_with_analysis_data(tmp_path, sample_arch_data):
+    """Test generate_architecture_doc accepts and uses analysis_data parameter."""
+    import json
+
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["main.py"]
+
+    # Create analysis file
+    analysis_file = tmp_path / "codebase.json"
+    mock_analysis = {
+        "statistics": {"total_files": 150, "total_lines": 12000},
+        "analysis": {"modules": []}
+    }
+    analysis_file.write_text(json.dumps(mock_analysis))
+
+    # Mock LLM consultation
+    def mock_llm_fn(prompt: str) -> tuple[bool, str]:
+        # Verify prompt contains insights section
+        assert "### Codebase Analysis Insights" in prompt
+        return True, "## Architecture Analysis\n\nDetailed findings"
+
+    success, doc = generator.generate_architecture_doc(
+        sample_arch_data,
+        key_files,
+        mock_llm_fn,
+        max_files=15,
+        analysis_data=analysis_file
+    )
+
+    assert success is True
+    assert "# TestProject - Architecture Documentation" in doc

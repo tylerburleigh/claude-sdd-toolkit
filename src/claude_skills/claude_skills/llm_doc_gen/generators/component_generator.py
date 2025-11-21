@@ -10,6 +10,10 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 
 from ..markdown_validator import sanitize_llm_output
+from ..analysis.analysis_insights import (
+    extract_insights_from_analysis,
+    format_insights_for_prompt
+)
 
 
 @dataclass
@@ -65,7 +69,8 @@ class ComponentGenerator:
         self,
         component_data: ComponentData,
         directories_to_analyze: List[str],
-        max_directories: int = 10
+        max_directories: int = 10,
+        analysis_data: Optional[Path] = None
     ) -> str:
         """
         Format LLM prompt for component analysis.
@@ -80,6 +85,7 @@ class ComponentGenerator:
             component_data: Structured component data
             directories_to_analyze: List of directory paths to analyze
             max_directories: Maximum number of directories to include in prompt
+            analysis_data: Optional path to codebase.json for insights
 
         Returns:
             Formatted prompt string for LLM
@@ -138,6 +144,23 @@ class ComponentGenerator:
             prompt_parts.append(component_data.complete_source_tree)
             prompt_parts.append("```")
             prompt_parts.append("")
+
+        # Add codebase analysis insights if available
+        if analysis_data and analysis_data.exists():
+            try:
+                insights = extract_insights_from_analysis(analysis_data)
+                formatted_insights = format_insights_for_prompt(
+                    insights,
+                    generator_type='component',
+                    docs_path=analysis_data
+                )
+                prompt_parts.append("### Codebase Analysis Insights")
+                prompt_parts.append("")
+                prompt_parts.append(formatted_insights)
+                prompt_parts.append("")
+            except Exception as e:
+                # Gracefully handle any errors in insight extraction
+                pass
 
         # Directories to analyze
         prompt_parts.append("## Directories to Analyze")
@@ -343,7 +366,8 @@ class ComponentGenerator:
         component_data: ComponentData,
         directories_to_analyze: List[str],
         llm_consultation_fn: Any,
-        max_directories: int = 10
+        max_directories: int = 10,
+        analysis_data: Optional[Path] = None
     ) -> tuple[bool, str]:
         """
         Generate component inventory documentation.
@@ -358,6 +382,7 @@ class ComponentGenerator:
             directories_to_analyze: List of directories to analyze
             llm_consultation_fn: Function to call LLM (signature: (prompt: str) -> tuple[bool, str])
             max_directories: Maximum directories to include in prompt
+            analysis_data: Optional path to codebase.json for insights
 
         Returns:
             Tuple of (success: bool, documentation: str)
@@ -368,7 +393,8 @@ class ComponentGenerator:
         prompt = self.format_component_prompt(
             component_data,
             directories_to_analyze,
-            max_directories
+            max_directories,
+            analysis_data
         )
 
         # Consult LLM

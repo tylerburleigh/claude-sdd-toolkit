@@ -107,10 +107,14 @@ class DocumentationWorkflow:
 
         # Overview shard
         def generate_overview(data: Dict[str, Any]) -> str:
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.overview_gen.generate_overview(
                 project_data,
                 key_files=data.get("key_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Overview generation failed: {content}")
@@ -131,10 +135,15 @@ class DocumentationWorkflow:
                 total_loc=project_data.total_loc,
                 directory_structure=project_data.directory_structure
             )
+
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.architecture_gen.generate_architecture_doc(
                 arch_data,
                 key_files=data.get("key_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Architecture generation failed: {content}")
@@ -156,10 +165,15 @@ class DocumentationWorkflow:
                 file_type_patterns=[],
                 config_files=[]
             )
+
+            # Determine path to codebase.json for analysis insights
+            analysis_data_path = self.output_dir / "codebase.json" if self.output_dir else None
+
             success, content = self.component_gen.generate_component_doc(
                 component_data,
                 directories_to_analyze=data.get("source_files", []),
-                llm_consultation_fn=llm_consultation_fn
+                llm_consultation_fn=llm_consultation_fn,
+                analysis_data=analysis_data_path
             )
             if not success:
                 raise Exception(f"Component generation failed: {content}")

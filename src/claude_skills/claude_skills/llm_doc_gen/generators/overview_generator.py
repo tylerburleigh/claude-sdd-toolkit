@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass
 
+from ..analysis.analysis_insights import (
+    extract_insights_from_analysis,
+    format_insights_for_prompt
+)
+
 
 @dataclass
 class ProjectData:
@@ -49,7 +54,8 @@ class OverviewGenerator:
         self,
         project_data: ProjectData,
         key_files: List[str],
-        max_files: int = 10
+        max_files: int = 10,
+        analysis_data: Optional[Path] = None
     ) -> str:
         """
         Format LLM prompt for project overview generation.
@@ -61,6 +67,7 @@ class OverviewGenerator:
             project_data: Structured project data
             key_files: List of key file paths to analyze
             max_files: Maximum number of files to include in prompt
+            analysis_data: Optional path to codebase.json for insights
 
         Returns:
             Formatted prompt string for LLM
@@ -157,6 +164,23 @@ class OverviewGenerator:
                     files = stats.get("files", 0)
                     prompt_parts.append(f"- **{lang}**: {lines:,} lines across {files} files")
                 prompt_parts.append("")
+
+        # Add codebase analysis insights if available
+        if analysis_data and analysis_data.exists():
+            try:
+                insights = extract_insights_from_analysis(analysis_data)
+                formatted_insights = format_insights_for_prompt(
+                    insights,
+                    generator_type='overview',
+                    docs_path=analysis_data
+                )
+                prompt_parts.append("### Codebase Analysis Insights")
+                prompt_parts.append("")
+                prompt_parts.append(formatted_insights)
+                prompt_parts.append("")
+            except Exception as e:
+                # Gracefully handle any errors in insight extraction
+                pass
 
         # Key files to analyze (limited to manage token budget)
         prompt_parts.append("## Key Files to Analyze")
@@ -304,7 +328,8 @@ class OverviewGenerator:
         project_data: ProjectData,
         key_files: List[str],
         llm_consultation_fn: Any,
-        max_files: int = 10
+        max_files: int = 10,
+        analysis_data: Optional[Path] = None
     ) -> tuple[bool, str]:
         """
         Generate project overview documentation.
@@ -319,6 +344,7 @@ class OverviewGenerator:
             key_files: List of key files to analyze
             llm_consultation_fn: Function to call LLM (signature: (prompt: str) -> tuple[bool, str])
             max_files: Maximum files to include in prompt
+            analysis_data: Optional path to codebase.json for insights
 
         Returns:
             Tuple of (success: bool, documentation: str)
@@ -326,7 +352,7 @@ class OverviewGenerator:
         from datetime import datetime
 
         # Format prompt
-        prompt = self.format_overview_prompt(project_data, key_files, max_files)
+        prompt = self.format_overview_prompt(project_data, key_files, max_files, analysis_data)
 
         # Consult LLM
         success, findings = llm_consultation_fn(prompt)
