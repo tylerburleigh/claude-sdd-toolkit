@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:51:00.132155Z",
+  "last_updated": "2025-11-21T16:52:28.655619Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 20,
+      "completed_tasks": 21,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -866,7 +866,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Ensure implementation works correctly and integrates properly",
         "risk_level": "low"
@@ -881,7 +881,7 @@
         "task-4-1"
       ],
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -907,7 +907,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
         "task_category": "implementation",
@@ -941,7 +941,7 @@
     "task-4-1-2": {
       "type": "subtask",
       "title": "Add tests for --implement preset",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -950,9 +950,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Test scope --implement --function with both markdown and json output using the same fixture data"
+        "description": "Test scope --implement --function with both markdown and json output using the same fixture data",
+        "started_at": "2025-11-21T16:51:32.678049Z",
+        "status_note": "Adding tests for scope --implement preset",
+        "completed_at": "2025-11-21T16:52:28.648371Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-21T16:52:28.654225Z"
       }
     },
     "task-4-1-3": {
@@ -1041,7 +1047,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 83,
+    "progress_percentage": 87,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -1314,6 +1320,15 @@
       "content": "Created comprehensive test suite for scope --plan preset in tests/doc_query/test_scope_command.py. Added 8 passing tests covering: basic output validation, complex functions analysis, JSON output format, error handling for missing module/preset/docs, invalid preset validation, and dependency information display. All tests use fixture-backed documentation (no reliance on repo docs). Test results: 8/8 passed.",
       "metadata": {},
       "task_id": "task-4-1-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:52:28.654216Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add tests for --implement preset",
+      "author": "claude-code",
+      "content": "Added comprehensive test suite for scope --implement preset in tests/doc_query/test_scope_command.py. Added 8 passing tests covering: function parameter handling, caller analysis, call graph display, instantiated classes, JSON/compact output formats, error handling for missing docs, and optional function parameter behavior. All tests use same fixture data as --plan tests. Combined test results: 16/16 tests passed (8 --plan + 8 --implement).",
+      "metadata": {},
+      "task_id": "task-4-1-2"
     }
   ]
 }

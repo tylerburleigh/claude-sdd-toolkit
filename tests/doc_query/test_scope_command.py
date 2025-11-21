@@ -322,3 +322,199 @@ class TestScopePlanPreset:
         # Should include dependency information
         # auth module depends on utils and database
         assert 'depend' in output_text.lower()
+
+
+class TestScopeImplementPreset:
+    """Tests for scope command with --implement preset."""
+
+    def test_scope_implement_with_function(self, sample_scope_codebase, capsys):
+        """Test --implement preset with function parameter."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='process_auth',
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+
+        # Should contain function information
+        assert 'process_auth' in output_text
+
+        # Should include caller information
+        assert 'caller' in output_text.lower() or 'login' in output_text or 'verify_token' in output_text
+
+        # Should include call graph
+        assert 'call' in output_text.lower()
+
+    def test_scope_implement_without_function(self, sample_scope_codebase, capsys):
+        """Test --implement preset without function shows tip."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+
+        # Should still show instantiated classes
+        assert 'authservice' in output_text.lower() or 'sessionmanager' in output_text.lower() or 'class' in output_text.lower()
+
+        # Should show tip about using --function
+        assert 'tip' in output_text.lower() or 'function' in output_text.lower()
+
+    def test_scope_implement_json_output(self, sample_scope_codebase, capsys):
+        """Test --implement preset with JSON output."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='process_auth',
+            docs_path=str(sample_scope_codebase.parent),
+            json=True,
+            compact=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+
+        # Should be valid JSON
+        try:
+            output_data = json.loads(captured.out)
+            assert isinstance(output_data, dict)
+        except json.JSONDecodeError:
+            pytest.fail("Output is not valid JSON")
+
+    def test_scope_implement_shows_callers(self, sample_scope_codebase, capsys):
+        """Test --implement preset includes caller analysis."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='process_auth',
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+
+        # Should identify callers (login and verify_token call process_auth)
+        # At minimum should show caller-related information
+        assert 'caller' in output_text.lower() or 'login' in output_text
+
+    def test_scope_implement_shows_instantiated_classes(self, sample_scope_codebase, capsys):
+        """Test --implement preset includes instantiated classes."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+
+        # Should show instantiated classes from auth module
+        # AuthService and SessionManager are in src/auth.py
+        assert 'authservice' in output_text.lower() or 'sessionmanager' in output_text.lower() or 'instantiat' in output_text.lower()
+
+    def test_scope_implement_missing_function_still_works(self, sample_scope_codebase, capsys):
+        """Test --implement preset works without function parameter."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function=None,
+            docs_path=str(sample_scope_codebase.parent),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        # Should succeed even without function
+        assert result == 0
+
+    def test_scope_implement_nonexistent_docs(self, tmp_path, capsys):
+        """Test --implement preset returns error when docs don't exist."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='process_auth',
+            docs_path=str(tmp_path / "nonexistent"),
+            json=False
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 1
+
+        captured = capsys.readouterr()
+        output_text = captured.out + captured.err
+        assert 'documentation not found' in output_text.lower()
+
+    def test_scope_implement_compact_json(self, sample_scope_codebase, capsys):
+        """Test --implement preset with compact JSON output."""
+        args = argparse.Namespace(
+            preset='implement',
+            module='src/auth.py',
+            function='process_auth',
+            docs_path=str(sample_scope_codebase.parent),
+            json=True,
+            compact=True
+        )
+
+        printer = PrettyPrinter(verbose=True)
+
+        result = cmd_scope(args, printer)
+
+        assert result == 0
+
+        captured = capsys.readouterr()
+
+        # Compact JSON should be single-line
+        lines = captured.out.strip().splitlines()
+        assert len(lines) == 1
+
+        # Should still be valid JSON
+        try:
+            output_data = json.loads(captured.out)
+            assert isinstance(output_data, dict)
+        except json.JSONDecodeError:
+            pytest.fail("Compact output is not valid JSON")
