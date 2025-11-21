@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:36:05.080479Z",
+  "last_updated": "2025-11-21T16:37:53.759123Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -372,7 +372,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Example Output Generation",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -388,10 +388,13 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "description": "Create concrete example outputs showing both presets in action",
-        "risk_level": "low"
+        "risk_level": "low",
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:37:53.748544Z",
+        "journaled_at": "2025-11-21T16:37:53.759096Z"
       }
     },
     "phase-2-files": {
@@ -549,7 +552,7 @@
     "phase-2-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "verify-2-1"
@@ -562,13 +565,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:37:53.748537Z",
+        "journaled_at": "2025-11-21T16:37:53.757412Z"
+      }
     },
     "verify-2-1": {
       "type": "verify",
       "title": "Phase 2 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -577,7 +584,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "skill": "sdd-fidelity-review",
@@ -588,7 +595,12 @@
           "revert_status": "in_progress",
           "continue_on_failure": false
         },
-        "agent": "sdd-fidelity-review"
+        "agent": "sdd-fidelity-review",
+        "started_at": "2025-11-21T16:36:33.258957Z",
+        "completed_at": "2025-11-21T16:37:53.748265Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-21T16:37:53.753458Z"
       }
     },
     "phase-3": {
@@ -984,7 +996,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 54,
+    "progress_percentage": 58,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -1149,6 +1161,33 @@
       "content": "All child tasks in group phase-2-files have been completed.",
       "metadata": {},
       "task_id": "phase-2-files"
+    },
+    {
+      "timestamp": "2025-11-21T16:37:53.753444Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 2 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Phase 2 fidelity review completed successfully. All 5 documentation tasks passed review with no deviations. Verified all example files exist with correct content: commit hash (c43903d28fce5b16f7a23db09108a3010d0c86d8), module paths, function names, metadata blocks, and valid JSON/Markdown formatting. README provides adequate documentation for regeneration and usage. Overall assessment: PASS - ready for Phase 3.",
+      "metadata": {},
+      "task_id": "verify-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:37:53.757400Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-verify"
+    },
+    {
+      "timestamp": "2025-11-21T16:37:53.759086Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Example Output Generation",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-2 have been completed.",
+      "metadata": {},
+      "task_id": "phase-2"
     }
   ]
 }
