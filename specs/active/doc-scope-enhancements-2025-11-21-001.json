@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:47:03.766744Z",
+  "last_updated": "2025-11-21T16:51:00.132155Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 19,
+      "completed_tasks": 20,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -852,7 +852,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Testing & Verification",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -866,7 +866,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Ensure implementation works correctly and integrates properly",
         "risk_level": "low"
@@ -875,13 +875,13 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [
         "task-4-1"
       ],
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -894,7 +894,7 @@
     "task-4-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -907,7 +907,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/tests/integration/test_doc_scope_cli.py",
         "task_category": "implementation",
@@ -918,7 +918,7 @@
     "task-4-1-1": {
       "type": "subtask",
       "title": "Add tests for --plan preset",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -927,9 +927,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Test scope --plan --module with both markdown and json output using fixture-backed docs (no reliance on repo docs/)"
+        "description": "Test scope --plan --module with both markdown and json output using fixture-backed docs (no reliance on repo docs/)",
+        "started_at": "2025-11-21T16:47:25.947225Z",
+        "status_note": "Adding tests for scope --plan preset with fixture-backed docs",
+        "completed_at": "2025-11-21T16:51:00.126965Z",
+        "needs_journaling": false,
+        "actual_hours": 0.059,
+        "journaled_at": "2025-11-21T16:51:00.130900Z"
       }
     },
     "task-4-1-2": {
@@ -1035,8 +1041,8 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 79,
-    "current_phase": "phase-3"
+    "progress_percentage": 83,
+    "current_phase": "phase-4"
   },
   "journal": [
     {
@@ -1299,6 +1305,15 @@
       "content": "All child tasks in phase phase-3 have been completed.",
       "metadata": {},
       "task_id": "phase-3"
+    },
+    {
+      "timestamp": "2025-11-21T16:51:00.130893Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add tests for --plan preset",
+      "author": "claude-code",
+      "content": "Created comprehensive test suite for scope --plan preset in tests/doc_query/test_scope_command.py. Added 8 passing tests covering: basic output validation, complex functions analysis, JSON output format, error handling for missing module/preset/docs, invalid preset validation, and dependency information display. All tests use fixture-backed documentation (no reliance on repo docs). Test results: 8/8 passed.",
+      "metadata": {},
+      "task_id": "task-4-1-1"
     }
   ]
 }
