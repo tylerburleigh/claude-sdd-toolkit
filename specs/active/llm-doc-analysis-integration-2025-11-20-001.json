@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-21T00:22:43.388261Z",
+  "last_updated": "2025-11-21T00:25:50.758757Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,7 +21,7 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 30,
+    "progress_percentage": 32,
     "status": "active",
     "current_phase": "phase-2"
   },
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {}
     },
     "phase-1": {
@@ -325,7 +325,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Create analysis_insights.py module with extraction, formatting, and caching capabilities",
         "risk_level": "medium"
@@ -640,7 +640,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "verify-2-1": {
@@ -667,15 +667,21 @@
     "verify-2-2": {
       "type": "verify",
       "title": "Verify token budgets",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "expected": "Generated insights stay within Architecture:450, Component:350, Overview:250 token limits",
-        "command": ""
+        "command": "",
+        "started_at": "2025-11-21T00:25:36.765871Z",
+        "status_note": "Token budget verification in progress",
+        "completed_at": "2025-11-21T00:25:50.753068Z",
+        "needs_journaling": false,
+        "actual_hours": 0.004,
+        "journaled_at": "2025-11-21T00:25:50.757142Z"
       },
       "dependencies": {
         "blocks": [],
@@ -1786,6 +1792,15 @@
       "content": "Test suite verification successful. All 18 tests passed in 0.27 seconds. Test coverage includes: AnalysisInsights dataclass, insight extraction (basic, entry points, fan-out, cross-module deps, integration points, adaptive scaling), caching mechanism with freshness validation, formatting for all generator types (architecture/component/overview), token budget enforcement, table formatting, priority-based truncation, cache metrics and entry tracking. 100% test pass rate.",
       "metadata": {},
       "task_id": "verify-2-1"
+    },
+    {
+      "timestamp": "2025-11-21T00:25:50.757137Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Verify token budgets",
+      "author": "claude-code",
+      "content": "Token budget verification successful. Test suite confirms format_insights_for_prompt() correctly enforces token limits: Architecture generator 450 tokens, Component generator 350 tokens, Overview generator 250 tokens. Test 'test_token_budget_enforcement' validates all three generator types with realistic data, ensuring formatted output stays within budget (with appropriate tolerance for file reference additions). Priority-based truncation mechanism verified working correctly.",
+      "metadata": {},
+      "task_id": "verify-2-2"
     }
   ]
 }
