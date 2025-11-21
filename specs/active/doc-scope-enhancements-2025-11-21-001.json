@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-scope-enhancements-2025-11-21-001",
   "generated": "2025-11-21T16:00:00Z",
-  "last_updated": "2025-11-21T16:44:54.967174Z",
+  "last_updated": "2025-11-21T16:47:03.766744Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 18,
+      "completed_tasks": 19,
       "metadata": {
         "description": "Add sdd doc scope command with --plan and --implement presets for opinionated codebase analysis workflows",
         "objectives": [
@@ -606,7 +606,7 @@
     "phase-3": {
       "type": "phase",
       "title": "Documentation Updates",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -622,10 +622,13 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "description": "Update SKILL.md files to guide agents on using the new scope command",
-        "risk_level": "low"
+        "risk_level": "low",
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:47:03.756238Z",
+        "journaled_at": "2025-11-21T16:47:03.766720Z"
       }
     },
     "phase-3-files": {
@@ -794,7 +797,7 @@
     "phase-3-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "verify-3-1"
@@ -807,13 +810,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-21T16:47:03.756235Z",
+        "journaled_at": "2025-11-21T16:47:03.764087Z"
+      }
     },
     "verify-3-1": {
       "type": "verify",
       "title": "Phase 3 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -822,7 +829,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "skill": "sdd-fidelity-review",
@@ -833,7 +840,13 @@
           "revert_status": "in_progress",
           "continue_on_failure": false
         },
-        "agent": "sdd-fidelity-review"
+        "agent": "sdd-fidelity-review",
+        "started_at": "2025-11-21T16:45:18.133968Z",
+        "status_note": "Starting Phase 3 fidelity review",
+        "completed_at": "2025-11-21T16:47:03.756089Z",
+        "needs_journaling": false,
+        "actual_hours": 0.029,
+        "journaled_at": "2025-11-21T16:47:03.760517Z"
       }
     },
     "phase-4": {
@@ -1022,7 +1035,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-21T16:14:34.003278Z",
-    "progress_percentage": 75,
+    "progress_percentage": 79,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -1259,6 +1272,33 @@
       "content": "All child tasks in group phase-3-files have been completed.",
       "metadata": {},
       "task_id": "phase-3-files"
+    },
+    {
+      "timestamp": "2025-11-21T16:47:03.760511Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 3 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Phase 3 fidelity review PASSED. All three documentation update tasks verified: (1) Quick Start in doc-query features scope command, (2) Phase 1.2 in sdd-plan integrates scope into planning workflow, (3) Implementation Handoff in sdd-next recommends scope --implement. 100% implementation fidelity achieved. No deviations found. Full report saved to specs/.fidelity-reviews/.",
+      "metadata": {},
+      "task_id": "verify-3-1"
+    },
+    {
+      "timestamp": "2025-11-21T16:47:03.764078Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-3-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-3-verify"
+    },
+    {
+      "timestamp": "2025-11-21T16:47:03.766713Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Documentation Updates",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-3 have been completed.",
+      "metadata": {},
+      "task_id": "phase-3"
     }
   ]
 }
