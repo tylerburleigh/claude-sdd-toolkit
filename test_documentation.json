@@ -1,0 +1,60 @@
+{
+  "functions": [
+    {
+      "name": "extract_insights_from_analysis",
+      "file": "src/claude_skills/llm_doc_gen/analysis/analysis_insights.py",
+      "call_count": 15,
+      "complexity": 8
+    },
+    {
+      "name": "format_insights_for_prompt",
+      "file": "src/claude_skills/llm_doc_gen/analysis/analysis_insights.py",
+      "call_count": 12,
+      "complexity": 6
+    },
+    {
+      "name": "run_test",
+      "file": "src/claude_skills/llm_doc_gen/ab_testing.py",
+      "call_count": 8,
+      "complexity": 5
+    },
+    {
+      "name": "benchmark_extraction",
+      "file": "src/claude_skills/llm_doc_gen/analysis/performance_benchmark.py",
+      "call_count": 5,
+      "complexity": 7
+    },
+    {
+      "name": "compute_composites",
+      "file": "src/claude_skills/llm_doc_gen/ab_testing.py",
+      "call_count": 10,
+      "complexity": 3
+    }
+  ],
+  "classes": [
+    {
+      "name": "ABTestFramework",
+      "file": "src/claude_skills/llm_doc_gen/ab_testing.py",
+      "instantiation_count": 5
+    },
+    {
+      "name": "PerformanceBenchmark",
+      "file": "src/claude_skills/llm_doc_gen/analysis/performance_benchmark.py",
+      "instantiation_count": 3
+    },
+    {
+      "name": "EvaluationMetrics",
+      "file": "src/claude_skills/llm_doc_gen/ab_testing.py",
+      "instantiation_count": 8
+    }
+  ],
+  "dependencies": {
+    "ab_testing": [
+      "analysis_insights"
+    ],
+    "performance_benchmark": [
+      "analysis_insights"
+    ],
+    "analysis_insights": []
+  }
+}
