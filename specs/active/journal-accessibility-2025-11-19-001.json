@@ -2,7 +2,7 @@
   "spec_id": "journal-accessibility-2025-11-19-001",
   "title": "Improve Journal Entry Accessibility",
   "generated": "2025-11-19T22:00:00Z",
-  "last_updated": "2025-11-22T12:45:08.289907Z",
+  "last_updated": "2025-11-22T12:46:14.799550Z",
   "metadata": {
     "description": "Enhance journal entry accessibility by making get-journal support flexible invocations and ensuring prepare-task always includes journal data",
     "objectives": [
@@ -13,7 +13,7 @@
     ],
     "complexity": "medium",
     "estimated_hours": 8,
-    "progress_percentage": 17,
+    "progress_percentage": 23,
     "status": "active",
     "current_phase": "phase-1"
   },
@@ -29,7 +29,7 @@
         "phase-3"
       ],
       "total_tasks": 17,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {}
     },
     "phase-1": {
@@ -42,7 +42,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 7,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Make get-journal accept flexible invocation patterns while maintaining backwards compatibility",
         "risk_level": "low"
@@ -66,7 +66,7 @@
         "task-1-3"
       ],
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -110,7 +110,7 @@
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-2-1",
@@ -125,7 +125,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
         "task_category": "implementation",
@@ -173,13 +173,19 @@
     "task-1-2-3": {
       "type": "subtask",
       "title": "Update help text with both usage patterns",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Update p_get_journal help text to show: 'sdd get-journal SPEC_ID [TASK_ID]' and mention --task-id as alternative"
+        "details": "Update p_get_journal help text to show: 'sdd get-journal SPEC_ID [TASK_ID]' and mention --task-id as alternative",
+        "started_at": "2025-11-22T12:45:37.674575Z",
+        "status_note": "Reviewing and updating help text for get-journal command",
+        "completed_at": "2025-11-22T12:46:14.793821Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-22T12:46:14.798053Z"
       }
     },
     "task-1-3": {
@@ -609,6 +615,15 @@
       "content": "Fallback logic for --task-id flag already implemented in task-1-2-1.\n\nVerified implementation at line 1279 of sdd_update/cli.py:\n```python\ntask_id = getattr(args, 'task_id', None) or getattr(args, 'task_id_flag', None)\n```\n\nThis line implements the required fallback behavior:\n1. First checks for positional `task_id` argument via `getattr(args, 'task_id', None)`\n2. Falls back to deprecated `--task-id` flag via `getattr(args, 'task_id_flag', None)`\n3. Uses logical OR to prioritize positional over flag\n\nThe fallback logic is working correctly and supports both usage patterns:\n- New: `sdd get-journal SPEC_ID TASK_ID` (positional)\n- Deprecated: `sdd get-journal SPEC_ID --task-id TASK_ID` (flag)\n\nNo additional changes needed as implementation was completed in previous subtask.",
       "metadata": {},
       "task_id": "task-1-2-2"
+    },
+    {
+      "timestamp": "2025-11-22T12:46:14.798040Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update help text with both usage patterns",
+      "author": "claude-code",
+      "content": "Updated help text for get-journal command to show both usage patterns.\n\nChanges made to sdd_update/cli.py (lines 1998-2007):\n\nUpdated the parser help text to include usage example:\n- Changed from: help=\"Get journal entries\"\n- Changed to: help=\"Get journal entries for a spec or task (usage: sdd get-journal SPEC_ID [TASK_ID])\"\n\nThis help text now clearly shows:\n1. The positional syntax with optional task_id: SPEC_ID [TASK_ID]\n2. The square brackets indicate TASK_ID is optional\n3. Users can easily see the preferred usage pattern\n\nAdditional help text already in place:\n- Line 2005: Positional task_id help explains it's optional and positional\n- Line 2006: Flag help marks --task-id as deprecated and directs to positional argument\n\nUsers running 'sdd get-journal --help' will now see clear usage instructions showing the modern positional syntax.",
+      "metadata": {},
+      "task_id": "task-1-2-3"
     }
   ]
 }

@@ -1996,7 +1996,11 @@ def register_update(subparsers, parent_parser):
     p_get_task.set_defaults(func=cmd_get_task)
 
     # get-journal command
-    p_get_journal = subparsers.add_parser("get-journal", help="Get journal entries", parents=[parent_parser])
+    p_get_journal = subparsers.add_parser(
+        "get-journal",
+        help="Get journal entries for a spec or task (usage: sdd get-journal SPEC_ID [TASK_ID])",
+        parents=[parent_parser]
+    )
     p_get_journal.add_argument("spec_id", help="Specification ID")
     p_get_journal.add_argument("task_id", nargs='?', help="Optional task ID to filter journal entries (positional)")
     p_get_journal.add_argument("--task-id", dest="task_id_flag", help="Filter by task ID (deprecated, use positional argument)")
