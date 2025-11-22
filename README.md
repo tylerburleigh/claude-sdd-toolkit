@@ -196,12 +196,10 @@ See [docs/skills-reference.md](docs/skills-reference.md) for complete skill docu
 
 ### For Users
 
-- [Getting Started](docs/getting-started.md) - Quick start guide
+- [INSTALLATION.md](INSTALLATION.md) - Detailed installation and setup guide
 - [Core Concepts](docs/core-concepts.md) - Specifications, tasks, dependencies
-- [Workflows](docs/workflows.md) - Common development patterns
+- [Workflows](docs/workflows.md) - Common development patterns and examples
 - [Configuration](docs/configuration.md) - Setup and configuration options
-- [Examples](docs/examples/complete_task_workflow.md) - Workflow examples
-- [INSTALLATION.md](INSTALLATION.md) - Detailed installation instructions
 
 ### For Developers
 
