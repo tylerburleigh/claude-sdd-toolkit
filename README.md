@@ -68,8 +68,6 @@ Claude: Task 1-2: Add notification system...
         [Continues through tasks]
 ```
 
-See [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for complete workflow examples.
-
 ## How It Works
 
 ### Specifications: Machine-Readable Plans
