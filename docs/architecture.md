@@ -1,62 +1,424 @@
-# claude-sdd-toolkit - Architecture Documentation
+# Architecture
 
-**Date:** 2025-11-20
-**Project Type:** Software Project
-**Primary Language(s):** python, javascript
+System architecture and design patterns for the SDD Toolkit.
 
-## Technology Stack Details
+## Table of Contents
 
-### Core Technologies
-
-- **Languages:** python, javascript
+- [Overview](#overview)
+- [Project Statistics](#project-statistics)
+- [Architectural Patterns](#architectural-patterns)
+- [Modular Skill-Based Design](#modular-skill-based-design)
+- [Provider Abstraction Layer](#provider-abstraction-layer)
+- [Data Flow](#data-flow)
+- [Project Structure](#project-structure)
+- [Technology Stack](#technology-stack)
 
 ---
 
-## Architecture Analysis Research Findings for `claude-sdd-toolkit`
+## Overview
 
-### 1. Executive Summary
+The SDD Toolkit is a Python-based CLI and library for Spec-Driven Development, enabling AI-assisted software engineering. The architecture centers around machine-readable JSON specifications that define tasks, dependencies, and track progress.
 
-The `claude-sdd-toolkit` is a Python-based Command Line Interface (CLI) and library designed for Spec-Driven Development (SDD), enabling AI-assisted software engineering. Its high-level architecture centers around machine-readable JSON specifications that define tasks, dependencies, and track progress, integrating seamlessly with various AI models. The primary architectural pattern is a **Monolith** that internally employs a **Plugin Architecture** (referred to as "Modular Skill-Based Design"), complemented by a **Layered Architecture** and a conceptual **Client-Server** model where Claude Code interacts with the toolkit. Key architectural characteristics include high modularity, extensibility through skills, a robust AI provider abstraction layer, declarative state management via JSON specifications, and a powerful, configurable CLI.
+**Key Characteristics:**
+- High modularity through skill-based design
+- Extensibility via plugin architecture
+- Robust AI provider abstraction
+- Declarative state management with JSON specs
+- Powerful, configurable CLI
 
-### 2. Architecture Pattern Identification
+---
 
-*   **Monolith (Internally Modular):**
-    *   **Evidence:** The `docs/project-overview.md` explicitly states "Architecture: monolith" and "Repository Type: monolith." The `README.md` mentions "183 Python modules, 154 classes, and 915 functions organized into independent, composable skills," indicating a large, single codebase. The entire project resides within a single repository and is deployed as a single Python package.
-    *   **Implementation:** Despite being a monolith, the project achieves significant modularity through its "Skill-Based Design" and extensive use of Python modules. All functionalities are bundled within the `src/claude_skills/claude_skills` package, but are logically separated.
-    *   **Benefits:** This pattern simplifies development, testing, and deployment processes compared to distributed systems, while internal modularity maintains a clear separation of concerns, preventing "big ball of mud" issues.
+## Project Statistics
 
-*   **Plugin Architecture (Modular Skill-Based Design):**
-    *   **Evidence:** The `README.md` details a "Modular Skill-Based Design" with independent Python modules for capabilities like `sdd-plan`, `sdd-next`, `doc-query`, `llm-doc-gen`, etc. The `skills/` directory at the project root and the `src/claude_skills/claude_skills/` package structure (containing sub-directories for each skill like `sdd_plan`, `doc_query`) confirm this design. Each skill has its own `SKILL.md` file, indicating distinct documentation and purpose.
-    *   **Implementation:** Each skill module encapsulates specific business logic and CLI commands. A central dispatcher (likely within `src/claude_skills/claude_skills/cli/sdd.py`) dynamically loads and executes the relevant skill logic based on user input or AI orchestration. This design also extends to Claude Code's plugin system, where the toolkit itself functions as a plugin.
-    *   **Benefits:** This pattern fosters independent development, testing, and easy extension of features. It promotes clear separation of concerns, allows new skills to be added without major core modifications, and enables flexible, composable workflows.
+**Codebase Metrics:**
+- **183 Python modules**
+- **154 classes**
+- **915 functions**
+- **72,268 lines of code**
+- **Average complexity:** 6.93
 
-*   **Layered Architecture:**
-    *   **Evidence:** The project's structure, particularly within `src/claude_skills/claude_skills/`, reveals distinct conceptual layers, although not strictly enforced by physical boundaries.
-    *   **Implementation:**
-        *   **Presentation Layer:** The `src/claude_skills/claude_skills/cli/` module handles user interaction via the unified `sdd` command. Output modes (`rich`, `plain`, `json`) are configured in `.claude/sdd_config.json` and handled by modules such as `common/ui_factory.py`, `common/rich_ui.py`, `common/plain_ui.py`, and `common/json_output.py`.
-        *   **Application/Business Logic Layer:** The various skill modules (e.g., `sdd_plan`, `sdd_next`, `run_tests` located in `src/claude_skills/claude_skills/sdd_plan`, `sdd_next`, etc.) contain the core SDD workflows, task orchestration, and AI consultation logic. Subagents are also part of this layer.
-        *   **Infrastructure/Utility Layer:** The `src/claude_skills/claude_skills/common/` module (`ai_config`, `ai_tools`, `cache`, `providers`, `spec`, `paths`, `context_tracker`, `templates`) provides foundational services, cross-cutting concerns (e.g., caching, configuration), and integration with external systems (AI models, file system, `tree-sitter`).
-    *   **Benefits:** Ensures strong separation of concerns, making the system easier to understand, test, and maintain. Changes within one layer (e.g., a new AI provider) are isolated, minimizing impact on other layers.
+**Primary Languages:**
+- Python 3.9+ (core toolkit)
+- JavaScript (OpenCode provider integration)
 
-*   **Client-Server (Conceptual):**
-    *   **Evidence:** The `README.md` and `INSTALLATION.md` describe user interaction via "Claude Code" (an AI assistant client) or directly via the `sdd` CLI from a terminal. The "Integration" section of the `README.md` states "Claude skills orchestrate workflows → Python CLI executes operations → Results inform next steps."
-    *   **Implementation:** Claude Code or the user's terminal acts as the client, sending commands to the `sdd` CLI. The CLI (acting as a server-like component) processes these commands, executes operations (e.g., reading/writing JSON specs, invoking AI models via providers, performing code analysis), and returns results back to the client.
-    *   **Benefits:** Establishes a clear interaction boundary between the AI assistant/user and the toolkit's functionalities, supporting flexible integration and execution models (e.g., direct CLI use or AI orchestration).
+---
 
-### 3. Key Architectural Decisions
+## Architectural Patterns
 
-| Decision Category        | Choice Made
+### 1. Modular Monolith
+
+**Description:** Single codebase with internal modularity
+
+**Implementation:**
+- All functionalities bundled in `src/claude_skills` package
+- Deployed as single Python package
+- Logically separated into independent modules
+
+**Benefits:**
+- Simplified development, testing, deployment
+- Clear separation of concerns
+- Avoids "big ball of mud" anti-pattern
+
+---
+
+### 2. Plugin Architecture (Skills)
+
+**Description:** Independent, composable skill modules
+
+**Implementation:**
+- Each skill is self-contained module
+- Skills directory structure:
+  ```
+  skills/
+  ├── sdd-plan/
+  ├── sdd-next/
+  ├── doc-query/
+  ├── llm-doc-gen/
+  └── common/
+  ```
+
+**Benefits:**
+- Independent development and testing
+- Easy feature extension
+- Flexible, composable workflows
+
+**See:** [Advanced Topics - Extension Points](advanced-topics.md#extension-points)
+
+---
+
+### 3. Layered Architecture
+
+**Presentation Layer:**
+- CLI interface (`sdd` command)
+- Output formatting (rich/plain/json)
+- Located in `src/claude_skills/cli/`
+
+**Application Layer:**
+- Skill modules (sdd-plan, sdd-next, etc.)
+- Task orchestration
+- AI consultation logic
+- Subagent system
+
+**Infrastructure Layer:**
+- AI configuration
+- Provider abstraction
+- Caching
+- File I/O
+- Template system
+- Located in `src/claude_skills/common/`
+
+**Benefits:**
+- Strong separation of concerns
+- Isolated changes (new provider doesn't affect UI)
+- Easier testing and maintenance
+
+---
+
+### 4. Client-Server (Conceptual)
+
+**Client:** Claude Code or terminal
+**Server:** SDD CLI
+
+**Interaction Flow:**
+```
+Claude Code
+    ↓ (command)
+  SDD CLI
+    ↓ (execute)
+  Operations (read specs, call AI, analyze code)
+    ↓ (results)
+  Claude Code
+```
+
+**Benefits:**
+- Clear interaction boundary
+- Supports multiple clients (Claude Code, terminal, scripts)
+- Flexible integration models
+
+---
+
+## Modular Skill-Based Design
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      Skill Architecture                         │
+└─────────────────────────────────────────────────────────────────┘
+
+         Core Workflow Skills (Main)
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  sdd-plan    │  │  sdd-next    │  │  sdd-update  │
+│              │  │              │  │              │
+│  Create      │  │  Orchestrate │  │  Track       │
+│  Specs       │  │  Tasks       │  │  Progress    │
+└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+    ┌────────────────────┼────────────────────┐
+    │                    │                    │
+┌───▼────┐     ┌─────▼─────┐   ┌─────▼─────┐   ┌─────▼─────┐
+│ code-  │     │    doc-   │   │ llm-doc-  │   │   run-    │
+│ doc    │     │   query   │   │   gen     │   │   tests   │
+│        │     │           │   │           │   │           │
+│ Docs   │     │  Analyze  │   │  AI Docs  │   │  Testing  │
+└───┬────┘     └─────┬─────┘   └─────┬─────┘   └─────┬─────┘
+    │                │               │               │
+    └────────────────┴───────────────┴───────────────┘
+                         │
+              Supporting Skills
+    ┌────────────────────┼────────────────────┐
+    │                    │                    │
+┌───▼──────────┐  ┌──────▼──────┐   ┌────────▼──────┐
+│ sdd-validate │  │ sdd-fidelity│   │ sdd-plan-     │
+│ sdd-render   │  │    -review  │   │    review     │
+│ sdd-modify   │  │             │   │               │
+└──────────────┘  └─────────────┘   └───────────────┘
+                         │
+                  ┌──────▼──────┐
+                  │   common    │
+                  │             │
+                  │  Shared     │
+                  │  Utilities  │
+                  └─────────────┘
+```
+
+### Skill Categories
+
+**Core Workflow:**
+- **sdd-plan** - Specification creation
+- **sdd-next** - Task orchestration
+- **sdd-update** - Progress tracking
+
+**Documentation & Analysis:**
+- **doc-query** - Code queries
+- **llm-doc-gen** - AI documentation
+
+**Quality Assurance:**
+- **sdd-validate** - Spec validation
+- **sdd-fidelity-review** - Implementation verification
+- **sdd-plan-review** - Multi-model review
+- **sdd-modify** - Spec modifications
+
+**Testing:**
+- **run-tests** - Test execution with AI debugging
+
+**Utilities:**
+- **sdd-render** - Human-readable output
+- **sdd-pr** - Pull request creation
+
+---
+
+## Provider Abstraction Layer
+
+### Architecture
+
+```
+         Skills
+           ↓
+   ProviderContext (Abstract)
+           ↓
+    ┌──────┴──────┐
+    │             │
+┌───▼───┐   ┌─────▼─────┐
+│Gemini │   │  Cursor   │
+│       │   │  Agent    │
+└───────┘   └───────────┘
+    │             │
+┌───▼───┐   ┌─────▼─────┐
+│Codex  │   │  Claude   │
+│       │   │(read-only)│
+└───────┘   └───────────┘
+    │
+┌───▼────┐
+│OpenCode│
+│        │
+└────────┘
+```
+
+### Provider Features
+
+| Provider | Models | Tool Support | Security |
+|----------|--------|--------------|----------|
+| **Gemini** | Pro, Flash | No | Full access |
+| **Cursor** | Composer 1M | Yes | Full access |
+| **Codex** | Sonnet, Haiku | No | Full access |
+| **Claude** | Sonnet, Haiku | Limited | Read-only |
+| **OpenCode** | Various | Yes | Read-only |
+
+**Read-Only Mode:**
+- ✅ Allowed: Read, Grep, Glob, WebSearch
+- ❌ Blocked: Write, Edit, Bash
+
+**See:** [Advanced Topics - Provider Abstraction](advanced-topics.md#provider-abstraction-layer)
+
+---
+
+## Data Flow
+
+### Primary State: JSON Specifications
+
+```
+specs/
+├── pending/      # Planned work
+├── active/       # Current implementation
+├── completed/    # Finished features
+└── archived/     # Cancelled work
+```
+
+### Lifecycle
+
+```
+Plan → Validate → Activate → Implement → Track → Review → Complete
+  ↓        ↓          ↓           ↓         ↓        ↓         ↓
+sdd-plan  validate  activate  sdd-next  update  fidelity    archive
+```
+
+### Integration Flow
+
+```
+User Request
+    ↓
+Claude Code (Skills)
+    ↓
+Python CLI (sdd commands)
+    ↓
+Operations (spec I/O, AI calls, code analysis)
+    ↓
+Results
+    ↓
+Claude Code (Next Steps)
+```
+
+---
+
+## Project Structure
+
+### Repository Layout
+
+```
+claude-sdd-toolkit/
+├── skills/                          # Claude Code skills
+│   ├── sdd-plan/
+│   ├── sdd-next/
+│   ├── doc-query/
+│   └── common/
+│
+├── src/claude_skills/               # Python package
+│   ├── sdd_plan/                    # Skill implementations
+│   ├── sdd_next/
+│   ├── doc_query/
+│   ├── llm_doc_gen/
+│   ├── run_tests/
+│   ├── common/                      # Shared utilities
+│   │   ├── providers/               # AI provider abstraction
+│   │   ├── ai_config.py
+│   │   ├── cache.py
+│   │   ├── spec.py
+│   │   └── templates/
+│   └── cli/                         # CLI entry points
+│
+├── tests/                           # Test suite
+│   ├── unit/
+│   ├── integration/
+│   └── fixtures/
+│
+├── docs/                            # Documentation
+│   ├── core-concepts.md
+│   ├── skills-reference.md
+│   ├── workflows.md
+│   ├── configuration.md
+│   └── architecture.md (this file)
+│
+├── specs/                           # Specification examples
+│   ├── pending/
+│   ├── active/
+│   └── completed/
+│
+└── README.md
+```
+
+### User Project Structure
+
+```
+your-project/
+├── specs/
+│   ├── pending/
+│   ├── active/
+│   ├── completed/
+│   ├── archived/
+│   ├── .reports/        # Gitignored
+│   ├── .reviews/        # Gitignored
+│   └── .backups/        # Gitignored
+│
+├── .claude/
+│   ├── settings.local.json
+│   ├── sdd_config.json
+│   └── ai_config.yaml
+│
+├── docs/                # Optional
+│   ├── codebase.json
+│   └── index.md
+│
+└── [source code]
+```
+
+---
+
+## Technology Stack
+
+### Core Technologies
+
+**Python 3.9+**
+- Modern async/await
+- Type hints
+- Standard library utilities
+
+**Key Libraries:**
+- **Rich** - Terminal UI (colors, tables, progress)
+- **tree-sitter** - AST parsing (Python, JavaScript, TypeScript)
+- **JSON Schema** - Spec validation
+- **pytest** - Testing framework
+
+### AI Integration
+
+**External CLIs:**
+- `gemini` - Google Gemini
+- `cursor-agent` - Cursor Composer
+- `codex` - Anthropic Codex
+- `claude` - Claude API
+- `opencode` - OpenCode AI (Node.js)
+
+**Integration Method:**
+```python
+# Subprocess-based CLI calls
+result = subprocess.run([provider, prompt], capture_output=True)
+```
+
+### File Formats
+
+**Specifications:**
+- JSON with JSON Schema validation
+- Git-trackable version control
+
+**Documentation:**
+- Markdown (human-readable)
+- JSON (machine-readable)
+
+**Configuration:**
+- JSON (CLI settings)
+- YAML (AI configuration)
 
 ---
 
 ## Related Documentation
 
-For additional information, see:
-
-- `index.md` - Master documentation index
-- `project-overview.md` - Project overview and summary
-- `development-guide.md` - Development workflow and setup
+- [Core Concepts](core-concepts.md) - Fundamental concepts
+- [Advanced Topics](advanced-topics.md) - Design patterns and extension points
+- [Skills Reference](skills-reference.md) - Skill documentation
+- [Configuration](configuration.md) - Configuration options
 
 ---
 
-*Generated using LLM-based documentation workflow*
+*Last updated: 2025-11-22*
