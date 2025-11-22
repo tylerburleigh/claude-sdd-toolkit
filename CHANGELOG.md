@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.7.1] - 2025-11-22
+
+### Added
+
+**Journal Accessibility Improvements:**
+- Enhanced `get-journal` command with ergonomic positional syntax
+  - New syntax: `sdd get-journal SPEC_ID [TASK_ID]` for cleaner command-line usage
+  - Legacy `--task-id` flag still supported for backward compatibility
+  - Improved help text with usage examples
+- Journal data now included in `prepare-task` output at all verbosity levels
+  - `context.task_journal` field added to both ESSENTIAL and STANDARD field sets
+  - Accessible via `--quiet`, default, and `--verbose` modes
+  - Provides integrated access to task journal without requiring separate `get-journal` calls
+
+### Changed
+- `prepare-task` context now includes task journal entries by default
+  - Previously required verbose mode to access journal data
+  - Now available at all verbosity levels for better workflow integration
+
+### Documentation
+- Added `docs/journal-accessibility-improvements.md` with usage examples and migration guide
+- Documented positional vs flag-based syntax patterns
+- Clarified when to use `get-journal` vs `prepare-task` for journal access
+
+### Notes
+- All changes maintain full backward compatibility
+- Existing scripts using `--task-id` flag continue to work unchanged
+- Output structure remains consistent across all verbosity levels
+
 ## [0.7.0] - 2025-11-21
 
 ### Added
