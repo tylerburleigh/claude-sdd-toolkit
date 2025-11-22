@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.7.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.1-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -914,6 +914,8 @@ sdd render <spec>
 
 ## Version History
 
+**0.7.1** - Journal accessibility improvements: ergonomic positional syntax for `get-journal` (`sdd get-journal SPEC_ID [TASK_ID]`), journal data in `prepare-task` output at all verbosity levels. Full backward compatibility maintained.
+
 **0.7.0** - New `sdd doc scope` command with `--plan`/`--implement` presets. 49x speedup in llm-doc-gen cross-reference resolution. Analysis integration enhances LLM docs with real codebase metrics. Parallel processing, persistent caching, streaming output. 100+ new tests.
 
 **0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
@@ -996,4 +998,4 @@ See [INSTALLATION.md](INSTALLATION.md) for setup.
 
 ---
 
-**Version**: 0.6.8 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.7.1 | **License**: MIT | **Author**: Tyler Burleigh
