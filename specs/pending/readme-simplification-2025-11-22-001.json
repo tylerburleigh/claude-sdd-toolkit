@@ -1,0 +1,727 @@
+{
+  "spec_id": "readme-simplification-2025-11-22-001",
+  "title": "README Simplification",
+  "generated": "2025-11-22T00:00:00Z",
+  "last_updated": "2025-11-22T13:55:56.000088Z",
+  "metadata": {
+    "description": "Restructure README from 1,001-line reference to focused ~250-line introduction, preserving all content in organized docs/",
+    "objectives": [
+      "Reduce README to ~250 lines (~75% reduction)",
+      "Balance: 40% getting started, 30% purpose/benefits, 30% essential reference",
+      "Use factual, developer-centric language (no marketing copy)",
+      "Preserve all information in properly organized docs/",
+      "Follow gemini-cli README success patterns"
+    ],
+    "complexity": "medium",
+    "estimated_hours": 8,
+    "assumptions": [
+      "Multi-model consensus recommendations inform content strategy",
+      "gemini-cli README serves as quality benchmark",
+      "All detailed content preserved in new documentation structure"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "README Simplification",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ],
+      "total_tasks": 20,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Create Documentation Structure",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Establish new documentation files to preserve detailed content before simplifying README",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "docs/core-concepts.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/core-concepts.md",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "details": [
+          "Extract 'Core Concepts' section from current README",
+          "Deep dive into specs, tasks, and dependencies",
+          "Add examples and diagrams where helpful",
+          "Ensure progressive disclosure of complexity"
+        ]
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "docs/skills-reference.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/skills-reference.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Extract skills reference tables from README",
+          "Include detailed examples for each skill",
+          "Add usage patterns and common workflows",
+          "Cross-reference with workflows.md where relevant"
+        ]
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "docs/workflows.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Extract 'Common Workflows' section from README",
+          "Include multiple workflow examples (5-6 examples)",
+          "Add step-by-step instructions with commands",
+          "Include troubleshooting tips for each workflow"
+        ]
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "docs/configuration.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/configuration.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Extract all configuration details from README",
+          "Document .sddconfig, environment variables, provider configs",
+          "Include configuration examples for common scenarios",
+          "Add configuration troubleshooting section"
+        ]
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "docs/cli-reference.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/cli-reference.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Extract CLI reference tables from README",
+          "Document all sdd commands with options and examples",
+          "Include output examples for each command",
+          "Add CLI usage tips and best practices"
+        ]
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "docs/troubleshooting.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/troubleshooting.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Extract troubleshooting section from README",
+          "Organize by problem category (installation, runtime, validation, etc.)",
+          "Include common error messages and solutions",
+          "Add debugging tips and diagnostic commands"
+        ]
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "docs/advanced-topics.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/advanced-topics.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Extract advanced topics from README",
+          "Include design patterns and extension points",
+          "Document customization and integration options",
+          "Add examples of advanced usage scenarios"
+        ]
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "All new documentation files exist",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "ls docs/core-concepts.md docs/skills-reference.md docs/workflows.md docs/configuration.md docs/cli-reference.md docs/troubleshooting.md docs/advanced-topics.md",
+        "expected": "All 7 files exist"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Content properly extracted from README",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each doc file contains relevant content from current README with proper formatting and cross-references",
+        "command": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Update Existing Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3",
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Enhance existing docs with content from current README",
+        "risk_level": "low"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "docs/architecture.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/architecture.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Add architecture diagrams from current README",
+          "Include project statistics (modules, classes, functions)",
+          "Add project structure details",
+          "Ensure consistency with new documentation structure"
+        ]
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Architecture doc enhanced with README content",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Architecture doc includes diagrams, stats, and structure details from README",
+        "command": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "All cross-references point to correct locations",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Links between documentation files work correctly",
+        "command": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Simplify README",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Replace current README with streamlined version following approved structure",
+        "risk_level": "medium"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "README.md",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "details": [
+          "Replace with new structure (~250 lines total):",
+          "- Header (tagline, badges) - 5 lines",
+          "- What & Why (problem \u2192 solution \u2192 outcome) - 30-40 lines",
+          "- Quick Start (install + first example) - 40-50 lines",
+          "- How It Works (core concepts, minimal) - 60-80 lines",
+          "- Essential Reference (key skills table) - 40-50 lines",
+          "- Documentation Links - 20-30 lines",
+          "- Footer (version, license, help) - 5 lines",
+          "Use factual, developer-centric language",
+          "Follow problem \u2192 solution \u2192 outcome framework",
+          "Link to all new documentation locations"
+        ]
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "README length is approximately 250 lines",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "wc -l README.md",
+        "expected": "Line count between 200-300 lines"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "All required sections present",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "README includes: Header, What & Why, Quick Start, How It Works, Essential Reference, Documentation Links, Footer",
+        "command": ""
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Tone is factual and non-promotional",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "No marketing language like 'revolutionary', 'game-changing'; uses problem \u2192 solution \u2192 outcome framework",
+        "command": ""
+      }
+    },
+    "verify-3-4": {
+      "type": "verify",
+      "title": "All documentation links work correctly",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Links to docs/core-concepts.md, docs/skills-reference.md, docs/workflows.md, docs/configuration.md, docs/cli-reference.md, docs/troubleshooting.md, docs/advanced-topics.md, docs/architecture.md all work",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Final Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure all content is preserved, links work, and messaging is appropriate",
+        "risk_level": "low"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "No content lost from original README",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All sections from original 1,001-line README exist somewhere in new documentation structure",
+        "command": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Matches gemini-cli success patterns",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "README follows gemini-cli patterns: concise, scannable, action-oriented, links to detailed docs",
+        "command": ""
+      }
+    }
+  }
+}
