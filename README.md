@@ -42,7 +42,7 @@ Systematic development where AI understands the full plan, tracks what's done, k
    /sdd-setup
    ```
 
-**Requirements:** Python 3.9+, Node.js >= 18.x. See [INSTALLATION.md](INSTALLATION.md) for detailed instructions.
+**Requirements:** Python 3.9+, Node.js >= 18.x. See [Getting Started](docs/getting-started.md) for detailed instructions.
 
 ### First Workflow
 
@@ -196,7 +196,7 @@ See [docs/skills-reference.md](docs/skills-reference.md) for complete skill docu
 
 ### For Users
 
-- [INSTALLATION.md](INSTALLATION.md) - Detailed installation and setup guide
+- [Getting Started](docs/getting-started.md) - Installation and setup guide
 - [Core Concepts](docs/core-concepts.md) - Specifications, tasks, dependencies
 - [Workflows](docs/workflows.md) - Common development patterns and examples
 - [Configuration](docs/configuration.md) - Setup and configuration options
@@ -228,7 +228,7 @@ See [docs/skills-reference.md](docs/skills-reference.md) for complete skill docu
 
 **0.6.0** - Three-tier verbosity system. AI consultation enhancements. Work mode configuration.
 
-See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+See [docs/changelog.md](docs/changelog.md) for complete version history.
 
 ## Getting Help
 
