@@ -181,9 +181,19 @@ def _get_sibling_ids(
 def _get_latest_journal_excerpt(
     journal_entries: List[Dict[str, Any]],
     task_id: str,
-    limit: int = 200,
+    limit: int = None,
 ) -> Optional[Dict[str, Any]]:
-    """Return the most recent journal entry summary for the given task."""
+    """
+    Return the most recent journal entry for the given task.
+
+    Args:
+        journal_entries: List of journal entries
+        task_id: Task identifier
+        limit: Optional character limit for summary (None = no limit)
+
+    Returns:
+        Full journal entry by default (no truncation unless limit specified)
+    """
     if not journal_entries:
         return None
 
@@ -196,7 +206,9 @@ def _get_latest_journal_excerpt(
     filtered.sort(key=lambda entry: entry.get("timestamp") or "", reverse=True)
     latest = filtered[0]
     summary = (latest.get("content") or "").strip()
-    if len(summary) > limit:
+
+    # Only truncate if limit explicitly provided
+    if limit is not None and len(summary) > limit:
         summary = summary[:limit]
 
     return {

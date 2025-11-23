@@ -142,7 +142,7 @@ Claude: [Moves spec to specs/completed/rate-limiting-2025-11-22-001.json]
 | **Task is blocked** | Blocker details are included in `sdd prepare-task` output (context.dependencies) |
 | **Wrong task suggested** | Use `/sdd-begin` and choose "Browse alternatives" |
 | **Need to modify spec** | Edit JSON directly, then run `sdd validate <spec>` |
-| **Need more context** | Use `--include-full-journal` or `--include-phase-history` flags with prepare-task |
+| **Need phase-wide context** | Use `--include-phase-history` or `--include-spec-overview` flags with prepare-task |
 
 ---
 
