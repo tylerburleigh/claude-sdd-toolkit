@@ -240,4 +240,4 @@ See [docs/changelog.md](docs/changelog.md) for complete version history.
 
 ---
 
-**Version:** 0.7.1 | **License:** MIT | **Author:** Tyler Burleigh
+**Version:** 0.7.5 | **License:** MIT | **Author:** Tyler Burleigh
