@@ -1,0 +1,703 @@
+{
+  "spec_id": "prepare-task-default-context-2025-11-23-001",
+  "title": "Prepare-task Default Context Upgrade",
+  "generated": "2025-11-23T00:00:00Z",
+  "last_updated": "2025-11-23T23:16:57.364927Z",
+  "metadata": {
+    "description": "Enhance the default sdd prepare-task workflow so every invocation returns execution-ready context (dependencies, file scopes, validation steps) without extra flags or helper commands.",
+    "objectives": [
+      "Fold execution plan, file scopes, and validation hints into the default prepare-task payload",
+      "Keep JSON contract backward compatible via updated extract_prepare_task_contract rules",
+      "Document the one-call workflow in CLI/workflow guides to discourage redundant commands",
+      "Add regression tests that lock in the richer default behavior",
+      "Provide instrumentation/benchmarking to keep latency overhead under 30ms"
+    ],
+    "complexity": "medium",
+    "estimated_hours": 14,
+    "assumptions": [
+      "Existing context_utils helpers can be extended without major refactors",
+      "Token-reduction contracts continue to govern compact output",
+      "Agents consume prepare-task responses programmatically and prefer defaults over opt-in flags"
+    ],
+    "progress_percentage": 4,
+    "status": "active",
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Prepare-task Default Context Upgrade",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 24,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Design & Contract Updates",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Define the richer default payload and update prepare-task contracts before implementation",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "analysis/prepare-task-default-context.md",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "analysis/prepare-task-default-context.md",
+        "task_category": "research",
+        "estimated_hours": 1,
+        "details": [
+          "Capture the desired default payload structure (plan, files, validations)",
+          "Document backwards-compatibility expectations and latency budget (<30ms overhead)",
+          "List data sources reused from prepare-task enhancement flags",
+          "Add a contract appendix with sample payloads showing legacy vs richer defaults"
+        ],
+        "started_at": "2025-11-23T23:14:10.113388Z",
+        "status_note": "Starting analysis of prepare-task default context requirements",
+        "completed_at": "2025-11-23T23:16:57.361502Z",
+        "needs_journaling": false,
+        "actual_hours": 0.046,
+        "journaled_at": "2025-11-23T23:16:57.363894Z"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Update prepare-task contract extraction",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/contracts.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": [
+          "Expand extract_prepare_task_contract() to surface new default fields",
+          "Keep optional fields gated so older consumers can ignore them",
+          "Update json_output.CommandType mapping if needed"
+        ]
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Contract appendix & compatibility matrix",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "analysis/prepare-task-default-context.md",
+        "task_category": "research",
+        "estimated_hours": 1,
+        "details": [
+          "Define explicit new-field descriptions and optional gating semantics",
+          "Provide JSON samples showing legacy minimal vs upgraded payloads",
+          "Record versioning or feature-flag signals agents can sniff"
+        ]
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      }
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Design review approved",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Stakeholders sign off on contract/doc before coding",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Implementation & Docs",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "total_tasks": 14,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Apply the new default behavior across the skill, CLI, and docs",
+        "risk_level": "medium"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5",
+        "task-2-6",
+        "task-2-7",
+        "task-2-8",
+        "task-2-9",
+        "task-2-10"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Extend context_utils for default payload",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/context_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": [
+          "Add helpers that gather execution plan, file scopes, validation hints",
+          "Ensure fallbacks are lightweight when data unavailable",
+          "Expose reusable dataclasses for discovery.prepare_task"
+        ]
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Update discovery.prepare_task()",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": [
+          "Wire new context helpers into the default prepare-task response",
+          "Remove dependency on enhancement flags for core data",
+          "Protect latency budget and add structured error handling"
+        ]
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Refresh CLI handler/help",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "details": [
+          "Ensure CLI defaults emit the richer payload without extra flags",
+          "Update --help text to reflect simplified workflow",
+          "Confirm compact JSON honors updated contract"
+        ]
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "Update workflow documentation",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/workflows.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Rewrite the Plan-and-Implement section to highlight one-call prepare-task",
+          "Cross-reference docs/cli-reference.md for new field descriptions",
+          "Clarify when (if ever) to call task-info/check-deps after this change"
+        ]
+      }
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "Update documentation schema",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/schemas/documentation-schema.json",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Introduce new prepare-task fields and optional sections to the schema",
+          "Encode version tags or feature flags so consumers can detect richer payloads",
+          "Regenerate or validate schema docs after the update"
+        ]
+      }
+    },
+    "task-2-6": {
+      "type": "task",
+      "title": "Align json_output serialization",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/json_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Ensure CommandType + serializers include new default fields",
+          "Keep fallback behavior for legacy agents that ignore unknown keys",
+          "Add unit coverage for compact JSON output paths"
+        ]
+      }
+    },
+    "task-2-7": {
+      "type": "task",
+      "title": "Instrument prepare-task latency",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "scripts/benchmark_prepare_task_latency.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "details": [
+          "Add a reproducible benchmark or instrumentation hook for prepare-task",
+          "Capture baseline numbers before changes and assert <30ms delta",
+          "Document how to run the benchmark in developer docs"
+        ]
+      }
+    },
+    "task-2-8": {
+      "type": "task",
+      "title": "Update CLI reference",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/cli-reference.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Describe new default fields emitted by prepare-task",
+          "Provide example CLI output for the one-call workflow",
+          "Call out that task-info/check-deps are unnecessary unless overrides required"
+        ]
+      }
+    },
+    "task-2-9": {
+      "type": "task",
+      "title": "Refresh onboarding docs",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/index.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Highlight the one-call prepare-task flow in the overview",
+          "Link to workflows + CLI reference for deeper field descriptions",
+          "Remove or relegate redundant command sequences"
+        ]
+      }
+    },
+    "task-2-10": {
+      "type": "task",
+      "title": "Update cached context consumers",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/context_tracker/parser.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Audit context_tracker storage + caches for new fields",
+          "Migrate any persisted payloads or fallback defaults",
+          "Add guards so old cache entries remain readable"
+        ]
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      }
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Manual CLI dry-run",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd prepare-task <spec-id> --json",
+        "expected": "Default output includes plan/files/validation without extra flags"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Docs accuracy check",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "CLI reference and workflows describe new defaults consistently",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Automated CLI integration",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/integration/test_prepare_task_cli.py -k default_payload",
+        "expected": "CLI invocation emits plan/files/validation without extra flags"
+      }
+    },
+    "verify-2-4": {
+      "type": "verify",
+      "title": "task-info/check-deps redundancy check",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Documented scenario shows no follow-up commands needed unless overrides requested",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Testing & Rollout",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Lock in the behavior via automated tests and release notes",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Update prepare-task tests",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/sdd_next/test_prepare_task_context.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "details": [
+          "Add assertions for new default fields and latency budget",
+          "Cover both pretty and compact JSON outputs"
+        ]
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Document release in changelog",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/changelog.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Add entry summarizing default prepare-task upgrade and agent impact"
+        ]
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Add CLI integration tests",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/integration/test_prepare_task_cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Cover sdd prepare-task end-to-end JSON output",
+          "Assert redundant commands remain no-ops with new defaults"
+        ]
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      }
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Automated test suite",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "python -m pytest tests/sdd_next/test_prepare_task_context.py tests/test_output_reduction.py -v",
+        "expected": "All updated tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "expected": "Review confirms default prepare-task covers workflow requirements"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Latency benchmark recorded",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "python scripts/benchmark_prepare_task_latency.py --spec <spec-id>",
+        "expected": "Benchmark report shows <30ms overhead and is attached to release notes"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-23T23:16:57.363890Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: analysis/prepare-task-default-context.md",
+      "author": "claude-code",
+      "content": "Created comprehensive analysis document at analysis/prepare-task-default-context.md. The document captures:\n- Current state of prepare-task context payload and contract structure\n- Desired default payload enhancements with specific field definitions\n- Data sources to reuse from existing enhancement flags and functions\n- Backwards compatibility strategy with migration examples\n- Latency budget analysis showing <30ms overhead is achievable\n- Sample payloads comparing legacy (150 tokens) vs enhanced (450 tokens) output, demonstrating 3x token increase eliminates 2-3 CLI calls saving 600-900 tokens net\n- Phased rollout recommendations prioritized by risk/value\n\nAnalysis is based on review of:\n- discovery.py (prepare_task function, lines 258-538)\n- context_utils.py (all context gathering functions)\n- contracts.py (extract_prepare_task_contract function)\n\nDocument provides foundation for implementation planning in subsequent tasks.",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ]
+}
