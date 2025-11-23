@@ -98,9 +98,32 @@ def mock_tools(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> MockToolSuite
           model="gemini-2.0-pro"
         fi
 
-        printf '{"response": "Gemini response to: %s", "model": "%s", "stats": {"models": {"%s": {"tokens": {"prompt": 1, "candidates": 1, "total": 2}}}}}\n' "$prompt" "$model" "$model"
+        python3 - "$prompt" "$model" <<'PY'
+import json
+import sys
+
+prompt = sys.argv[1]
+model = sys.argv[2]
+payload = {
+    "response": f"Gemini response to: {prompt}",
+    "model": model,
+    "stats": {
+        "models": {
+            model: {
+                "tokens": {
+                    "prompt": 1,
+                    "candidates": 1,
+                    "total": 2,
+                }
+            }
+        }
+    },
+}
+print(json.dumps(payload))
+PY
         """,
     )
+
 
     write_script(
         "codex",
@@ -137,11 +160,29 @@ def mock_tools(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> MockToolSuite
           prompt="(no prompt)"
         fi
 
-        echo '{"type": "thread.started", "thread_id": "thread-123"}'
-        printf '{"type": "item.completed", "agent_message": {"content": "Codex response to: %s"}, "model": "codex-gpt-4o"}\n' "$prompt"
-        echo '{"type": "turn.completed", "usage": {"input_tokens": 3, "output_tokens": 7, "total_tokens": 10}}'
+        python3 - "$prompt" <<'PY'
+import json
+import sys
+
+prompt = sys.argv[1]
+messages = [
+    {"type": "thread.started", "thread_id": "thread-123"},
+    {
+        "type": "item.completed",
+        "agent_message": {"content": f"Codex response to: {prompt}"},
+        "model": "gpt-4o",
+    },
+    {
+        "type": "turn.completed",
+        "usage": {"input_tokens": 3, "output_tokens": 7, "total_tokens": 10},
+    },
+]
+for message in messages:
+    print(json.dumps(message))
+PY
         """,
     )
+
 
     write_script(
         "cursor-agent",
@@ -179,9 +220,21 @@ def mock_tools(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> MockToolSuite
           prompt="(no prompt)"
         fi
 
-        printf '{"content": "Cursor-agent response to: %s", "model": "cursor-default", "usage": {"input_tokens": 4, "output_tokens": 6, "total_tokens": 10}}\n' "$prompt"
+        python3 - "$prompt" <<'PY'
+import json
+import sys
+
+prompt = sys.argv[1]
+payload = {
+    "content": f"Cursor-agent response to: {prompt}",
+    "model": "cursor-default",
+    "usage": {"input_tokens": 4, "output_tokens": 6, "total_tokens": 10},
+}
+print(json.dumps(payload))
+PY
         """,
     )
+
 
     original_path = os.environ.get("PATH", "")
     injected_path = f"{scripts_dir}{os.pathsep}{original_path}"
@@ -231,7 +284,8 @@ def test_build_tool_command_executes_successfully(mock_tools: MockToolSuite) -> 
     command = build_tool_command("gemini", "test prompt", model="gemini-exp-1114")
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     assert result.returncode == 0
-    assert "Gemini response to: test prompt" in result.stdout
+    assert "Gemini response to:" in result.stdout
+    assert "test prompt" in result.stdout
 
 
 def test_build_tool_command_handles_special_characters(mock_tools: MockToolSuite) -> None:
@@ -239,7 +293,9 @@ def test_build_tool_command_handles_special_characters(mock_tools: MockToolSuite
     command = build_tool_command("codex", prompt)
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     assert result.returncode == 0
-    assert "Codex response to: Analyze: 'quotes' \"double\" $VAR" in result.stdout
+    lines = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+    item_event = next(event for event in lines if event.get("type") == "item.completed")
+    assert item_event["agent_message"]["content"] == "Codex response to: Analyze: 'quotes' \"double\" $VAR"
 
 
 def test_build_tool_command_uses_list_invocation(mock_tools: MockToolSuite) -> None:
@@ -251,7 +307,8 @@ def test_build_tool_command_uses_list_invocation(mock_tools: MockToolSuite) -> N
 def test_execute_tool_runs_mock_binary(mock_tools: MockToolSuite) -> None:
     response = execute_tool("gemini", "hello world", timeout=5)
     assert response.status is ToolStatus.SUCCESS
-    assert "Gemini response to: hello world" in response.output
+    assert "Gemini response to:" in response.output
+    assert "hello world" in response.output
     assert response.exit_code is None
 
 
@@ -281,7 +338,7 @@ def test_execute_tool_handles_stderr_only_output(mock_tools: MockToolSuite) -> N
         fi
         echo "warning message" >&2
         echo '{"type": "thread.started", "thread_id": "thread-123"}'
-        echo '{"type": "item.completed", "agent_message": {"content": "Codex response to: stderr test"}, "model": "codex-gpt-4o"}'
+        echo '{"type": "item.completed", "agent_message": {"content": "Codex response to: stderr test"}, "model": "gpt-4o"}'
         echo '{"type": "turn.completed", "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2}}'
         """,
     )
@@ -301,13 +358,20 @@ def test_execute_tool_handles_large_output(mock_tools: MockToolSuite) -> None:
           echo "gemini mock"
           exit 0
         fi
-        content=""
-        for i in $(seq 1 200); do
-          content="${content}Line ${i}\\n"
-        done
-        printf '{"response": "%s", "model": "gemini-2.0-pro", "stats": {"models": {"gemini-2.0-pro": {"tokens": {"prompt": 1, "candidates": 1, "total": 2}}}}}\n' "$content"
+        python3 - <<'PY'
+import json
+
+content = chr(10).join(f"Line {i}" for i in range(1, 201))
+payload = {
+    "response": content,
+    "model": "gemini-2.0-pro",
+    "stats": {"models": {"gemini-2.0-pro": {"tokens": {"prompt": 1, "candidates": 1, "total": 2}}}},
+}
+print(json.dumps(payload))
+PY
         """,
     )
+
     response = execute_tool("gemini", "big output", timeout=5)
     assert response.status is ToolStatus.SUCCESS
     assert len(response.output.splitlines()) == 200
@@ -323,7 +387,7 @@ def test_execute_tool_handles_unicode_output(mock_tools: MockToolSuite) -> None:
           exit 0
         fi
         echo '{"type": "thread.started", "thread_id": "thread-123"}'
-        echo '{"type": "item.completed", "agent_message": {"content": "こんにちは 世界 🚀"}, "model": "codex-gpt-4o"}'
+        echo '{"type": "item.completed", "agent_message": {"content": "こんにちは 世界 🚀"}, "model": "gpt-4o"}'
         echo '{"type": "turn.completed", "usage": {"input_tokens": 2, "output_tokens": 2, "total_tokens": 4}}'
         """,
     )
