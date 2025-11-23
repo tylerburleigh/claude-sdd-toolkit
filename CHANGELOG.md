@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.7.5] - 2025-11-23
+
+### Added
+- Dedicated INSTALLATION guide covering marketplace setup, unified dependency installation (pip + npm), verification commands, troubleshooting, and update workflow.
+- Provider security documentation set: `docs/providers/OVERVIEW.md`, `docs/security/PROVIDER_SECURITY.md`, `docs/security/THREAT_MODEL.md`, and `docs/security/TESTING.md`, plus `BIKE_LANE.md` clarifying how `sdd fidelity-review` chooses AI models.
+
+### Changed
+- Enforced read-only/tool-restriction policies across Claude, Gemini, Codex, Cursor Agent, and Opencode providers with corresponding unit tests and CLI flag updates in `ai_tools.py`/`providers/base.py`.
+- Expanded README/OPENCODE docs with architectural diagrams, provider comparisons, workflow walkthroughs, and linked security guidance; moved `CHANGELOG.md` to the repo root for visibility.
+- Hardened `ai_tools` integration tests by switching the mock binaries to JSON outputs and supporting float timeouts to better mirror real provider CLIs.
+
 ## [0.7.0] - 2025-11-21
 
 ### Added

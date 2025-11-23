@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.7.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.5-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -89,7 +89,7 @@ Claude: Task 1-2: Add notification system...
         [Continues through tasks]
 ```
 
-See [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a complete workflow example.
+See [examples/doc-scope/README.md](examples/doc-scope/README.md) for a complete workflow example.
 
 ## Architecture
 
@@ -928,6 +928,8 @@ sdd render <spec>
 
 ## Version History
 
+**0.7.5** - Enforces read-only/tool restrictions across every AI provider, ships a comprehensive INSTALLATION guide plus fidelity-review model selection notes, and adds deep-dive security docs (threat model, testing, provider overview) linked from the expanded README.
+
 **0.7.0** - New `sdd doc scope` command with `--plan`/`--implement` presets. 49x speedup in llm-doc-gen cross-reference resolution. Analysis integration enhances LLM docs with real codebase metrics. Parallel processing, persistent caching, streaming output. 100+ new tests.
 
 **0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
@@ -952,7 +954,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ### For Users
 - [INSTALLATION.md](INSTALLATION.md) - Setup guide
-- [docs/examples/](docs/examples/) - Workflow examples
+- [examples/](examples/) - Workflow examples
 
 ### For Developers
 - [docs/index.md](docs/index.md) - Structural reference
@@ -1010,4 +1012,4 @@ See [INSTALLATION.md](INSTALLATION.md) for setup.
 
 ---
 
-**Version**: 0.6.8 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.7.5 | **License**: MIT | **Author**: Tyler Burleigh

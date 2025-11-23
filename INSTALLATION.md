@@ -279,4 +279,4 @@ pip install -e .
 
 ---
 
-**Version**: 0.5.1 | **Installation Guide** | Last updated: 2024-11-18
+**Version**: 0.7.5 | **Installation Guide** | Last updated: 2025-11-23
