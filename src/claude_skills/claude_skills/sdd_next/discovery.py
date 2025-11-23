@@ -15,6 +15,9 @@ from .context_utils import (
     get_sibling_files,
     get_task_journal_summary,
     collect_phase_task_ids,
+    get_dependency_details,
+    get_plan_validation_context,
+    get_enhanced_sibling_files,
 )
 from claude_skills.common import (
     validate_spec_before_proceed,
@@ -463,8 +466,11 @@ def prepare_task(
         previous_sibling = get_previous_sibling(spec_data, task_id)
         parent_task = get_parent_context(spec_data, task_id)
         phase_context = get_phase_context(spec_data, task_id)
-        sibling_files = get_sibling_files(spec_data, task_id)
+        sibling_files = get_enhanced_sibling_files(spec_data, task_id)
         task_journal = get_task_journal_summary(spec_data, task_id)
+        dependency_details = get_dependency_details(spec_data, task_id)
+        plan_validation = get_plan_validation_context(spec_data, task_id)
+
         parent_warning = None
         parent_pointer = task_node.get("parent") if isinstance(task_node, dict) else None
         if parent_task is None:
@@ -482,7 +488,13 @@ def prepare_task(
             "phase": phase_context,
             "sibling_files": sibling_files,
             "task_journal": task_journal,
+            "dependencies": dependency_details,
         }
+
+        # Add plan validation only if task has a plan
+        if plan_validation:
+            result["context"]["plan_validation"] = plan_validation
+
         if parent_warning:
             result["context"]["parent_task_warning"] = parent_warning
 
@@ -519,6 +531,11 @@ def prepare_task(
             "phase": None,
             "sibling_files": [],
             "task_journal": {"entry_count": 0, "entries": []},
+            "dependencies": {
+                "blocking": [],
+                "blocked_by_details": [],
+                "soft_depends": []
+            },
         }
         if include_full_journal or include_phase_history or include_spec_overview:
             fallback = {}
