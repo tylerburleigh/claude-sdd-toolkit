@@ -218,6 +218,8 @@ See [docs/skills-reference.md](docs/skills-reference.md) for complete skill docu
 
 ## Version History
 
+**0.7.5** - Provider security enhancements: read-only/tool restrictions across all AI providers (Codex, Claude, Gemini, Cursor Agent, OpenCode). Comprehensive security documentation with threat model and testing guides.
+
 **0.7.1** - Journal accessibility improvements: ergonomic positional syntax, journal data in `prepare-task` output. Full backward compatibility.
 
 **0.7.0** - New `sdd doc scope` command with `--plan`/`--implement` presets. 49x speedup in llm-doc-gen. Parallel processing, persistent caching, streaming output.
