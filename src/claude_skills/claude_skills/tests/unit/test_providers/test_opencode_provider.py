@@ -22,6 +22,7 @@ from claude_skills.common.providers import (
 from claude_skills.common.providers.opencode import (
     DEFAULT_SERVER_URL,
     OPENCODE_METADATA,
+    READONLY_TOOLS_CONFIG,
     OpenCodeProvider,
     create_provider,
     is_opencode_available,
@@ -694,3 +695,138 @@ def test_provider_calls_hooks_in_correct_order() -> None:
         provider.generate(GenerationRequest(prompt="test", stream=True))
 
     assert hook_sequence == ["before", "stream:chunk1", "after"]
+
+
+def test_create_readonly_config_creates_valid_json() -> None:
+    """Test that _create_readonly_config creates valid opencode.json."""
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    config_path = provider._create_readonly_config()
+
+    try:
+        # Verify file exists
+        assert config_path.exists()
+        assert config_path.name == "opencode.json"
+
+        # Verify content is valid JSON matching READONLY_TOOLS_CONFIG
+        with open(config_path) as f:
+            config = json.load(f)
+
+        assert config == READONLY_TOOLS_CONFIG
+        assert config["tools"]["write"] is False
+        assert config["tools"]["edit"] is False
+        assert config["tools"]["bash"] is False
+        assert config["tools"]["read"] is True
+        assert config["permission"]["edit"] == "deny"
+        assert config["permission"]["bash"] == "deny"
+
+    finally:
+        # Cleanup
+        if config_path.exists():
+            config_path.unlink()
+        if config_path.parent.exists():
+            config_path.parent.rmdir()
+
+
+def test_cleanup_config_file_removes_temp_files() -> None:
+    """Test that _cleanup_config_file properly removes config file and directory."""
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    # Create config file
+    config_path = provider._create_readonly_config()
+    provider._config_file_path = config_path
+
+    assert config_path.exists()
+    temp_dir = config_path.parent
+
+    # Clean up
+    provider._cleanup_config_file()
+
+    # Verify both file and directory are removed
+    assert not config_path.exists()
+    assert not temp_dir.exists()
+    assert provider._config_file_path is None
+
+
+def test_ensure_server_running_creates_config_and_sets_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that _ensure_server_running creates config file and sets OPENCODE_CONFIG env var."""
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    captured_env = {}
+    captured_config_path = None
+
+    def mock_popen(*args, **kwargs):
+        nonlocal captured_env, captured_config_path
+        captured_env.update(kwargs.get("env", {}))
+        captured_config_path = kwargs.get("env", {}).get("OPENCODE_CONFIG")
+        mock_proc = MagicMock()
+        mock_proc.terminate = MagicMock()
+        return mock_proc
+
+    # Mock port closed initially, then open
+    call_count = [0]
+    def mock_port_check(port, host="localhost"):
+        call_count[0] += 1
+        return call_count[0] > 1
+
+    monkeypatch.setattr(provider, "_is_port_open", mock_port_check)
+    monkeypatch.setattr(Path, "exists", lambda self: True)
+
+    with patch("subprocess.Popen", side_effect=mock_popen):
+        with patch("time.sleep"):
+            provider._ensure_server_running()
+
+    # Verify OPENCODE_CONFIG environment variable was set
+    assert "OPENCODE_CONFIG" in captured_env
+    assert captured_config_path is not None
+
+    # Verify config file was created
+    assert provider._config_file_path is not None
+    assert provider._config_file_path.exists()
+    assert provider._config_file_path.name == "opencode.json"
+
+    # Cleanup
+    provider._cleanup_config_file()
+
+
+def test_provider_metadata_has_readonly_flags() -> None:
+    """Test that OPENCODE_METADATA has read_only security flags set."""
+    assert OPENCODE_METADATA.security_flags["writes_allowed"] is False
+    assert OPENCODE_METADATA.security_flags["read_only"] is True
+    assert "readonly_config" in OPENCODE_METADATA.extra
+    assert OPENCODE_METADATA.extra["readonly_config"] == READONLY_TOOLS_CONFIG
+
+
+def test_provider_del_cleans_up_config_file() -> None:
+    """Test that __del__ properly cleans up config file."""
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    # Create config file
+    config_path = provider._create_readonly_config()
+    provider._config_file_path = config_path
+
+    assert config_path.exists()
+    temp_dir = config_path.parent
+
+    # Trigger cleanup via __del__
+    provider.__del__()
+
+    # Verify cleanup
+    assert not config_path.exists()
+    assert not temp_dir.exists()

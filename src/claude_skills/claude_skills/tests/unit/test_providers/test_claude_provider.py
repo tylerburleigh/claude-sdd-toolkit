@@ -15,12 +15,13 @@ from claude_skills.common.providers import (
     ProviderHooks,
 )
 from claude_skills.common.providers.claude import (
+    ALLOWED_TOOLS,
     CLAUDE_METADATA,
     ClaudeProvider,
+    DISALLOWED_TOOLS,
+    SHELL_COMMAND_WARNING,
     create_provider,
     is_claude_available,
-    ALLOWED_TOOLS,
-    DISALLOWED_TOOLS,
 )
 
 
@@ -95,7 +96,12 @@ def test_claude_provider_executes_command_with_read_only_tools(monkeypatch: pyte
     assert "--allowed-tools" in command
     assert "--disallowed-tools" in command
     assert "--system-prompt" in command
-    assert "You are a code reviewer" in command
+
+    # Verify system prompt includes both custom prompt and security warning
+    system_prompt_index = command.index("--system-prompt") + 1
+    system_prompt_value = command[system_prompt_index]
+    assert "You are a code reviewer" in system_prompt_value
+    assert SHELL_COMMAND_WARNING.strip() in system_prompt_value
 
     # Verify all allowed tools are in the command
     for tool in ALLOWED_TOOLS:
@@ -354,7 +360,7 @@ def test_claude_provider_uses_default_model_when_none_specified() -> None:
 
 
 def test_claude_provider_includes_system_prompt_in_command() -> None:
-    """Test that system prompts are properly included in commands."""
+    """Test that system prompts are properly included in commands with security warning."""
     captured: Dict[str, object] = {}
 
     def runner(command, *, timeout=None, env=None):
@@ -377,7 +383,12 @@ def test_claude_provider_includes_system_prompt_in_command() -> None:
 
     command = captured["command"]
     assert "--system-prompt" in command
-    assert "Custom system instructions" in command
+
+    # Verify both custom prompt and security warning are included
+    system_prompt_index = command.index("--system-prompt") + 1
+    system_prompt_value = command[system_prompt_index]
+    assert "Custom system instructions" in system_prompt_value
+    assert SHELL_COMMAND_WARNING.strip() in system_prompt_value
 
 
 def test_claude_provider_uses_default_timeout() -> None:

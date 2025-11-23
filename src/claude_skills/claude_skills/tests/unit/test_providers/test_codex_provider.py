@@ -16,6 +16,7 @@ from claude_skills.common.providers import (
 )
 from claude_skills.common.providers.codex import (
     CODEX_METADATA,
+    SANDBOX_WARNING,
     CodexProvider,
     create_provider,
     is_codex_available,
@@ -86,7 +87,9 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
 
     result = provider.generate(request)
 
-    assert captured_command["args"] == [
+    # Verify command structure
+    args = captured_command["args"]
+    assert args[0:8] == [
         "codex",
         "exec",
         "--sandbox",
@@ -95,9 +98,17 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
         "-m",
         "gpt-5-codex",
         "--image",
-        "diagram.png",
-        "System\n\nSolve",
     ]
+    assert args[8] == "diagram.png"
+
+    # Verify prompt includes sandbox warning
+    prompt = args[9]
+    assert "System" in prompt
+    assert SANDBOX_WARNING.strip() in prompt
+    assert "Solve" in prompt
+    assert prompt.startswith("System\n\n")
+    assert prompt.endswith("\n\nSolve")
+
     assert captured_command["timeout"] == 45
     assert stream_chunks == ["Hello", " world"]
     assert result.content == "Hello world"
@@ -153,6 +164,60 @@ def test_codex_provider_handles_non_zero_exit() -> None:
         provider.generate(GenerationRequest(prompt="test"))
 
     assert "code 2" in str(excinfo.value)
+
+
+def test_codex_provider_injects_sandbox_warning() -> None:
+    """Test that SANDBOX_WARNING is always injected into prompts."""
+    captured_prompts: List[str] = []
+
+    def runner(command, *, timeout=None, env=None):
+        # Capture the prompt (last argument)
+        captured_prompts.append(command[-1])
+        return FakeProcess(
+            stdout=_event(
+                "item.completed",
+                agent_message={"content": "done"},
+                model="gpt-5-codex",
+            )
+        )
+
+    provider = CodexProvider(
+        CODEX_METADATA,
+        ProviderHooks(),
+        runner=runner,
+        binary="codex",
+    )
+
+    # Test 1: With system prompt
+    provider.generate(
+        GenerationRequest(
+            prompt="User prompt",
+            system_prompt="Custom system prompt",
+        )
+    )
+
+    assert len(captured_prompts) == 1
+    prompt_with_system = captured_prompts[0]
+    assert "Custom system prompt" in prompt_with_system
+    assert SANDBOX_WARNING.strip() in prompt_with_system
+    assert "User prompt" in prompt_with_system
+    # Order should be: system prompt, warning, user prompt
+    assert prompt_with_system.index("Custom system prompt") < prompt_with_system.index(SANDBOX_WARNING.strip())
+    assert prompt_with_system.index(SANDBOX_WARNING.strip()) < prompt_with_system.index("User prompt")
+
+    # Test 2: Without system prompt
+    captured_prompts.clear()
+    provider.generate(
+        GenerationRequest(
+            prompt="Just a prompt",
+        )
+    )
+
+    assert len(captured_prompts) == 1
+    prompt_without_system = captured_prompts[0]
+    assert SANDBOX_WARNING.strip() in prompt_without_system
+    assert "Just a prompt" in prompt_without_system
+    assert prompt_without_system.index(SANDBOX_WARNING.strip()) < prompt_without_system.index("Just a prompt")
 
 
 def test_create_provider_and_availability_override(monkeypatch: pytest.MonkeyPatch) -> None:

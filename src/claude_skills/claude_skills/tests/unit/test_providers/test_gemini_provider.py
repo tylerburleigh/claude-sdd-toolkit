@@ -15,8 +15,10 @@ from claude_skills.common.providers import (
     ProviderHooks,
 )
 from claude_skills.common.providers.gemini import (
+    ALLOWED_TOOLS,
     GEMINI_METADATA,
     GeminiProvider,
+    PIPED_COMMAND_WARNING,
     create_provider,
     is_gemini_available,
 )
@@ -73,15 +75,29 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
 
     result = provider.generate(request)
 
-    assert captured["command"] == [
-        "gemini",
-        "-m",
-        "pro",
-        "--output-format",
-        "json",
-        "-p",
-        "System\n\nHello",
+    # Verify command structure includes allowed tools
+    command = captured["command"]
+    assert command[0] == "gemini"
+    assert "-m" in command
+    assert "pro" in command
+    assert "--output-format" in command
+    assert "json" in command
+    assert "-p" in command
+
+    # Verify all allowed tools are included
+    allowed_tools_in_command = [
+        command[i + 1] for i in range(len(command) - 1) if command[i] == "--allowed-tools"
     ]
+    assert len(allowed_tools_in_command) == len(ALLOWED_TOOLS)
+    assert set(allowed_tools_in_command) == set(ALLOWED_TOOLS)
+
+    # Verify the prompt includes the piped command warning
+    prompt_index = command.index("-p") + 1
+    prompt = command[prompt_index]
+    assert PIPED_COMMAND_WARNING.strip() in prompt
+    assert "System" in prompt
+    assert "Hello" in prompt
+
     assert captured["timeout"] == 30
     assert stream_chunks == ["Gemini output"]
     assert result.content == "Gemini output"

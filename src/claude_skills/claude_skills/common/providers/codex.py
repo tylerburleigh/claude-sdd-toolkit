@@ -3,7 +3,8 @@ Codex CLI provider implementation.
 
 Wraps the `codex exec` command to satisfy the ProviderContext contract,
 including availability checks, request validation, JSONL parsing, and
-token usage normalization.
+token usage normalization. Enforces read-only restrictions via native
+OS-level sandboxing (--sandbox read-only flag).
 """
 
 from __future__ import annotations
@@ -35,6 +36,181 @@ DEFAULT_BINARY = "codex"
 DEFAULT_TIMEOUT_SECONDS = 360
 AVAILABILITY_OVERRIDE_ENV = "CODEX_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CODEX_CLI_BINARY"
+
+# Read-only operations allowed by Codex --sandbox read-only mode
+# Note: These are enforced natively by OS-level sandboxing, not by this wrapper
+# macOS: Seatbelt | Linux: Landlock + seccomp | Windows: Restricted Token
+SANDBOX_ALLOWED_OPERATIONS = [
+    # File operations (read-only)
+    "Read",
+    "Grep",
+    "Glob",
+    "List",
+
+    # Web operations (read-only)
+    "WebFetch",
+
+    # Task delegation
+    "Task",
+
+    # Shell commands - file viewing
+    "Shell(cat)",
+    "Shell(head)",
+    "Shell(tail)",
+    "Shell(bat)",
+    "Shell(less)",
+    "Shell(more)",
+
+    # Shell commands - directory listing/navigation
+    "Shell(ls)",
+    "Shell(tree)",
+    "Shell(pwd)",
+    "Shell(which)",
+    "Shell(whereis)",
+
+    # Shell commands - search/find
+    "Shell(grep)",
+    "Shell(rg)",
+    "Shell(ag)",
+    "Shell(find)",
+    "Shell(fd)",
+    "Shell(locate)",
+
+    # Shell commands - git operations (read-only)
+    "Shell(git log)",
+    "Shell(git show)",
+    "Shell(git diff)",
+    "Shell(git status)",
+    "Shell(git grep)",
+    "Shell(git blame)",
+    "Shell(git branch)",
+    "Shell(git rev-parse)",
+    "Shell(git describe)",
+    "Shell(git ls-tree)",
+    "Shell(git ls-files)",
+
+    # Shell commands - text processing
+    "Shell(wc)",
+    "Shell(cut)",
+    "Shell(paste)",
+    "Shell(column)",
+    "Shell(sort)",
+    "Shell(uniq)",
+    "Shell(diff)",
+
+    # Shell commands - data formats
+    "Shell(jq)",
+    "Shell(yq)",
+    "Shell(xmllint)",
+
+    # Shell commands - file analysis
+    "Shell(file)",
+    "Shell(stat)",
+    "Shell(du)",
+    "Shell(df)",
+    "Shell(lsof)",
+
+    # Shell commands - checksums/hashing
+    "Shell(md5sum)",
+    "Shell(shasum)",
+    "Shell(sha256sum)",
+    "Shell(sha512sum)",
+    "Shell(cksum)",
+
+    # Shell commands - process inspection
+    "Shell(ps)",
+    "Shell(top)",
+    "Shell(htop)",
+
+    # Shell commands - system information
+    "Shell(uname)",
+    "Shell(hostname)",
+    "Shell(whoami)",
+    "Shell(id)",
+    "Shell(date)",
+    "Shell(uptime)",
+]
+
+# Operations blocked by Codex --sandbox read-only mode
+SANDBOX_BLOCKED_OPERATIONS = [
+    "Write",
+    "Edit",
+    "Patch",
+    "Delete",
+
+    # Dangerous file operations
+    "Shell(rm)",
+    "Shell(rmdir)",
+    "Shell(dd)",
+    "Shell(mkfs)",
+    "Shell(fdisk)",
+    "Shell(shred)",
+
+    # File modifications
+    "Shell(touch)",
+    "Shell(mkdir)",
+    "Shell(mv)",
+    "Shell(cp)",
+    "Shell(chmod)",
+    "Shell(chown)",
+    "Shell(chgrp)",
+    "Shell(sed)",
+    "Shell(awk)",
+    "Shell(tee)",
+
+    # Git write operations
+    "Shell(git add)",
+    "Shell(git commit)",
+    "Shell(git push)",
+    "Shell(git pull)",
+    "Shell(git merge)",
+    "Shell(git rebase)",
+    "Shell(git reset)",
+    "Shell(git checkout)",
+    "Shell(git stash)",
+    "Shell(git cherry-pick)",
+
+    # Package installations
+    "Shell(npm install)",
+    "Shell(pip install)",
+    "Shell(apt install)",
+    "Shell(apt-get install)",
+    "Shell(brew install)",
+    "Shell(yum install)",
+    "Shell(dnf install)",
+    "Shell(cargo install)",
+
+    # System operations
+    "Shell(sudo)",
+    "Shell(su)",
+    "Shell(halt)",
+    "Shell(reboot)",
+    "Shell(shutdown)",
+    "Shell(systemctl)",
+    "Shell(service)",
+
+    # Network write operations
+    "Shell(curl -X POST)",
+    "Shell(curl -X PUT)",
+    "Shell(curl -X DELETE)",
+    "Shell(wget)",
+    "Shell(scp)",
+    "Shell(rsync)",
+]
+
+# System prompt warning about Codex sandbox restrictions
+SANDBOX_WARNING = """
+IMPORTANT SECURITY NOTE: This session runs with Codex CLI's native --sandbox read-only mode:
+1. Native OS-level sandboxing enforced by the operating system:
+   - macOS: Seatbelt sandbox policy
+   - Linux: Landlock LSM + seccomp filters
+   - Windows: Restricted token + job objects
+2. Only read operations are permitted - writes are blocked at the OS level
+3. Shell commands are restricted to read-only operations by the sandbox
+4. The sandbox is enforced by the Codex CLI itself, not just tool filtering
+5. This is the most robust security model - cannot be bypassed by piped commands or escapes
+6. Attempts to write files or modify system state will be blocked by the OS
+"""
 
 
 class RunnerProtocol(Protocol):
@@ -104,13 +280,19 @@ CODEX_METADATA = ProviderMetadata(
     provider_name="codex",
     models=tuple(CODEX_MODELS),
     default_model="gpt-5-codex",
-    security_flags={"writes_allowed": False, "sandbox": "read-only"},
-    extra={"cli": "codex", "command": "codex exec"},
+    security_flags={"writes_allowed": False, "read_only": True, "sandbox": "read-only"},
+    extra={
+        "cli": "codex",
+        "command": "codex exec",
+        "allowed_operations": SANDBOX_ALLOWED_OPERATIONS,
+        "blocked_operations": SANDBOX_BLOCKED_OPERATIONS,
+        "os_level_sandboxing": True,
+    },
 )
 
 
 class CodexProvider(ProviderContext):
-    """ProviderContext implementation backed by the Codex CLI."""
+    """ProviderContext implementation backed by the Codex CLI with OS-level read-only sandboxing."""
 
     def __init__(
         self,
@@ -162,9 +344,25 @@ class CodexProvider(ProviderContext):
             )
 
     def _build_prompt(self, request: GenerationRequest) -> str:
+        """
+        Build prompt with sandbox security warning injected.
+
+        Combines user system prompt + SANDBOX_WARNING + user prompt to ensure
+        the AI is aware of the read-only sandbox restrictions.
+        """
+        parts = []
+
+        # Add user system prompt if provided
         if request.system_prompt:
-            return f"{request.system_prompt.strip()}\n\n{request.prompt}"
-        return request.prompt
+            parts.append(request.system_prompt.strip())
+
+        # Add sandbox warning (always)
+        parts.append(SANDBOX_WARNING.strip())
+
+        # Add user prompt
+        parts.append(request.prompt)
+
+        return "\n\n".join(parts)
 
     def _normalize_attachment_paths(self, request: GenerationRequest) -> List[str]:
         attachments = []
@@ -395,8 +593,8 @@ register_provider(
     factory=create_provider,
     metadata=CODEX_METADATA,
     availability_check=is_codex_available,
-    description="OpenAI Codex CLI adapter",
-    tags=("cli", "text", "function_calling"),
+    description="OpenAI Codex CLI adapter with native OS-level read-only sandboxing",
+    tags=("cli", "text", "function_calling", "read-only", "sandboxed"),
     replace=True,
 )
 

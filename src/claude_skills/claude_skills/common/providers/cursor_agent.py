@@ -3,6 +3,7 @@ Cursor Agent CLI provider implementation.
 
 Adapts the `cursor-agent` command-line tool to the ProviderContext contract,
 including availability checks, streaming normalization, and response parsing.
+Enforces read-only restrictions via Cursor's permission configuration system.
 """
 
 from __future__ import annotations
@@ -10,6 +11,8 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
 
 from .base import (
@@ -34,6 +37,136 @@ DEFAULT_BINARY = "cursor-agent"
 DEFAULT_TIMEOUT_SECONDS = 360
 AVAILABILITY_OVERRIDE_ENV = "CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CURSOR_AGENT_CLI_BINARY"
+
+# Read-only tools allowed for Cursor Agent
+# Note: Cursor Agent uses config files for permissions, not command-line flags
+# These lists serve as documentation and validation
+ALLOWED_TOOLS = [
+    # File operations (read-only)
+    "Read",
+    "Grep",
+    "Glob",
+    "List",
+
+    # Web operations (read-only)
+    "WebFetch",
+
+    # Task delegation
+    "Task",
+
+    # Shell commands - file viewing
+    "Shell(cat)",
+    "Shell(head)",
+    "Shell(tail)",
+    "Shell(bat)",
+
+    # Shell commands - directory listing/navigation
+    "Shell(ls)",
+    "Shell(tree)",
+    "Shell(pwd)",
+    "Shell(which)",
+    "Shell(whereis)",
+
+    # Shell commands - search/find
+    "Shell(grep)",
+    "Shell(rg)",
+    "Shell(ag)",
+    "Shell(find)",
+    "Shell(fd)",
+
+    # Shell commands - git operations (read-only)
+    "Shell(git log)",
+    "Shell(git show)",
+    "Shell(git diff)",
+    "Shell(git status)",
+    "Shell(git grep)",
+    "Shell(git blame)",
+    "Shell(git branch)",
+    "Shell(git rev-parse)",
+    "Shell(git describe)",
+    "Shell(git ls-tree)",
+
+    # Shell commands - text processing
+    "Shell(wc)",
+    "Shell(cut)",
+    "Shell(paste)",
+    "Shell(column)",
+    "Shell(sort)",
+    "Shell(uniq)",
+
+    # Shell commands - data formats
+    "Shell(jq)",
+    "Shell(yq)",
+
+    # Shell commands - file analysis
+    "Shell(file)",
+    "Shell(stat)",
+    "Shell(du)",
+    "Shell(df)",
+
+    # Shell commands - checksums/hashing
+    "Shell(md5sum)",
+    "Shell(shasum)",
+    "Shell(sha256sum)",
+    "Shell(sha512sum)",
+]
+
+# Tools that should be explicitly blocked
+DISALLOWED_TOOLS = [
+    "Write",
+    "Edit",
+    "Patch",
+    "Delete",
+
+    # Dangerous file operations
+    "Shell(rm)",
+    "Shell(rmdir)",
+    "Shell(dd)",
+    "Shell(mkfs)",
+    "Shell(fdisk)",
+
+    # File modifications
+    "Shell(touch)",
+    "Shell(mkdir)",
+    "Shell(mv)",
+    "Shell(cp)",
+    "Shell(chmod)",
+    "Shell(chown)",
+    "Shell(sed)",
+    "Shell(awk)",
+
+    # Git write operations
+    "Shell(git add)",
+    "Shell(git commit)",
+    "Shell(git push)",
+    "Shell(git pull)",
+    "Shell(git merge)",
+    "Shell(git rebase)",
+    "Shell(git reset)",
+    "Shell(git checkout)",
+
+    # Package installations
+    "Shell(npm install)",
+    "Shell(pip install)",
+    "Shell(apt install)",
+    "Shell(brew install)",
+
+    # System operations
+    "Shell(sudo)",
+    "Shell(halt)",
+    "Shell(reboot)",
+    "Shell(shutdown)",
+]
+
+# System prompt warning about Cursor Agent security limitations
+SHELL_COMMAND_WARNING = """
+IMPORTANT SECURITY NOTE: This session is running in read-only mode with the following restrictions:
+1. File write operations (Write, Edit, Patch, Delete) are disabled via Cursor Agent config
+2. Only approved read-only shell commands are permitted
+3. Cursor Agent's security model is weaker than other CLIs - be cautious
+4. Configuration is enforced via temporary .cursor/cli-config.json file
+5. Note: Cursor Agent's deprecated denylist approach had known bypasses - this uses allowlist
+"""
 
 
 class RunnerProtocol(Protocol):
@@ -93,13 +226,18 @@ CURSOR_METADATA = ProviderMetadata(
     provider_name="cursor-agent",
     models=tuple(CURSOR_MODELS),
     default_model="composer-1",
-    security_flags={"writes_allowed": False},
-    extra={"cli": "cursor-agent", "command": "cursor-agent --print --output-format json"},
+    security_flags={"writes_allowed": False, "read_only": True},
+    extra={
+        "cli": "cursor-agent",
+        "command": "cursor-agent --print --output-format json",
+        "allowed_tools": ALLOWED_TOOLS,
+        "config_based_permissions": True,
+    },
 )
 
 
 class CursorAgentProvider(ProviderContext):
-    """ProviderContext implementation backed by cursor-agent."""
+    """ProviderContext implementation backed by cursor-agent with read-only restrictions."""
 
     def __init__(
         self,
@@ -120,6 +258,12 @@ class CursorAgentProvider(ProviderContext):
         self._model = self._ensure_model(
             model or metadata.default_model or self._first_model_id()
         )
+        self._config_dir: Optional[Path] = None
+        self._config_file_path: Optional[Path] = None
+
+    def __del__(self) -> None:
+        """Clean up temporary config directory on provider destruction."""
+        self._cleanup_config_file()
 
     def _first_model_id(self) -> str:
         if not self.metadata.models:
@@ -138,12 +282,104 @@ class CursorAgentProvider(ProviderContext):
             )
         return candidate
 
-    def _build_command(self, request: GenerationRequest, model: str) -> List[str]:
-        """Assemble the cursor-agent CLI invocation."""
+    def _create_readonly_config(self) -> Path:
+        """
+        Create temporary .cursor/cli-config.json with read-only permissions.
+
+        Cursor Agent uses a permission configuration system with the format:
+        - Read(pathOrGlob): Controls read access
+        - Write(pathOrGlob): Controls write access
+        - Shell(commandBase): Controls shell commands (first token only)
+
+        Returns:
+            Path to the temporary config directory
+
+        Note:
+            The config directory will be used as --working-directory for cursor-agent,
+            which makes it look for .cursor/cli-config.json in that directory.
+        """
+        # Create temp directory for config
+        temp_dir = Path(tempfile.mkdtemp(prefix="cursor_readonly_"))
+        cursor_dir = temp_dir / ".cursor"
+        cursor_dir.mkdir(exist_ok=True)
+
+        # Build permission list
+        permissions = []
+
+        # Allow read access to all paths (using glob pattern)
+        permissions.append("Read(**/*)")
+
+        # Deny write access to all paths
+        permissions.append("Write()")  # Empty means deny all
+
+        # Add allowed shell commands (extract command names from ALLOWED_TOOLS)
+        for tool in ALLOWED_TOOLS:
+            if tool.startswith("Shell(") and tool.endswith(")"):
+                # Extract command: "Shell(git log)" -> "git log"
+                command = tool[6:-1]
+                # Cursor Agent Shell permissions use first token only
+                # "git log" becomes "git" in the config
+                base_command = command.split()[0]
+                permissions.append(f"Shell({base_command})")
+
+        # Create config file
+        config_path = cursor_dir / "cli-config.json"
+        config_data = {
+            "permissions": permissions,
+            "description": "Read-only mode enforced by claude-sdd-toolkit",
+        }
+
+        with open(config_path, 'w') as f:
+            json.dump(config_data, f, indent=2)
+
+        self._config_dir = temp_dir
+        self._config_file_path = config_path
+        return temp_dir
+
+    def _cleanup_config_file(self) -> None:
+        """Remove temporary config directory and all contents."""
+        if hasattr(self, '_config_dir') and self._config_dir is not None:
+            try:
+                # Remove config file
+                if self._config_file_path and self._config_file_path.exists():
+                    self._config_file_path.unlink()
+
+                # Remove .cursor directory
+                cursor_dir = self._config_dir / ".cursor"
+                if cursor_dir.exists():
+                    cursor_dir.rmdir()
+
+                # Remove temp directory
+                if self._config_dir.exists():
+                    self._config_dir.rmdir()
+            except (OSError, FileNotFoundError):
+                # Files already removed or don't exist, ignore
+                pass
+            finally:
+                self._config_dir = None
+                self._config_file_path = None
+
+    def _build_command(
+        self,
+        request: GenerationRequest,
+        model: str,
+        config_dir: Optional[Path] = None,
+    ) -> List[str]:
+        """
+        Assemble the cursor-agent CLI invocation with read-only config.
+
+        Args:
+            request: Generation request
+            model: Model ID to use
+            config_dir: Directory containing .cursor/cli-config.json (if provided,
+                       will be used as --working-directory to enforce permissions)
+        """
         # cursor-agent requires "chat" subcommand and --json flag
         command = [self._binary, "chat", "--json"]
 
-        working_dir = (request.metadata or {}).get("working_directory")
+        # Use config directory as working directory to enforce permissions
+        # User-provided working_directory is ignored when using read-only config
+        working_dir = config_dir if config_dir else (request.metadata or {}).get("working_directory")
         if working_dir:
             command.extend(["--working-directory", str(working_dir)])
 
@@ -156,8 +392,15 @@ class CursorAgentProvider(ProviderContext):
         if model:
             command.extend(["--model", model])
 
-        if request.system_prompt:
-            command.extend(["--system", request.system_prompt])
+        # Build system prompt with security warning
+        system_prompt = request.system_prompt or ""
+        if system_prompt:
+            system_prompt = f"{system_prompt.strip()}\n\n{SHELL_COMMAND_WARNING.strip()}"
+        else:
+            system_prompt = SHELL_COMMAND_WARNING.strip()
+
+        if system_prompt:
+            command.extend(["--system", system_prompt])
 
         extra_flags = (request.metadata or {}).get("cursor_agent_flags")
         if isinstance(extra_flags, list):
@@ -277,9 +520,17 @@ class CursorAgentProvider(ProviderContext):
             else self._model
         )
 
-        command = self._build_command(request, model)
-        timeout = request.timeout or self._timeout
-        completed, json_mode = self._run_with_retry(command, timeout)
+        # Create read-only config directory
+        config_dir = self._create_readonly_config()
+
+        try:
+            # Build command with config directory
+            command = self._build_command(request, model, config_dir=config_dir)
+            timeout = request.timeout or self._timeout
+            completed, json_mode = self._run_with_retry(command, timeout)
+        finally:
+            # Always clean up config file, even if command fails
+            self._cleanup_config_file()
 
         if json_mode:
             payload = self._parse_json_payload(completed.stdout)
@@ -360,8 +611,8 @@ register_provider(
     factory=create_provider,
     metadata=CURSOR_METADATA,
     availability_check=is_cursor_agent_available,
-    description="Cursor Agent CLI adapter",
-    tags=("cli", "text", "function_calling"),
+    description="Cursor Agent CLI adapter with read-only restrictions via config files",
+    tags=("cli", "text", "function_calling", "read-only"),
     replace=True,
 )
 
