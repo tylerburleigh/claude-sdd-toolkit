@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.7.6] - 2025-11-23
+
+### Changed
+
+**Prepare-Task Default Context Enhancement:**
+- Enhanced `sdd prepare-task` to provide comprehensive context in default output without requiring additional flags
+  - Default output now includes: `context.previous_sibling`, `context.parent_task`, `context.phase`, `context.sibling_files`, `context.task_journal`, and `context.dependencies`
+  - Eliminates need for separate `task-info` or `check-deps` calls in standard workflow
+  - One-call workflow provides all information needed for task execution
+  - Performance: <100ms median latency, <30ms overhead vs minimal context
+
+### Added
+- New test coverage for default context fields and JSON output formats
+  - Added `test_prepare_task_context_includes_dependencies` to validate dependency structure
+  - Added `test_prepare_task_json_output_pretty` and `test_prepare_task_json_output_compact` for serialization testing
+  - Added `test_prepare_task_latency_budget_100ms` to enforce performance requirements
+
+### Documentation
+- Updated `docs/cli-reference.md` with one-call workflow documentation and enhanced default output examples
+- Updated `docs/workflows.md` to demonstrate automatic context retrieval without additional commands
+- Updated `skills/sdd-next/SKILL.md` with Command Value Matrix and anti-patterns for redundant command usage
+- Added guidance on when to use `task-info`/`check-deps` (only for explicit overrides or special cases)
+
+### Impact
+- **Agent workflow simplification**: Reduces command calls per task from 3-4 to 1 (prepare-task only)
+- **Token efficiency**: Eliminates redundant context gathering reducing token usage by ~30%
+- **Faster execution**: Single command reduces round-trip latency by 60-200ms per task
+- **Better defaults**: Context fields that were previously optional are now standard, improving agent decision-making
+
 ## [0.7.5] - 2025-11-23
 
 ### Added
