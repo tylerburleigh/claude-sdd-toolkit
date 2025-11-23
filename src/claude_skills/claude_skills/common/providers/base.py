@@ -150,7 +150,7 @@ class GenerationRequest:
     metadata: Dict[str, Any] = field(default_factory=dict)
     continuation_id: Optional[str] = None
     attachments: Sequence[str] = field(default_factory=list)
-    timeout: Optional[int] = None
+    timeout: Optional[float] = None
     stream: bool = False
 
 

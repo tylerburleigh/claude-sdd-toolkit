@@ -36,6 +36,81 @@ DEFAULT_TIMEOUT_SECONDS = 360
 AVAILABILITY_OVERRIDE_ENV = "GEMINI_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "GEMINI_CLI_BINARY"
 
+# Read-only tools allowed for safe codebase exploration
+# Based on Gemini CLI tool names (both class names and function names supported)
+ALLOWED_TOOLS = [
+    # Core file operations (read-only)
+    "ReadFileTool",
+    "read_file",
+    "ReadManyFilesTool",
+    "read_many_files",
+    "LSTool",
+    "list_directory",
+    "GlobTool",
+    "glob",
+    "GrepTool",
+    "search_file_content",
+
+    # Shell commands - file viewing
+    "ShellTool(cat)",
+    "ShellTool(head)",
+    "ShellTool(tail)",
+    "ShellTool(bat)",
+
+    # Shell commands - directory listing/navigation
+    "ShellTool(ls)",
+    "ShellTool(tree)",
+    "ShellTool(pwd)",
+    "ShellTool(which)",
+    "ShellTool(whereis)",
+
+    # Shell commands - search/find
+    "ShellTool(grep)",
+    "ShellTool(rg)",
+    "ShellTool(ag)",
+    "ShellTool(find)",
+    "ShellTool(fd)",
+
+    # Shell commands - git operations (read-only)
+    "ShellTool(git log)",
+    "ShellTool(git show)",
+    "ShellTool(git diff)",
+    "ShellTool(git status)",
+    "ShellTool(git grep)",
+    "ShellTool(git blame)",
+
+    # Shell commands - text processing
+    "ShellTool(wc)",
+    "ShellTool(cut)",
+    "ShellTool(paste)",
+    "ShellTool(column)",
+    "ShellTool(sort)",
+    "ShellTool(uniq)",
+
+    # Shell commands - data formats
+    "ShellTool(jq)",
+    "ShellTool(yq)",
+
+    # Shell commands - file analysis
+    "ShellTool(file)",
+    "ShellTool(stat)",
+    "ShellTool(du)",
+    "ShellTool(df)",
+
+    # Shell commands - checksums/hashing
+    "ShellTool(md5sum)",
+    "ShellTool(shasum)",
+    "ShellTool(sha256sum)",
+    "ShellTool(sha512sum)",
+]
+
+# System prompt addition warning about piped command vulnerability
+PIPED_COMMAND_WARNING = """
+IMPORTANT SECURITY NOTE: When using shell commands, avoid piped commands (e.g., cat file.txt | wc -l).
+Piped commands bypass the tool allowlist checks in Gemini CLI - only the first command in a pipe is validated.
+Instead, use sequential commands or alternative approaches to achieve the same result safely.
+"""
+
 
 class RunnerProtocol(Protocol):
     """Callable signature used for executing Gemini CLI commands."""
@@ -164,14 +239,30 @@ class GeminiProvider(ProviderContext):
             )
 
     def _build_prompt(self, request: GenerationRequest) -> str:
+        # Build the system prompt with security warning
+        system_parts = []
         if request.system_prompt:
-            return f"{request.system_prompt.strip()}\n\n{request.prompt}"
+            system_parts.append(request.system_prompt.strip())
+        system_parts.append(PIPED_COMMAND_WARNING.strip())
+
+        if system_parts:
+            return f"{chr(10).join(system_parts)}\n\n{request.prompt}"
         return request.prompt
 
     def _build_command(self, model: str, prompt: str) -> List[str]:
-        command = [self._binary, "--output-format", "json", "-p", prompt]
+        command = [self._binary, "--output-format", "json"]
+
+        # Add allowed tools for read-only enforcement
+        for tool in ALLOWED_TOOLS:
+            command.extend(["--allowed-tools", tool])
+
+        # Add prompt at the end
+        command.extend(["-p", prompt])
+
+        # Insert model if specified
         if model:
             command[1:1] = ["-m", model]
+
         return command
 
     def _run(self, command: Sequence[str], timeout: Optional[int]) -> subprocess.CompletedProcess[str]:

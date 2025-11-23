@@ -12,6 +12,7 @@ import json
 import os
 import socket
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Protocol
@@ -43,6 +44,50 @@ AVAILABILITY_OVERRIDE_ENV = "OPENCODE_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "OPENCODE_BINARY"
 CUSTOM_WRAPPER_ENV = "OPENCODE_WRAPPER_SCRIPT"
 
+# Read-only tools configuration for OpenCode server
+# Uses dual-layer protection: tool disabling + permission denial
+READONLY_TOOLS_CONFIG = {
+    "$schema": "https://opencode.ai/config.json",
+    "tools": {
+        # Disable write operations
+        "write": False,
+        "edit": False,
+        "patch": False,
+        "todowrite": False,
+
+        # Disable shell execution
+        "bash": False,
+
+        # Enable read operations
+        "read": True,
+        "grep": True,
+        "glob": True,
+        "list": True,
+        "todoread": True,
+        "task": True,
+
+        # Disable web operations (data exfiltration risk)
+        "webfetch": False,
+    },
+    "permission": {
+        # Double-guard with permission denials
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny",
+        "external_directory": "deny",
+    },
+}
+
+# System prompt warning about tool limitations
+SHELL_COMMAND_WARNING = """
+IMPORTANT SECURITY NOTE: This session is running in read-only mode with the following restrictions:
+1. File write operations (write, edit, patch) are disabled
+2. Shell command execution (bash) is disabled
+3. Web operations (webfetch) are disabled to prevent data exfiltration
+4. Only read operations are available (read, grep, glob, list)
+5. Attempts to modify files, execute commands, or access the web will be blocked by the server
+"""
+
 
 OPENCODE_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
@@ -60,11 +105,12 @@ OPENCODE_METADATA = ProviderMetadata(
     provider_name="opencode",
     models=tuple(OPENCODE_MODELS),
     default_model="default",
-    security_flags={"writes_allowed": False},
+    security_flags={"writes_allowed": False, "read_only": True},
     extra={
         "wrapper": "opencode_wrapper.js",
         "server_url": DEFAULT_SERVER_URL,
         "configurable": True,
+        "readonly_config": READONLY_TOOLS_CONFIG,
     },
 )
 
@@ -130,9 +176,11 @@ class OpenCodeProvider(ProviderContext):
         self._timeout = timeout or DEFAULT_TIMEOUT_SECONDS
         self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
         self._server_process: Optional[subprocess.Popen] = None
+        self._config_file_path: Optional[Path] = None
 
     def __del__(self) -> None:
-        """Clean up server process on provider destruction."""
+        """Clean up server process and config file on provider destruction."""
+        # Clean up server process
         if hasattr(self, '_server_process') and self._server_process is not None:
             try:
                 self._server_process.terminate()
@@ -147,6 +195,9 @@ class OpenCodeProvider(ProviderContext):
                 pass
             finally:
                 self._server_process = None
+
+        # Clean up config file
+        self._cleanup_config_file()
 
     def _prepare_subprocess_env(self, custom_env: Optional[Dict[str, str]]) -> Dict[str, str]:
         """
@@ -170,6 +221,45 @@ class OpenCodeProvider(ProviderContext):
         # We don't set a default value for security reasons
 
         return subprocess_env
+
+    def _create_readonly_config(self) -> Path:
+        """
+        Create temporary opencode.json with read-only tool restrictions.
+
+        Returns:
+            Path to the temporary config file
+
+        Note:
+            - Tool blocking may not work for MCP tools (OpenCode issue #3756)
+            - Config is server-wide, affecting all sessions on this server instance
+        """
+        # Create temp directory for config
+        temp_dir = Path(tempfile.mkdtemp(prefix="opencode_readonly_"))
+
+        # Create config file
+        config_path = temp_dir / "opencode.json"
+        with open(config_path, 'w') as f:
+            json.dump(READONLY_TOOLS_CONFIG, f, indent=2)
+
+        return config_path
+
+    def _cleanup_config_file(self) -> None:
+        """Remove temporary config file and directory."""
+        if hasattr(self, '_config_file_path') and self._config_file_path is not None:
+            try:
+                # Remove config file
+                if self._config_file_path.exists():
+                    self._config_file_path.unlink()
+
+                # Remove temp directory
+                temp_dir = self._config_file_path.parent
+                if temp_dir.exists():
+                    temp_dir.rmdir()
+            except (OSError, FileNotFoundError):
+                # File already removed or doesn't exist, ignore
+                pass
+            finally:
+                self._config_file_path = None
 
     def _first_model_id(self) -> str:
         if not self.metadata.models:
@@ -250,9 +340,15 @@ class OpenCodeProvider(ProviderContext):
                 provider=self.metadata.provider_name,
             )
 
+        # Create read-only configuration file
+        self._config_file_path = self._create_readonly_config()
+
         # Start server in background
         # Prepare environment with API keys and configuration
         server_env = self._prepare_subprocess_env(self._env)
+        # Set OPENCODE_CONFIG to point to our readonly config
+        server_env["OPENCODE_CONFIG"] = str(self._config_file_path)
+
         try:
             self._server_process = subprocess.Popen(
                 [opencode_binary, "serve", f"--hostname=127.0.0.1", f"--port={port}"],

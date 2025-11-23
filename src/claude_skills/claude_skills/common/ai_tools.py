@@ -697,8 +697,9 @@ def execute_tool(
     prompt: str,
     *,
     model: Optional[str] = None,
-    timeout: int = 90
+    timeout: float = 90
 ) -> ToolResponse:
+
     """
     Execute AI tool with a prompt and return structured response.
 
@@ -793,7 +794,7 @@ def execute_tools_parallel(
     prompt: str,
     *,
     models: Optional[dict[str, str]] = None,
-    timeout: int = 90
+    timeout: float = 90
 ) -> MultiToolResponse:
     """
     Execute multiple AI tools in parallel with same prompt.

@@ -2,7 +2,7 @@
 
 > Spec-Driven Development: Structured, trackable AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.7.1-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.5-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 

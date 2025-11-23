@@ -15,12 +15,13 @@ from claude_skills.common.providers import (
     ProviderHooks,
 )
 from claude_skills.common.providers.claude import (
+    ALLOWED_TOOLS,
     CLAUDE_METADATA,
     ClaudeProvider,
+    DISALLOWED_TOOLS,
+    SHELL_COMMAND_WARNING,
     create_provider,
     is_claude_available,
-    ALLOWED_TOOLS,
-    DISALLOWED_TOOLS,
 )
 
 
@@ -95,7 +96,12 @@ def test_claude_provider_executes_command_with_read_only_tools(monkeypatch: pyte
     assert "--allowed-tools" in command
     assert "--disallowed-tools" in command
     assert "--system-prompt" in command
-    assert "You are a code reviewer" in command
+
+    # Verify system prompt includes both custom prompt and security warning
+    system_prompt_index = command.index("--system-prompt") + 1
+    system_prompt_value = command[system_prompt_index]
+    assert "You are a code reviewer" in system_prompt_value
+    assert SHELL_COMMAND_WARNING.strip() in system_prompt_value
 
     # Verify all allowed tools are in the command
     for tool in ALLOWED_TOOLS:
@@ -354,7 +360,7 @@ def test_claude_provider_uses_default_model_when_none_specified() -> None:
 
 
 def test_claude_provider_includes_system_prompt_in_command() -> None:
-    """Test that system prompts are properly included in commands."""
+    """Test that system prompts are properly included in commands with security warning."""
     captured: Dict[str, object] = {}
 
     def runner(command, *, timeout=None, env=None):
@@ -377,7 +383,12 @@ def test_claude_provider_includes_system_prompt_in_command() -> None:
 
     command = captured["command"]
     assert "--system-prompt" in command
-    assert "Custom system instructions" in command
+
+    # Verify both custom prompt and security warning are included
+    system_prompt_index = command.index("--system-prompt") + 1
+    system_prompt_value = command[system_prompt_index]
+    assert "Custom system instructions" in system_prompt_value
+    assert SHELL_COMMAND_WARNING.strip() in system_prompt_value
 
 
 def test_claude_provider_uses_default_timeout() -> None:
@@ -418,3 +429,38 @@ def test_claude_provider_extracts_model_from_model_usage() -> None:
 
     result = provider.generate(GenerationRequest(prompt="test"))
     assert result.model_fqn == f"claude:{custom_model}"
+
+
+def test_claude_provider_blocks_web_operations() -> None:
+    """Test that WebSearch and WebFetch are explicitly blocked to prevent data exfiltration."""
+    # Verify WebSearch and WebFetch are NOT in allowed tools
+    assert "WebSearch" not in ALLOWED_TOOLS
+    assert "WebFetch" not in ALLOWED_TOOLS
+
+    # Verify WebSearch and WebFetch ARE in disallowed tools
+    assert "WebSearch" in DISALLOWED_TOOLS
+    assert "WebFetch" in DISALLOWED_TOOLS
+
+    # Verify the tools are actually blocked in the command
+    captured: Dict[str, object] = {}
+
+    def runner(command, *, timeout=None, env=None):
+        captured["command"] = list(command)
+        return FakeProcess(stdout=_payload())
+
+    provider = ClaudeProvider(
+        CLAUDE_METADATA,
+        ProviderHooks(),
+        runner=runner,
+    )
+
+    provider.generate(GenerationRequest(prompt="test"))
+
+    command = captured["command"]
+    disallowed_index = command.index("--disallowed-tools") + 1
+    disallowed_end = command.index("--system-prompt") if "--system-prompt" in command else len(command)
+    disallowed_tools_in_command = command[disallowed_index:disallowed_end]
+
+    # Verify WebSearch and WebFetch are in the disallowed tools section
+    assert "WebSearch" in disallowed_tools_in_command
+    assert "WebFetch" in disallowed_tools_in_command

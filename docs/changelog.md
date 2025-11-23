@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.7.5] - 2025-11-23
+
+### Added
+- Provider security documentation set: `docs/security/PROVIDER_SECURITY.md`, `docs/security/THREAT_MODEL.md`, and `docs/security/TESTING.md`
+
+### Changed
+- Enforced read-only/tool-restriction policies across Claude, Gemini, Codex, Cursor Agent, and OpenCode providers with corresponding unit tests and CLI flag updates
+- Hardened `ai_tools` integration tests by switching the mock binaries to JSON outputs and supporting float timeouts to better mirror real provider CLIs
+
 ## [0.7.1] - 2025-11-22
 
 ### Added

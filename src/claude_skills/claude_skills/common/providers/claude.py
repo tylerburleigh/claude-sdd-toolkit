@@ -37,8 +37,130 @@ AVAILABILITY_OVERRIDE_ENV = "CLAUDE_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CLAUDE_CLI_BINARY"
 
 # Read-only tools allowed for Claude provider
-ALLOWED_TOOLS = ["Read", "Grep", "Glob", "WebSearch", "WebFetch", "Task", "Explore"]
-DISALLOWED_TOOLS = ["Write", "Edit", "Bash"]
+# Core tools
+ALLOWED_TOOLS = [
+    # File operations (read-only)
+    "Read",
+    "Grep",
+    "Glob",
+
+    # Task delegation
+    "Task",
+
+    # Bash commands - file viewing
+    "Bash(cat)",
+    "Bash(head:*)",
+    "Bash(tail:*)",
+    "Bash(bat:*)",
+
+    # Bash commands - directory listing/navigation
+    "Bash(ls:*)",
+    "Bash(tree:*)",
+    "Bash(pwd)",
+    "Bash(which:*)",
+    "Bash(whereis:*)",
+
+    # Bash commands - search/find
+    "Bash(grep:*)",
+    "Bash(rg:*)",
+    "Bash(ag:*)",
+    "Bash(find:*)",
+    "Bash(fd:*)",
+
+    # Bash commands - git operations (read-only)
+    "Bash(git log:*)",
+    "Bash(git show:*)",
+    "Bash(git diff:*)",
+    "Bash(git status:*)",
+    "Bash(git grep:*)",
+    "Bash(git blame:*)",
+    "Bash(git branch:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git describe:*)",
+    "Bash(git ls-tree:*)",
+
+    # Bash commands - text processing
+    "Bash(wc:*)",
+    "Bash(cut:*)",
+    "Bash(paste:*)",
+    "Bash(column:*)",
+    "Bash(sort:*)",
+    "Bash(uniq:*)",
+
+    # Bash commands - data formats
+    "Bash(jq:*)",
+    "Bash(yq:*)",
+
+    # Bash commands - file analysis
+    "Bash(file:*)",
+    "Bash(stat:*)",
+    "Bash(du:*)",
+    "Bash(df:*)",
+
+    # Bash commands - checksums/hashing
+    "Bash(md5sum:*)",
+    "Bash(shasum:*)",
+    "Bash(sha256sum:*)",
+    "Bash(sha512sum:*)",
+]
+
+# Tools that should be explicitly blocked
+DISALLOWED_TOOLS = [
+    "Write",
+    "Edit",
+
+    # Web operations (data exfiltration risk)
+    "WebSearch",
+    "WebFetch",
+
+    # Dangerous file operations
+    "Bash(rm:*)",
+    "Bash(rmdir:*)",
+    "Bash(dd:*)",
+    "Bash(mkfs:*)",
+    "Bash(fdisk:*)",
+
+    # File modifications
+    "Bash(touch:*)",
+    "Bash(mkdir:*)",
+    "Bash(mv:*)",
+    "Bash(cp:*)",
+    "Bash(chmod:*)",
+    "Bash(chown:*)",
+    "Bash(sed:*)",
+    "Bash(awk:*)",
+
+    # Git write operations
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(git push:*)",
+    "Bash(git pull:*)",
+    "Bash(git merge:*)",
+    "Bash(git rebase:*)",
+    "Bash(git reset:*)",
+    "Bash(git checkout:*)",
+
+    # Package installations
+    "Bash(npm install:*)",
+    "Bash(pip install:*)",
+    "Bash(apt install:*)",
+    "Bash(brew install:*)",
+
+    # System operations
+    "Bash(sudo:*)",
+    "Bash(halt:*)",
+    "Bash(reboot:*)",
+    "Bash(shutdown:*)",
+]
+
+# System prompt warning about shell command limitations
+SHELL_COMMAND_WARNING = """
+IMPORTANT SECURITY NOTE: When using shell commands, be aware of the following restrictions:
+1. Only specific read-only commands are allowed (cat, grep, git log, etc.)
+2. Write operations, file modifications, and destructive commands are blocked
+3. Avoid using piped commands as they may bypass some security checks
+4. Use sequential commands or alternative approaches when possible
+"""
 
 
 class RunnerProtocol(Protocol):
@@ -171,9 +293,15 @@ class ClaudeProvider(ProviderContext):
         command.extend(["--allowed-tools"] + ALLOWED_TOOLS)
         command.extend(["--disallowed-tools"] + DISALLOWED_TOOLS)
 
-        # Add system prompt if provided
-        if system_prompt:
-            command.extend(["--system-prompt", system_prompt])
+        # Build system prompt with security warning
+        full_system_prompt = system_prompt or ""
+        if full_system_prompt:
+            full_system_prompt = f"{full_system_prompt.strip()}\n\n{SHELL_COMMAND_WARNING.strip()}"
+        else:
+            full_system_prompt = SHELL_COMMAND_WARNING.strip()
+
+        # Add system prompt
+        command.extend(["--system-prompt", full_system_prompt])
 
         # Add model if specified and not default
         if model and model != self.metadata.default_model:
