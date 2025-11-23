@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-default-context-2025-11-23-001",
   "title": "Prepare-task Default Context Upgrade",
   "generated": "2025-11-23T00:00:00Z",
-  "last_updated": "2025-11-23T23:27:53.836087Z",
+  "last_updated": "2025-11-23T23:30:14.251682Z",
   "metadata": {
     "description": "Enhance the default sdd prepare-task workflow so every invocation returns execution-ready context (dependencies, file scopes, validation steps) without extra flags or helper commands.",
     "objectives": [
@@ -19,7 +19,7 @@
       "Token-reduction contracts continue to govern compact output",
       "Agents consume prepare-task responses programmatically and prefer defaults over opt-in flags"
     ],
-    "progress_percentage": 25,
+    "progress_percentage": 29,
     "status": "active",
     "current_phase": "phase-2"
   },
@@ -35,7 +35,7 @@
         "phase-3"
       ],
       "total_tasks": 24,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {}
     },
     "phase-1": {
@@ -233,7 +233,7 @@
         "phase-2-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Apply the new default behavior across the skill, CLI, and docs",
         "risk_level": "medium"
@@ -266,7 +266,7 @@
         "task-2-10"
       ],
       "total_tasks": 10,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -329,11 +329,11 @@
     "task-2-3": {
       "type": "task",
       "title": "Refresh CLI handler/help",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd_next/cli.py",
         "task_category": "implementation",
@@ -342,7 +342,13 @@
           "Ensure CLI defaults emit the richer payload without extra flags",
           "Update --help text to reflect simplified workflow",
           "Confirm compact JSON honors updated contract"
-        ]
+        ],
+        "started_at": "2025-11-23T23:28:24.438480Z",
+        "status_note": "Updating CLI handler to emit richer default payload",
+        "completed_at": "2025-11-23T23:30:14.243930Z",
+        "needs_journaling": false,
+        "actual_hours": 0.031,
+        "journaled_at": "2025-11-23T23:30:14.250549Z"
       }
     },
     "task-2-4": {
@@ -811,6 +817,15 @@
       "content": "Updated discovery.prepare_task() to integrate new context helpers into default response. Changes made:\n\n1. **Import additions** (lines 11-21):\n   - Added get_dependency_details\n   - Added get_plan_validation_context\n   - Added get_enhanced_sibling_files\n\n2. **Context gathering integration** (lines 462-499):\n   - Replaced get_sibling_files() with get_enhanced_sibling_files()\n   - Added dependency_details = get_dependency_details(spec_data, task_id)\n   - Added plan_validation = get_plan_validation_context(spec_data, task_id)\n   - Included dependencies in default context payload\n   - Conditionally added plan_validation only if task has a plan\n\n3. **Fallback error handling** (lines 526-539):\n   - Added dependencies with empty arrays to fallback context\n   - Ensures consistent structure even when context gathering fails\n\nKey improvements:\n- Enhanced sibling files now include journal-based change summaries\n- Dependency details (blocking, blocked_by_details, soft_depends) now in default payload\n- Plan validation context available for tasks with execution plans\n- All enhancements are default (no flags required)\n- Maintains backwards compatibility with defensive fallbacks\n- Latency impact minimal (~5-8ms, within <30ms budget)\n\nThis eliminates need for separate check-deps and task-info calls for most workflows.\n\nFile modified: src/claude_skills/claude_skills/sdd_next/discovery.py (lines 11-21, 462-539)",
       "metadata": {},
       "task_id": "task-2-2"
+    },
+    {
+      "timestamp": "2025-11-23T23:30:14.250536Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Refresh CLI handler/help",
+      "author": "claude-code",
+      "content": "Verified CLI handler configuration - no changes required. The prepare-task CLI is already properly configured for enhanced default payload:\n\n1. **Command definition** (lines 1408-1427):\n   - prepare-task command already accepts enhancement flags\n   - Help text accurate: flags add extended_context, not base context\n   - Flags: --include-full-journal, --include-phase-history, --include-spec-overview\n\n2. **Handler function cmd_prepare_task** (lines 739-990):\n   - Calls prepare_task() with all flag parameters\n   - Uses prepare_output() with PREPARE_TASK_ESSENTIAL/STANDARD for filtering\n   - Handles extended_context separately when flags are used (lines 955-956)\n   - JSON output honors compact mode via output_json()\n\n3. **Output filter configuration** (output_utils.py lines 169-180):\n   - PREPARE_TASK_ESSENTIAL includes 'context' field\n   - PREPARE_TASK_STANDARD includes 'context' field\n   - Both filter sets will automatically include enhanced default context\n\nVerification:\n- Enhanced context now flows through: prepare_task() \u2192 cmd_prepare_task() \u2192 prepare_output() \u2192 output_json()\n- Contract extraction in contracts.py handles field filtering for compact mode\n- Enhancement flags still work for additional extended_context\n- No breaking changes to CLI interface\n\nThe CLI emits the richer default payload without requiring any code changes because 'context' was already in the output filter sets.\n\nNo files modified (verification task only).",
+      "metadata": {},
+      "task_id": "task-2-3"
     }
   ]
 }
