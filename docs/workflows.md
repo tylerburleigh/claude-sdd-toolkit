@@ -139,9 +139,10 @@ Claude: [Moves spec to specs/completed/rate-limiting-2025-11-22-001.json]
 | Issue | Solution |
 |-------|----------|
 | **Spec validation fails** | Run `sdd validate <spec> --fix` to auto-correct issues |
-| **Task is blocked** | Check dependencies with `sdd check-deps <spec> <task>` |
+| **Task is blocked** | Blocker details are included in `sdd prepare-task` output (context.dependencies) |
 | **Wrong task suggested** | Use `/sdd-begin` and choose "Browse alternatives" |
 | **Need to modify spec** | Edit JSON directly, then run `sdd validate <spec>` |
+| **Need more context** | Use `--include-full-journal` or `--include-phase-history` flags with prepare-task |
 
 ---
 
@@ -210,9 +211,9 @@ Claude: Resuming rate-limiting-2025-11-22-001
 
 **What happened:**
 - Asked which spec to work on (multiple active specs)
-- Retrieved context from previous tasks
+- Retrieved rich context automatically (previous tasks, dependencies, phase progress)
 - Identified next actionable task
-- Created execution plan with context
+- Created execution plan with full context (no additional commands needed)
 
 **3. Continue implementation**
 

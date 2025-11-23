@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-default-context-2025-11-23-001",
   "title": "Prepare-task Default Context Upgrade",
   "generated": "2025-11-23T00:00:00Z",
-  "last_updated": "2025-11-23T23:30:14.251682Z",
+  "last_updated": "2025-11-23T23:32:06.233958Z",
   "metadata": {
     "description": "Enhance the default sdd prepare-task workflow so every invocation returns execution-ready context (dependencies, file scopes, validation steps) without extra flags or helper commands.",
     "objectives": [
@@ -19,7 +19,7 @@
       "Token-reduction contracts continue to govern compact output",
       "Agents consume prepare-task responses programmatically and prefer defaults over opt-in flags"
     ],
-    "progress_percentage": 29,
+    "progress_percentage": 33,
     "status": "active",
     "current_phase": "phase-2"
   },
@@ -35,7 +35,7 @@
         "phase-3"
       ],
       "total_tasks": 24,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {}
     },
     "phase-1": {
@@ -233,7 +233,7 @@
         "phase-2-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Apply the new default behavior across the skill, CLI, and docs",
         "risk_level": "medium"
@@ -266,7 +266,7 @@
         "task-2-10"
       ],
       "total_tasks": 10,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -354,11 +354,11 @@
     "task-2-4": {
       "type": "task",
       "title": "Update workflow documentation",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "docs/workflows.md",
         "task_category": "implementation",
@@ -367,7 +367,13 @@
           "Rewrite the Plan-and-Implement section to highlight one-call prepare-task",
           "Cross-reference docs/cli-reference.md for new field descriptions",
           "Clarify when (if ever) to call task-info/check-deps after this change"
-        ]
+        ],
+        "started_at": "2025-11-23T23:30:49.145095Z",
+        "status_note": "Updating workflow docs to highlight one-call prepare-task pattern",
+        "completed_at": "2025-11-23T23:32:06.228236Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-23T23:32:06.232919Z"
       }
     },
     "task-2-5": {
@@ -826,6 +832,15 @@
       "content": "Verified CLI handler configuration - no changes required. The prepare-task CLI is already properly configured for enhanced default payload:\n\n1. **Command definition** (lines 1408-1427):\n   - prepare-task command already accepts enhancement flags\n   - Help text accurate: flags add extended_context, not base context\n   - Flags: --include-full-journal, --include-phase-history, --include-spec-overview\n\n2. **Handler function cmd_prepare_task** (lines 739-990):\n   - Calls prepare_task() with all flag parameters\n   - Uses prepare_output() with PREPARE_TASK_ESSENTIAL/STANDARD for filtering\n   - Handles extended_context separately when flags are used (lines 955-956)\n   - JSON output honors compact mode via output_json()\n\n3. **Output filter configuration** (output_utils.py lines 169-180):\n   - PREPARE_TASK_ESSENTIAL includes 'context' field\n   - PREPARE_TASK_STANDARD includes 'context' field\n   - Both filter sets will automatically include enhanced default context\n\nVerification:\n- Enhanced context now flows through: prepare_task() \u2192 cmd_prepare_task() \u2192 prepare_output() \u2192 output_json()\n- Contract extraction in contracts.py handles field filtering for compact mode\n- Enhancement flags still work for additional extended_context\n- No breaking changes to CLI interface\n\nThe CLI emits the richer default payload without requiring any code changes because 'context' was already in the output filter sets.\n\nNo files modified (verification task only).",
       "metadata": {},
       "task_id": "task-2-3"
+    },
+    {
+      "timestamp": "2025-11-23T23:32:06.232912Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update workflow documentation",
+      "author": "claude-code",
+      "content": "Updated workflow documentation to highlight one-call prepare-task pattern. Changes made to docs/workflows.md:\n\n1. **Troubleshooting section** (line 142):\n   - Changed: \"Check dependencies with `sdd check-deps <spec> <task>`\"\n   - To: \"Blocker details are included in `sdd prepare-task` output (context.dependencies)\"\n   - Clarifies that dependency information is now in default payload\n\n2. **New troubleshooting row** (line 145):\n   - Added: \"Need more context\" \u2192 Use enhancement flags with prepare-task\n   - Clarifies when/how to get extended context beyond defaults\n\n3. **Resume After Break workflow** (lines 212-216):\n   - Updated \"Retrieved context from previous tasks\" to \"Retrieved rich context automatically\"\n   - Added \"(previous tasks, dependencies, phase progress)\" to clarify what's included\n   - Updated \"Created execution plan with context\" to \"with full context (no additional commands needed)\"\n   - Emphasizes one-call pattern eliminates need for task-info/check-deps\n\nKey messaging:\n- prepare-task now provides all context needed by default\n- Separate task-info/check-deps calls are rarely needed\n- Enhancement flags available for extra context when needed\n- References cli-reference.md for field descriptions (implicit via existing link structure)\n\nFile modified: docs/workflows.md (lines 142, 145, 212-216)",
+      "metadata": {},
+      "task_id": "task-2-4"
     }
   ]
 }
