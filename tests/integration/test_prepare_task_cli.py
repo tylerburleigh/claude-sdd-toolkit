@@ -226,3 +226,125 @@ def test_context_task_journal_has_entries():
 
     # Entry count should match entries list length
     assert task_journal["entry_count"] == len(task_journal["entries"])
+
+
+def test_end_to_end_json_output_pretty():
+    """Test that CLI output can be serialized as pretty JSON."""
+    spec_id = "prepare-task-default-context-2025-11-23-001"
+
+    result = run_prepare_task_command(spec_id)
+
+    # Serialize to pretty JSON
+    pretty_json = json.dumps(result, indent=2)
+
+    # Should have newlines (pretty formatting)
+    assert "\n" in pretty_json
+    assert "  " in pretty_json  # indentation present
+
+    # Should be valid JSON roundtrip
+    parsed = json.loads(pretty_json)
+    assert parsed == result
+
+
+def test_end_to_end_json_output_compact():
+    """Test that CLI output can be serialized as compact JSON."""
+    spec_id = "prepare-task-default-context-2025-11-23-001"
+
+    result = run_prepare_task_command(spec_id)
+
+    # Serialize to compact JSON
+    compact_json = json.dumps(result, separators=(',', ':'))
+
+    # Should be smaller than pretty version
+    pretty_json = json.dumps(result, indent=2)
+    assert len(compact_json) < len(pretty_json)
+
+    # Should be valid JSON roundtrip
+    parsed = json.loads(compact_json)
+    assert parsed == result
+
+
+def test_task_info_redundant_with_prepare_task():
+    """Test that task-info provides no additional value beyond prepare-task.
+
+    This verifies that the default prepare-task output includes all the
+    information that task-info would provide, making task-info redundant
+    for standard workflows.
+    """
+    spec_id = "prepare-task-default-context-2025-11-23-001"
+
+    # Get prepare-task output
+    prepare_result = run_prepare_task_command(spec_id)
+
+    # Get task-info output for comparison
+    task_id = prepare_result["task_id"]
+    task_info_cmd = ["sdd", "task-info", spec_id, task_id, "--json"]
+    task_info_result = subprocess.run(
+        task_info_cmd,
+        capture_output=True,
+        text=True,
+        cwd=Path(__file__).parent.parent.parent,
+    )
+
+    task_info_data = json.loads(task_info_result.stdout)
+
+    # Verify prepare-task.task_data contains same info as task-info
+    prepare_task_data = prepare_result["task_data"]
+
+    # Key fields that task-info provides should be in prepare-task output
+    assert prepare_task_data["title"] == task_info_data["title"]
+    assert prepare_task_data["status"] == task_info_data["status"]
+
+    # Metadata should also be present
+    if "metadata" in task_info_data:
+        assert "metadata" in prepare_task_data
+        # File path should match if present
+        if "file_path" in task_info_data["metadata"]:
+            assert prepare_task_data["metadata"]["file_path"] == \
+                   task_info_data["metadata"]["file_path"]
+
+
+def test_check_deps_redundant_with_prepare_task():
+    """Test that check-deps provides no additional value beyond prepare-task.
+
+    This verifies that context.dependencies in prepare-task output provides
+    the same dependency information as check-deps, making check-deps redundant.
+    """
+    spec_id = "prepare-task-default-context-2025-11-23-001"
+
+    # Get prepare-task output
+    prepare_result = run_prepare_task_command(spec_id)
+
+    # Get check-deps output for comparison
+    task_id = prepare_result["task_id"]
+    check_deps_cmd = ["sdd", "check-deps", spec_id, task_id, "--json"]
+    check_deps_result = subprocess.run(
+        check_deps_cmd,
+        capture_output=True,
+        text=True,
+        cwd=Path(__file__).parent.parent.parent,
+    )
+
+    check_deps_data = json.loads(check_deps_result.stdout)
+
+    # Verify prepare-task includes dependency info from check-deps
+    prepare_deps = prepare_result["dependencies"]
+
+    # prepare-task should have dependencies with can_start
+    assert prepare_deps is not None
+    assert "can_start" in prepare_deps
+
+    # The critical field from check-deps (can_start) should match
+    assert prepare_deps["can_start"] == check_deps_data["can_start"]
+
+    # prepare-task provides MORE information than check-deps:
+    # - task_id, blocked_by, soft_depends, blocks
+    assert "task_id" in prepare_deps
+    assert "blocked_by" in prepare_deps
+    assert "soft_depends" in prepare_deps
+
+    # context.dependencies provides even more detailed info
+    context_deps = prepare_result["context"]["dependencies"]
+    assert "blocking" in context_deps
+    assert "blocked_by_details" in context_deps
+    assert "soft_depends" in context_deps
