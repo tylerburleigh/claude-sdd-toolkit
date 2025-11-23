@@ -619,10 +619,96 @@ Token usage is extracted from the OpenCode response metadata:
 
 ### Security
 
-- API keys are passed via environment variables (not command-line arguments)
-- Server process runs in a new session (detached from parent)
-- Wrapper script validates JSON input before processing
-- Provider cleans up server process on destruction
+#### Security Model Overview
+
+OpenCode provider uses a **dual-layer security approach** to enforce read-only access:
+
+**Layer 1: Tool Configuration**
+- Disables write operations in temporary `opencode.json`
+- Enables only read-only tools: `read`, `grep`, `glob`, `list`, `task`
+- Disables dangerous tools: `write`, `edit`, `bash`, `patch`, `todowrite`, `webfetch`
+
+**Layer 2: Permission Denial**
+- Explicit permission denials in config
+- Blocks: `edit: deny`, `bash: deny`, `external_directory: deny`
+- Server-wide enforcement
+
+#### Read-Only Configuration
+
+Temporary `opencode.json` created at runtime:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "tools": {
+    "write": false,
+    "edit": false,
+    "patch": false,
+    "todowrite": false,
+    "bash": false,
+    "webfetch": false,
+    "read": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "todoread": true,
+    "task": true
+  },
+  "permission": {
+    "edit": "deny",
+    "bash": "deny",
+    "webfetch": "deny",
+    "external_directory": "deny"
+  }
+}
+```
+
+#### Allowed Operations
+
+- **File Operations (read-only)**: Read, Grep, Glob, List
+- **Task Delegation**: Task (spawn sub-agents)
+- **No Shell Access**: Bash/Shell commands are completely disabled
+- **No Web Access**: Web operations disabled for security
+
+#### Blocked Operations
+
+- File modifications: Write, Edit, Patch, Delete
+- Web operations: WebFetch (prevents data exfiltration)
+- All shell command execution (stricter than Claude/Gemini)
+- Todo file modifications (TodoWrite)
+- External directory access
+
+#### Known Limitations
+
+⚠️ **MCP Tool Bypass**: Tool blocking may not work for MCP (Model Context Protocol) tools
+
+- **Reference**: [OpenCode issue #3756](https://github.com/opencode-ai/opencode/issues/3756)
+- **Impact**: MCP tools may bypass config-based restrictions
+- **Mitigation**: Limit MCP servers to read-only tools only
+
+⚠️ **Server-Wide Configuration**: Configuration affects all sessions on the same server instance
+
+- **Impact**: All sessions share the same read-only restrictions
+- **Mitigation**: Use dedicated server instances for isolation if needed
+
+#### Security Best Practices
+
+- **API Keys**: Passed via environment variables (not command-line arguments)
+- **Server Isolation**: Server process runs in new session (detached from parent)
+- **Input Validation**: Wrapper script validates JSON input before processing
+- **Cleanup**: Provider cleans up server process and config files on destruction
+- **MCP Servers**: Review MCP server configurations for read-only compliance
+
+#### Comparison with Other Providers
+
+| Feature | OpenCode | Claude | Gemini | Codex |
+|---------|----------|--------|--------|-------|
+| Shell Access | ❌ Disabled | ✅ Read-only | ✅ Read-only | ✅ Sandboxed |
+| Enforcement | Config file | CLI flags | CLI flags | OS-level |
+| MCP Safe | ⚠️ No | ✅ Yes | ✅ Yes | ✅ Yes |
+| Robustness | ⭐⭐⭐ Good | ⭐⭐⭐⭐ Strong | ⭐⭐⭐⭐ Strong | ⭐⭐⭐⭐⭐ Best |
+
+See [Provider Security Architecture](../security/PROVIDER_SECURITY.md) for comprehensive security documentation.
 
 ## See Also
 

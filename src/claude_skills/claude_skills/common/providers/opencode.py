@@ -64,13 +64,16 @@ READONLY_TOOLS_CONFIG = {
         "glob": True,
         "list": True,
         "todoread": True,
-        "webfetch": True,
         "task": True,
+
+        # Disable web operations (data exfiltration risk)
+        "webfetch": False,
     },
     "permission": {
         # Double-guard with permission denials
         "edit": "deny",
         "bash": "deny",
+        "webfetch": "deny",
         "external_directory": "deny",
     },
 }
@@ -80,8 +83,9 @@ SHELL_COMMAND_WARNING = """
 IMPORTANT SECURITY NOTE: This session is running in read-only mode with the following restrictions:
 1. File write operations (write, edit, patch) are disabled
 2. Shell command execution (bash) is disabled
-3. Only read operations are available (read, grep, glob, list, webfetch)
-4. Attempts to modify files or execute commands will be blocked by the server
+3. Web operations (webfetch) are disabled to prevent data exfiltration
+4. Only read operations are available (read, grep, glob, list)
+5. Attempts to modify files, execute commands, or access the web will be blocked by the server
 """
 
 

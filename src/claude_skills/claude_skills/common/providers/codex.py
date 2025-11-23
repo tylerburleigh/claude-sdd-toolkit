@@ -47,9 +47,6 @@ SANDBOX_ALLOWED_OPERATIONS = [
     "Glob",
     "List",
 
-    # Web operations (read-only)
-    "WebFetch",
-
     # Task delegation
     "Task",
 
@@ -137,6 +134,9 @@ SANDBOX_BLOCKED_OPERATIONS = [
     "Edit",
     "Patch",
     "Delete",
+
+    # Web operations (data exfiltration risk)
+    "WebFetch",
 
     # Dangerous file operations
     "Shell(rm)",

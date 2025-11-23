@@ -51,12 +51,6 @@ ALLOWED_TOOLS = [
     "GrepTool",
     "search_file_content",
 
-    # Web operations (read-only)
-    "WebFetchTool",
-    "web_fetch",
-    "WebSearchTool",
-    "web_search",
-
     # Shell commands - file viewing
     "ShellTool(cat)",
     "ShellTool(head)",

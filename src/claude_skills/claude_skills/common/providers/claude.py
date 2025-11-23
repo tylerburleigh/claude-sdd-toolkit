@@ -44,10 +44,6 @@ ALLOWED_TOOLS = [
     "Grep",
     "Glob",
 
-    # Web operations (read-only)
-    "WebSearch",
-    "WebFetch",
-
     # Task delegation
     "Task",
 
@@ -112,6 +108,10 @@ ALLOWED_TOOLS = [
 DISALLOWED_TOOLS = [
     "Write",
     "Edit",
+
+    # Web operations (data exfiltration risk)
+    "WebSearch",
+    "WebFetch",
 
     # Dangerous file operations
     "Bash(rm:*)",

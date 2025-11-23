@@ -48,9 +48,6 @@ ALLOWED_TOOLS = [
     "Glob",
     "List",
 
-    # Web operations (read-only)
-    "WebFetch",
-
     # Task delegation
     "Task",
 
@@ -117,6 +114,9 @@ DISALLOWED_TOOLS = [
     "Edit",
     "Patch",
     "Delete",
+
+    # Web operations (data exfiltration risk)
+    "WebFetch",
 
     # Dangerous file operations
     "Shell(rm)",

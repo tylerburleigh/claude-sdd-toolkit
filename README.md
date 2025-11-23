@@ -180,9 +180,23 @@ results = consult_multi_agent(
 - **Claude** - Anthropic Claude with read-only restrictions (Sonnet 4.5/Haiku 4.5)
 - **OpenCode** - OpenCode AI models with Node.js SDK integration (requires Node.js >= 18.x)
 
-**Security**: Claude and OpenCode providers enforce read-only tool access (allows Read, Grep, Glob, WebSearch; blocks Write, Edit, Bash).
+### Provider Security Model
 
-**Provider Documentation**: See `docs/providers/OPENCODE.md` for detailed OpenCode setup instructions.
+All providers enforce read-only access to protect against unintended modifications during codebase analysis:
+
+| Provider | Security Model | Enforcement | Robustness |
+|----------|---------------|-------------|------------|
+| **Codex** | OS-level sandboxing (`--sandbox read-only`) | Seatbelt/Landlock/Restricted Token | ⭐⭐⭐⭐⭐ Most Secure |
+| **Claude** | Tool allowlist/denylist | CLI flags (`--allowed-tools`, `--disallowed-tools`) | ⭐⭐⭐⭐ Strong |
+| **Gemini** | Tool allowlist | CLI flags (`--allowed-tools`) | ⭐⭐⭐⭐ Strong |
+| **Opencode** | Dual-layer protection | Config file + permissions | ⭐⭐⭐ Good |
+| **Cursor Agent** | Config-based allowlist | Temporary `.cursor/cli-config.json` | ⭐⭐⭐ Good |
+
+**Allowed Operations:** Read, Grep, Glob, List, read-only git commands (log, show, diff, status), file analysis tools, text processing
+
+**Blocked Operations:** Write, Edit, Delete, web operations (WebSearch, WebFetch - prevents data exfiltration), destructive shell commands (rm, chmod), git write operations (add, commit, push), package installations, system modifications
+
+**Security Documentation**: See [Provider Security Architecture](docs/security/PROVIDER_SECURITY.md) for detailed security model, [Threat Model](docs/security/THREAT_MODEL.md) for attack scenarios, and `docs/providers/OPENCODE.md` for provider-specific details.
 
 ### Data Flow
 

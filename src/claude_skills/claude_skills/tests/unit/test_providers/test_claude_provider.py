@@ -429,3 +429,38 @@ def test_claude_provider_extracts_model_from_model_usage() -> None:
 
     result = provider.generate(GenerationRequest(prompt="test"))
     assert result.model_fqn == f"claude:{custom_model}"
+
+
+def test_claude_provider_blocks_web_operations() -> None:
+    """Test that WebSearch and WebFetch are explicitly blocked to prevent data exfiltration."""
+    # Verify WebSearch and WebFetch are NOT in allowed tools
+    assert "WebSearch" not in ALLOWED_TOOLS
+    assert "WebFetch" not in ALLOWED_TOOLS
+
+    # Verify WebSearch and WebFetch ARE in disallowed tools
+    assert "WebSearch" in DISALLOWED_TOOLS
+    assert "WebFetch" in DISALLOWED_TOOLS
+
+    # Verify the tools are actually blocked in the command
+    captured: Dict[str, object] = {}
+
+    def runner(command, *, timeout=None, env=None):
+        captured["command"] = list(command)
+        return FakeProcess(stdout=_payload())
+
+    provider = ClaudeProvider(
+        CLAUDE_METADATA,
+        ProviderHooks(),
+        runner=runner,
+    )
+
+    provider.generate(GenerationRequest(prompt="test"))
+
+    command = captured["command"]
+    disallowed_index = command.index("--disallowed-tools") + 1
+    disallowed_end = command.index("--system-prompt") if "--system-prompt" in command else len(command)
+    disallowed_tools_in_command = command[disallowed_index:disallowed_end]
+
+    # Verify WebSearch and WebFetch are in the disallowed tools section
+    assert "WebSearch" in disallowed_tools_in_command
+    assert "WebFetch" in disallowed_tools_in_command
