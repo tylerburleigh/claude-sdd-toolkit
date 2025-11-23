@@ -420,3 +420,203 @@ def get_task_journal_summary(
         "last_entry_at": filtered[0].get("timestamp"),
         "entries": entries,
     }
+
+
+def get_dependency_details(
+    spec_data: Dict[str, Any],
+    task_id: str,
+) -> Dict[str, Any]:
+    """
+    Get detailed dependency information for a task.
+
+    Provides richer context than just task IDs by including titles,
+    status, and file paths for all dependency relationships.
+
+    Args:
+        spec_data: Loaded JSON spec dictionary.
+        task_id: Task identifier.
+
+    Returns:
+        Dictionary with detailed blocker, soft dependency, and blocks info:
+        {
+            "blocking": List[Dict],  # Tasks this blocks
+            "blocked_by_details": List[Dict],  # Tasks blocking this
+            "soft_depends": List[Dict]  # Soft dependencies
+        }
+    """
+    if not spec_data or not task_id:
+        return {
+            "blocking": [],
+            "blocked_by_details": [],
+            "soft_depends": []
+        }
+
+    hierarchy = spec_data.get("hierarchy", {})
+    task = hierarchy.get(task_id)
+
+    if not task:
+        return {
+            "blocking": [],
+            "blocked_by_details": [],
+            "soft_depends": []
+        }
+
+    deps = task.get("dependencies", {})
+    blocked_by = deps.get("blocked_by", [])
+    depends = deps.get("depends", [])
+    blocks = deps.get("blocks", [])
+
+    def get_task_detail(dep_id: str) -> Optional[Dict[str, Any]]:
+        """Extract task details for a dependency."""
+        dep_task = hierarchy.get(dep_id)
+        if not dep_task:
+            return None
+        return {
+            "id": dep_id,
+            "title": dep_task.get("title", ""),
+            "status": dep_task.get("status", ""),
+            "file_path": dep_task.get("metadata", {}).get("file_path", "")
+        }
+
+    result = {
+        "blocking": [
+            detail for detail in (get_task_detail(dep_id) for dep_id in blocks)
+            if detail is not None
+        ],
+        "blocked_by_details": [
+            detail for detail in (get_task_detail(dep_id) for dep_id in blocked_by)
+            if detail is not None
+        ],
+        "soft_depends": [
+            detail for detail in (get_task_detail(dep_id) for dep_id in depends)
+            if detail is not None
+        ]
+    }
+
+    return result
+
+
+def get_plan_validation_context(
+    spec_data: Dict[str, Any],
+    task_id: str,
+) -> Optional[Dict[str, Any]]:
+    """
+    Extract plan validation context for tasks with execution plans.
+
+    Args:
+        spec_data: Loaded JSON spec dictionary.
+        task_id: Task identifier.
+
+    Returns:
+        Plan validation context if task has a plan, None otherwise:
+        {
+            "has_plan": bool,
+            "plan_items": List[Dict],  # step, description, status
+            "completed_steps": int,
+            "total_steps": int,
+            "current_step": Optional[Dict]
+        }
+    """
+    if not spec_data or not task_id:
+        return None
+
+    hierarchy = spec_data.get("hierarchy", {})
+    task = hierarchy.get(task_id)
+
+    if not task:
+        return None
+
+    metadata = task.get("metadata", {}) or {}
+    plan = metadata.get("plan")
+
+    if not plan or not isinstance(plan, list):
+        return None
+
+    completed_steps = sum(1 for item in plan if item.get("status") == "completed")
+    total_steps = len(plan)
+
+    # Find current step (first non-completed step)
+    current_step = None
+    for item in plan:
+        if item.get("status") != "completed":
+            current_step = {
+                "step": item.get("step", 0),
+                "description": item.get("description", ""),
+                "status": item.get("status", "pending")
+            }
+            break
+
+    return {
+        "has_plan": True,
+        "plan_items": [
+            {
+                "step": item.get("step", idx + 1),
+                "description": item.get("description", ""),
+                "status": item.get("status", "pending")
+            }
+            for idx, item in enumerate(plan)
+        ],
+        "completed_steps": completed_steps,
+        "total_steps": total_steps,
+        "current_step": current_step
+    }
+
+
+def get_enhanced_sibling_files(
+    spec_data: Dict[str, Any],
+    task_id: str,
+) -> List[Dict[str, Any]]:
+    """
+    Get enhanced file metadata for siblings with journal-based change summaries.
+
+    Extends get_sibling_files() by adding change summaries and line counts
+    extracted from journal entries.
+
+    Args:
+        spec_data: Loaded JSON spec dictionary.
+        task_id: Task identifier.
+
+    Returns:
+        List of dictionaries with enhanced file metadata:
+        - task_id, title, status, file_path (from get_sibling_files)
+        - last_modified_by, last_activity (from get_sibling_files)
+        - changes_summary: Optional summary from journal
+        - lines_changed: Optional line count from journal metadata
+    """
+    # Get base sibling files
+    base_files = get_sibling_files(spec_data, task_id)
+
+    if not base_files:
+        return []
+
+    # Enhance with journal data
+    journal = spec_data.get("journal", []) or []
+    enhanced_files = []
+
+    for file_entry in base_files:
+        sibling_task_id = file_entry.get("task_id")
+        enhanced_entry = dict(file_entry)
+
+        # Find most recent journal entry for this sibling
+        sibling_journals = [
+            entry for entry in journal
+            if entry.get("task_id") == sibling_task_id
+        ]
+
+        if sibling_journals:
+            sibling_journals.sort(key=lambda e: e.get("timestamp") or "", reverse=True)
+            latest = sibling_journals[0]
+
+            # Extract changes summary (first 200 chars)
+            content = (latest.get("content") or "").strip()
+            if content:
+                enhanced_entry["changes_summary"] = content[:200]
+
+            # Extract lines changed if present in metadata
+            journal_metadata = latest.get("metadata", {})
+            if journal_metadata and "lines_changed" in journal_metadata:
+                enhanced_entry["lines_changed"] = journal_metadata["lines_changed"]
+
+        enhanced_files.append(enhanced_entry)
+
+    return enhanced_files
