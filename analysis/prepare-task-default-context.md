@@ -375,6 +375,170 @@ Target: <30ms additional overhead
 
 **Token count**: ~800-1000 tokens (with full journals)
 
+## Contract Field Definitions
+
+### Core Fields (Always Present)
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `task_id` | string | Unique task identifier | `"task-1-2"` |
+| `title` | string | Concise task description | `"Update prepare-task contract"` |
+| `can_start` | boolean | Whether task can be started now | `true` |
+| `blocked_by` | array[string] | Task IDs blocking this task | `["task-1-1"]` or `[]` |
+| `git.needs_branch` | boolean | Whether new branch should be created | `false` |
+| `git.suggested_branch` | string | Suggested branch name | `"feat/context-upgrade"` |
+| `git.dirty` | boolean | Whether working tree has uncommitted changes | `false` |
+| `spec_complete` | boolean | Whether spec is finished | `false` |
+| `context` | object | Enhanced context payload (see below) | `{...}` |
+
+### Context Block Fields (New Default)
+
+| Field | Type | Description | Always Present? |
+|-------|------|-------------|-----------------|
+| `context.previous_sibling` | object\|null | Previous task in same group | Yes |
+| `context.previous_sibling.id` | string | Sibling task ID | If present |
+| `context.previous_sibling.title` | string | Sibling task title | If present |
+| `context.previous_sibling.status` | string | Sibling task status | If present |
+| `context.previous_sibling.journal_excerpt` | object\|null | Latest journal summary | If present |
+| `context.parent_task` | object\|null | Parent task/group | Yes |
+| `context.parent_task.id` | string | Parent ID | If present |
+| `context.parent_task.title` | string | Parent title | If present |
+| `context.parent_task.position_label` | string | Position in siblings (e.g., "2 of 5 children") | If present |
+| `context.parent_task.remaining_tasks` | integer | Tasks left in parent | If present |
+| `context.phase` | object\|null | Current phase context | Yes |
+| `context.phase.title` | string | Phase title | If present |
+| `context.phase.percentage` | integer | Phase completion % | If present |
+| `context.phase.blockers` | array[string] | Phase-level blockers | If present |
+| `context.sibling_files` | array[object] | Files modified by siblings | Yes (may be empty) |
+| `context.task_journal` | object | Journal entries for current task | Yes |
+
+### Optional Fields (Conditionally Included)
+
+| Field | Type | Included When | Description |
+|-------|------|---------------|-------------|
+| `file_path` | string | Task has `metadata.file_path` | Target file for implementation |
+| `details` | array[string] | Task has `metadata.details` | Implementation steps/hints |
+| `task_metadata` | object | Metadata has enrichment fields | Full task metadata |
+| `task_metadata.category` | string | Has `task_category` | Task type (research, implementation, verification) |
+| `task_metadata.estimated_hours` | number | Has `estimated_hours` | Time estimate |
+| `task_metadata.acceptance_criteria` | array[string] | Has `acceptance_criteria` | Success criteria |
+| `task_metadata.verification_type` | string | Has `verification_type` | Verification method (auto, manual, fidelity) |
+| `status` | string | Status != "pending" | Current task status |
+| `validation_warnings` | array[string] | Non-empty warnings | Spec validation issues |
+| `completion_info` | object | `spec_complete` is true | Completion details |
+| `extended_context` | object | Enhancement flags used | Additional context from flags |
+
+### Field Gating Semantics
+
+**Smart Defaults Principle:**
+- Core fields always present (no null checks needed)
+- Context block always present, but sub-fields may be null
+- Optional fields only included when they have meaningful values
+- Empty arrays/objects omitted unless structurally required
+
+**Consumer Compatibility:**
+```python
+# Older consumers (before context block)
+if contract.get("can_start"):
+    # Works fine, context is ignored
+
+# New consumers (context-aware)
+if contract.get("can_start"):
+    prev_sibling = contract.get("context", {}).get("previous_sibling")
+    if prev_sibling:
+        # Use rich context
+```
+
+## Compatibility Matrix
+
+### Version Detection
+
+Consumers can detect payload version by checking for presence of `context` field:
+
+```python
+def get_contract_version(contract):
+    if "context" in contract:
+        if "task_metadata" in contract:
+            return "v3"  # Full enhanced context
+        return "v2"  # Basic context block
+    return "v1"  # Legacy minimal contract
+```
+
+### Version Comparison
+
+| Feature | v1 (Legacy) | v2 (Basic Context) | v3 (Full Enhanced) |
+|---------|-------------|--------------------|--------------------|
+| Core fields (task_id, title, can_start, etc.) | ✅ | ✅ | ✅ |
+| Git fields (needs_branch, dirty, etc.) | ✅ | ✅ | ✅ |
+| Context block | ❌ | ✅ | ✅ |
+| Previous sibling context | ❌ | ✅ (basic) | ✅ (with journal) |
+| Parent task context | ❌ | ✅ | ✅ |
+| Phase context | ❌ | ✅ | ✅ |
+| Task metadata extraction | ❌ | ❌ | ✅ |
+| Acceptance criteria | ❌ | ❌ | ✅ |
+| Verification type | ❌ | ❌ | ✅ |
+| Extended context support | ❌ | ✅ | ✅ |
+
+### Migration Path
+
+**Phase 1: v1 → v2 (Add context block)**
+- Status: **Current implementation** (as of task-1-2)
+- Changes: Add `context` field to contract extraction
+- Backwards compatible: Yes (additive only)
+- Consumers: Can ignore context if not ready
+
+**Phase 2: v2 → v3 (Add task metadata)**
+- Status: **Planned** (implementation phase)
+- Changes: Add `task_metadata` extraction
+- Backwards compatible: Yes (additive only)
+- Consumers: Optional field, can be ignored
+
+**Phase 3: Full Enhancement (Promote flags to defaults)**
+- Status: **Future**
+- Changes: Include full journal in previous_sibling by default
+- Backwards compatible: Yes (existing flags still work)
+- Performance: May add 10-15ms, within budget
+
+### Consumer Guidance
+
+**For Older Consumers (v1):**
+```python
+# No changes needed - contract structure unchanged
+task_id = contract["task_id"]
+can_start = contract["can_start"]
+```
+
+**For Context-Aware Consumers (v2):**
+```python
+# Optionally use context for better decisions
+task_id = contract["task_id"]
+can_start = contract["can_start"]
+
+# Safe access to context
+context = contract.get("context", {})
+prev_sibling = context.get("previous_sibling")
+if prev_sibling:
+    print(f"Follows: {prev_sibling['title']}")
+```
+
+**For Full Enhancement Consumers (v3):**
+```python
+# Use all available context
+task_id = contract["task_id"]
+can_start = contract["can_start"]
+
+# Access task metadata
+metadata = contract.get("task_metadata", {})
+category = metadata.get("category", "unknown")
+est_hours = metadata.get("estimated_hours", 0)
+
+# Access rich context
+context = contract["context"]
+if context["previous_sibling"]:
+    journal = context["previous_sibling"].get("journal_excerpt", {})
+    print(f"Previous work: {journal.get('summary', 'N/A')}")
+```
+
 ## Recommendations
 
 ### Immediate Actions
