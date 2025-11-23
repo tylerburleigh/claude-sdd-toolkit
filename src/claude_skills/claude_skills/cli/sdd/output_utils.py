@@ -167,13 +167,13 @@ PROGRESS_STANDARD = {
 
 # prepare-task command
 PREPARE_TASK_ESSENTIAL = {
-    'task_id', 'task_data', 'dependencies',
+    'task_id', 'task_data', 'dependencies', 'context',
     'needs_branch_creation', 'suggested_branch_name',
     'dirty_tree_status', 'validation_warnings',
     'spec_complete'
 }
 PREPARE_TASK_STANDARD = {
-    'success', 'task_id', 'task_data', 'dependencies',
+    'success', 'task_id', 'task_data', 'dependencies', 'context',
     'repo_root', 'needs_branch_creation', 'dirty_tree_status',
     'needs_commit_cadence', 'spec_complete',
     'completion_info', 'doc_context'

@@ -56,3 +56,6 @@ specs/.fidelity-reviews/
 
 # ModelChorus configuration
 .model-chorusrc
+
+.doc-cache/
+.agents/

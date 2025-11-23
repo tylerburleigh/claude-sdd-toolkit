@@ -9,13 +9,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [0.7.5] - 2025-11-23
 
 ### Added
-- Dedicated INSTALLATION guide covering marketplace setup, unified dependency installation (pip + npm), verification commands, troubleshooting, and update workflow.
-- Provider security documentation set: `docs/providers/OVERVIEW.md`, `docs/security/PROVIDER_SECURITY.md`, `docs/security/THREAT_MODEL.md`, and `docs/security/TESTING.md`, plus `BIKE_LANE.md` clarifying how `sdd fidelity-review` chooses AI models.
+- Provider security documentation set: `docs/security/PROVIDER_SECURITY.md`, `docs/security/THREAT_MODEL.md`, and `docs/security/TESTING.md`
 
 ### Changed
-- Enforced read-only/tool-restriction policies across Claude, Gemini, Codex, Cursor Agent, and Opencode providers with corresponding unit tests and CLI flag updates in `ai_tools.py`/`providers/base.py`.
-- Expanded README/OPENCODE docs with architectural diagrams, provider comparisons, workflow walkthroughs, and linked security guidance; moved `CHANGELOG.md` to the repo root for visibility.
-- Hardened `ai_tools` integration tests by switching the mock binaries to JSON outputs and supporting float timeouts to better mirror real provider CLIs.
+- Enforced read-only/tool-restriction policies across Claude, Gemini, Codex, Cursor Agent, and OpenCode providers with corresponding unit tests and CLI flag updates
+- Hardened `ai_tools` integration tests by switching the mock binaries to JSON outputs and supporting float timeouts to better mirror real provider CLIs
+
+## [0.7.1] - 2025-11-22
+
+### Added
+
+**Journal Accessibility Improvements:**
+- Enhanced `get-journal` command with ergonomic positional syntax
+  - New syntax: `sdd get-journal SPEC_ID [TASK_ID]` for cleaner command-line usage
+  - Legacy `--task-id` flag still supported for backward compatibility
+  - Improved help text with usage examples
+- Journal data now included in `prepare-task` output at all verbosity levels
+  - `context.task_journal` field added to both ESSENTIAL and STANDARD field sets
+  - Accessible via `--quiet`, default, and `--verbose` modes
+  - Provides integrated access to task journal without requiring separate `get-journal` calls
+
+### Changed
+- `prepare-task` context now includes task journal entries by default
+  - Previously required verbose mode to access journal data
+  - Now available at all verbosity levels for better workflow integration
+
+### Documentation
+- Added `docs/journal-accessibility-improvements.md` with usage examples and migration guide
+- Documented positional vs flag-based syntax patterns
+- Clarified when to use `get-journal` vs `prepare-task` for journal access
+
+### Notes
+- All changes maintain full backward compatibility
+- Existing scripts using `--task-id` flag continue to work unchanged
+- Output structure remains consistent across all verbosity levels
 
 ## [0.7.0] - 2025-11-21
 
