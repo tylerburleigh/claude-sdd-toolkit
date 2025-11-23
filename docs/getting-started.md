@@ -154,17 +154,37 @@ Claude: Found pending spec "pomodoro-timer-001"
 
 You: Yes
 
-Claude: [Moves to specs/active/, starts first task]
+Claude: [Uses one-call prepare-task to get complete context]
         Task 1-1: Create Timer class with start/pause/stop methods
+
+        Context from previous work:
+        - No previous tasks (first in spec)
+        - Phase: Foundation (0% complete)
+        - Target file: src/timer.py
+
         [Implements task, updates status]
 
 You: /sdd-begin
 
-Claude: Task 1-2: Add notification system...
-        [Continues through tasks]
+Claude: [prepare-task provides rich context in single call]
+        Task 1-2: Add notification system...
+
+        Context from previous work:
+        - Previous: task-1-1 (Timer class created with basic structure)
+        - Phase: Foundation (33% complete)
+        - Related files: src/timer.py modified
+
+        [Continues through tasks with automatic context loading]
 ```
 
-See [workflows.md](workflows.md) for more workflow examples.
+**Key Features:**
+
+- **One-Call Context**: `prepare-task` now provides all task info, dependencies, phase progress, and previous work in a single call
+- **No Extra Commands**: No need for separate `task-info` or `check-deps` calls
+- **Automatic Continuity**: Each task includes journal summaries from previous work
+- **File Tracking**: See which files were modified by related tasks
+
+See [workflows.md](workflows.md) for more workflow examples and [cli-reference.md](cli-reference.md) for detailed prepare-task documentation.
 
 ## Troubleshooting
 
