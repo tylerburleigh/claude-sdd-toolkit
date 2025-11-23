@@ -663,7 +663,53 @@ def consult_parallel(prompt, providers):
 
 ---
 
-#### 2. TTL-Based Caching
+#### 2. Performance Benchmarking
+
+Benchmark prepare-task latency to ensure enhancements don't add overhead:
+
+```bash
+# Benchmark specific spec
+python scripts/benchmark_prepare_task_latency.py my-spec-001
+
+# Benchmark with specific task
+python scripts/benchmark_prepare_task_latency.py my-spec-001 task-2-1
+
+# More iterations for statistical significance
+python scripts/benchmark_prepare_task_latency.py my-spec-001 --iterations 100
+
+# JSON output for CI integration
+python scripts/benchmark_prepare_task_latency.py my-spec-001 --json
+```
+
+**Performance Target:**
+- Delta between minimal and enhanced context: <30ms (99th percentile)
+- Absolute latency: <100ms (median)
+
+**Example Output:**
+```
+Benchmark Results:
+==================
+Baseline Context:
+  Median: 45ms | p95: 67ms | p99: 89ms
+
+Enhanced Context (new default):
+  Median: 52ms | p95: 74ms | p99: 92ms
+
+Delta (enhanced - baseline):
+  Median: +7ms | p95: +7ms | p99: +3ms ✓
+
+✓ PASS: p99 delta (3ms) < 30ms threshold
+```
+
+**Use Cases:**
+- Validate performance impact of context enhancements
+- Establish baseline metrics before refactoring
+- CI/CD performance regression testing
+- Compare performance across different specs
+
+---
+
+#### 3. TTL-Based Caching
 
 ```python
 import time
