@@ -609,8 +609,11 @@ This section defines the contract for integrating codebase documentation context
     # Freshness metadata (present when available=True)
     "freshness": {
         "generated_at": str,        # ISO timestamp
-        "age_hours": float,         # Hours since generation
-        "is_stale": bool,           # True if age exceeds TTL threshold
+        "generated_at_commit": str, # Git SHA when docs were generated
+        "current_commit": str,      # Current HEAD commit SHA
+        "commits_since": int,       # Number of commits since generation
+        "files_changed": int,       # Files changed since generation
+        "is_stale": bool,           # True if commits_since exceeds threshold
         "stale_reason": Optional[str], # Explanation if stale
         "refresh_recommended": bool # True if refresh would improve quality
     }
@@ -655,9 +658,12 @@ This section defines the contract for integrating codebase documentation context
 | Field | Type | Description |
 |-------|------|-------------|
 | `generated_at` | str | ISO timestamp of doc generation |
-| `age_hours` | float | Hours since generation |
-| `is_stale` | bool | True if age exceeds TTL threshold |
-| `stale_reason` | str\|None | Explanation if stale (e.g., "Documentation is 72 hours old") |
+| `generated_at_commit` | str | Git SHA when documentation was generated |
+| `current_commit` | str | Current HEAD commit SHA |
+| `commits_since` | int | Number of commits since doc generation |
+| `files_changed` | int | Number of files changed since doc generation |
+| `is_stale` | bool | True if commits_since exceeds threshold (default: 10) |
+| `stale_reason` | str\|None | Explanation if stale (e.g., "15 commits since generation") |
 | `refresh_recommended` | bool | True if refresh would improve quality |
 
 ### Gating Rules and Status States
@@ -666,8 +672,8 @@ This section defines the contract for integrating codebase documentation context
 
 | Status | Condition | Behavior |
 |--------|-----------|----------|
-| `"available"` | Docs exist, fresh (age < TTL), query succeeded | Return full context payload |
-| `"stale"` | Docs exist but age ≥ TTL | Return context payload with freshness warning |
+| `"available"` | Docs exist, fresh (commits_since < threshold), query succeeded | Return full context payload |
+| `"stale"` | Docs exist but commits_since ≥ threshold | Return context payload with freshness warning |
 | `"unavailable"` | No docs found or `check_doc_query_available()` failed | Return minimal payload with generation suggestion |
 | `"generating"` | Doc generation in progress (reserved for future) | Return minimal payload with wait message |
 
@@ -685,22 +691,24 @@ def determine_doc_context_status(task_data):
             "message": "No documentation found. Run `sdd doc generate` to enable context gathering."
         }
 
-    # Check freshness
-    generated_at = doc_check["stats"].get("generated_at")
-    if not generated_at:
-        # Missing metadata, treat as available but unknown freshness
+    # Check git-based freshness
+    generated_at_commit = doc_check["stats"].get("generated_at_commit")
+    if not generated_at_commit:
+        # Missing git metadata, treat as available but unknown freshness
         return query_docs_and_build_payload(task_data, is_stale=False)
 
-    age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
-    ttl_hours = get_staleness_ttl()  # See Freshness Policy section
+    # Get current commit and count commits since generation
+    current_commit = get_current_git_commit()
+    commits_since = count_commits_between(generated_at_commit, current_commit)
+    commit_threshold = get_commit_staleness_threshold()  # Default: 10 commits
 
-    is_stale = age_hours >= ttl_hours
+    is_stale = commits_since >= commit_threshold
 
     if is_stale:
         return {
             "available": True,
             "status": "stale",
-            "message": f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h). Consider running `sdd doc generate --refresh`.",
+            "message": f"{commits_since} commits since doc generation (threshold: {commit_threshold}). Consider running `sdd doc generate --refresh`.",
             **query_docs_and_build_payload(task_data, is_stale=True)
         }
 
@@ -708,26 +716,26 @@ def determine_doc_context_status(task_data):
     return {
         "available": True,
         "status": "available",
-        "message": f"Found {result_count} relevant entities from fresh documentation",
+        "message": f"Found {result_count} relevant entities from fresh documentation ({commits_since} commits since generation)",
         **query_docs_and_build_payload(task_data, is_stale=False)
     }
 ```
 
 ### Freshness Policy
 
-#### TTL Thresholds
+#### Commit-Based Thresholds
 
-| Documentation Type | TTL (hours) | Rationale |
-|-------------------|-------------|-----------|
-| **Default** | 48 hours | Balance between freshness and regeneration cost |
-| **Fast-changing repos** | 24 hours | High commit velocity projects |
-| **Stable repos** | 168 hours (7 days) | Infrequent changes, stable APIs |
+| Documentation Type | Commit Threshold | Rationale |
+|-------------------|------------------|-----------|
+| **Default** | 10 commits | Balance between freshness and regeneration cost |
+| **Fast-changing repos** | 5 commits | High commit velocity, frequent changes |
+| **Stable repos** | 25 commits | Infrequent changes, stable APIs |
 
 Configuration via `.claude/sdd_config.json`:
 ```json
 {
   "doc_context": {
-    "staleness_ttl_hours": 48,
+    "staleness_commit_threshold": 10,
     "auto_refresh_on_stale": false,
     "skip_stale_warning": false
   }
@@ -737,21 +745,22 @@ Configuration via `.claude/sdd_config.json`:
 #### Staleness Detection
 
 ```python
-def is_documentation_stale(doc_stats, ttl_hours=48):
+def is_documentation_stale(doc_stats, commit_threshold=10):
     """
-    Determine if documentation is stale based on age.
+    Determine if documentation is stale based on commits since generation.
 
     Returns:
         tuple[bool, str]: (is_stale, reason)
     """
-    generated_at = doc_stats.get("generated_at")
-    if not generated_at:
-        return (False, "Unknown generation time")
+    generated_at_commit = doc_stats.get("generated_at_commit")
+    if not generated_at_commit:
+        return (False, "Unknown generation commit")
 
-    age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
+    current_commit = get_current_git_commit()
+    commits_since = count_commits_between(generated_at_commit, current_commit)
 
-    if age_hours >= ttl_hours:
-        return (True, f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h)")
+    if commits_since >= commit_threshold:
+        return (True, f"{commits_since} commits since doc generation (threshold: {commit_threshold})")
 
     return (False, None)
 ```
@@ -760,12 +769,13 @@ def is_documentation_stale(doc_stats, ttl_hours=48):
 
 Documentation should be regenerated when:
 
-1. **Age-based**: Documentation age exceeds TTL threshold
-2. **Content-based**: Significant code changes detected
-   - New files added in tracked directories
-   - Major refactoring (>20% of files modified)
-   - Dependency changes (package.json, requirements.txt modified)
-3. **Manual**: User runs `sdd doc generate --force`
+1. **Commit-based**: Commits since generation exceed threshold (default: 10)
+2. **File-based**: Significant code changes detected
+   - New Python/JS/etc files added in tracked directories
+   - Major refactoring (>20% of tracked files modified)
+   - Dependency changes (package.json, requirements.txt, pyproject.toml modified)
+3. **Branch-based**: Switched to different branch since generation
+4. **Manual**: User runs `sdd doc generate --force`
 
 #### Refresh Strategies
 
@@ -805,13 +815,16 @@ Documentation should be regenerated when:
 {
     "available": True,
     "status": "stale",
-    "message": "Documentation is 72.3 hours old (threshold: 48h). Results may be outdated.",
+    "message": "15 commits since doc generation (threshold: 10). Results may be outdated.",
     "suggested_files": [...],  # Include results despite staleness
     "freshness": {
         "generated_at": "2025-11-21T12:00:00Z",
-        "age_hours": 72.3,
+        "generated_at_commit": "abc123def456",
+        "current_commit": "789ghi012jkl",
+        "commits_since": 15,
+        "files_changed": 42,
         "is_stale": True,
-        "stale_reason": "Documentation is 72.3 hours old (threshold: 48h)",
+        "stale_reason": "15 commits since doc generation (threshold: 10)",
         "refresh_recommended": True
     },
     "telemetry": {...}
@@ -921,28 +934,34 @@ def build_doc_context_payload(context_data, query_time_ms, task_data):
     """
     doc_stats = context_data.get("metadata", {})
     generated_at = doc_stats.get("generated_at")
+    generated_at_commit = doc_stats.get("generated_at_commit")
 
-    # Calculate freshness
+    # Calculate git-based freshness
     freshness = None
     is_stale = False
-    if generated_at:
-        age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
-        ttl_hours = get_staleness_ttl()
-        is_stale = age_hours >= ttl_hours
+    if generated_at_commit:
+        current_commit = get_current_git_commit()
+        commits_since = count_commits_between(generated_at_commit, current_commit)
+        files_changed = count_files_changed_between(generated_at_commit, current_commit)
+        commit_threshold = get_commit_staleness_threshold()
+        is_stale = commits_since >= commit_threshold
 
         freshness = {
             "generated_at": generated_at,
-            "age_hours": round(age_hours, 1),
+            "generated_at_commit": generated_at_commit,
+            "current_commit": current_commit,
+            "commits_since": commits_since,
+            "files_changed": files_changed,
             "is_stale": is_stale,
-            "stale_reason": f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h)" if is_stale else None,
+            "stale_reason": f"{commits_since} commits since doc generation (threshold: {commit_threshold})" if is_stale else None,
             "refresh_recommended": is_stale
         }
 
     # Determine status
     status = "stale" if is_stale else "available"
     message = (
-        f"Documentation is {freshness['age_hours']}h old. Consider refreshing." if is_stale
-        else f"Found {len(context_data['suggested_files'])} relevant files from fresh documentation"
+        f"{freshness['commits_since']} commits since doc generation. Consider refreshing." if is_stale
+        else f"Found {len(context_data['suggested_files'])} relevant files ({freshness['commits_since']} commits since generation)"
     )
 
     return {
@@ -1009,7 +1028,7 @@ Add to `.claude/sdd_config.json`:
 {
   "doc_context": {
     "enabled": true,
-    "staleness_ttl_hours": 48,
+    "staleness_commit_threshold": 10,
     "auto_refresh_on_stale": false,
     "skip_stale_warning": false,
     "max_suggested_files": 20,
@@ -1026,22 +1045,48 @@ Add to `.claude/sdd_config.json`:
 | Scenario | Expected Behavior |
 |----------|-------------------|
 | Docs never generated | `status: "unavailable"`, suggest generation |
-| Docs fresh (<48h) | `status: "available"`, full payload |
-| Docs stale (≥48h) | `status: "stale"`, full payload with warning |
+| Docs fresh (<10 commits) | `status: "available"`, full payload with commit count |
+| Docs stale (≥10 commits) | `status: "stale"`, full payload with freshness warning |
 | Query timeout | `status: "unavailable"`, graceful degradation |
 | Empty results | `status: "available"`, empty lists, message indicates no matches |
 | Task with file_path | Include `test_context` field |
 | Task without file_path | Omit `test_context` field |
+| Non-git repository | Treat as fresh (missing commit metadata) |
+
+### Design Decision: Git-Based vs Time-Based Freshness
+
+**Decision:** Use git commit history for freshness detection instead of time-based TTL.
+
+**Rationale:**
+1. **Accuracy**: Documentation staleness should reflect code changes, not arbitrary time periods
+2. **Efficiency**: Stable repos won't regenerate unnecessarily
+3. **Responsiveness**: Active repos get fresh docs immediately when commits accumulate
+4. **Provenance**: Git SHA provides precise tracking of what code version docs represent
+5. **CI/CD friendly**: Integrates naturally with git-based workflows
+
+**Trade-offs accepted:**
+- Requires git integration (gracefully degrades if unavailable)
+- Slightly more complex implementation than time-based
+- Needs configuration tuning per repo velocity (5-25 commit threshold range)
+
+**Fallback behavior:**
+- Non-git repositories: Treat as fresh (missing commit metadata)
+- Git metadata missing: Treat as available but unknown freshness
+- Git command failures: Log error, treat as fresh
 
 ### Implementation Checklist
 
 - [ ] Add `doc_context` field to prepare-task contract extraction
 - [ ] Implement `build_task_description()` helper
 - [ ] Implement `build_doc_context_payload()` helper
-- [ ] Implement `get_staleness_ttl()` config reader
-- [ ] Add freshness calculation logic
+- [ ] Implement `get_commit_staleness_threshold()` config reader
+- [ ] Implement `get_current_git_commit()` helper
+- [ ] Implement `count_commits_between(commit_a, commit_b)` helper
+- [ ] Implement `count_files_changed_between(commit_a, commit_b)` helper
+- [ ] Add git-based freshness calculation logic
 - [ ] Add gating logic for status determination
 - [ ] Add telemetry tracking
+- [ ] Store git commit SHA when generating docs (`sdd doc generate`)
 - [ ] Update contract tests for new schema
 - [ ] Document agent consumption patterns in sdd-next SKILL.md
 

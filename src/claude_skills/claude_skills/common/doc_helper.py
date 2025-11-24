@@ -8,8 +8,90 @@ These functions enable proactive documentation generation and context gathering.
 import json
 import subprocess
 import shutil
-from typing import Optional
+from typing import Optional, Tuple
 from pathlib import Path
+
+
+def get_current_git_commit(project_root: str = ".") -> Optional[str]:
+    """
+    Get the current HEAD commit SHA.
+
+    Args:
+        project_root: Root directory of the project
+
+    Returns:
+        str | None: Full commit SHA or None if not a git repo
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return proc.stdout.strip()
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return None
+
+
+def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+    """
+    Count commits between two git commits.
+
+    Args:
+        commit_a: Earlier commit SHA (e.g., when docs were generated)
+        commit_b: Later commit SHA (e.g., current HEAD)
+        project_root: Root directory of the project
+
+    Returns:
+        int: Number of commits between commit_a and commit_b (0 if error)
+    """
+    try:
+        # Use git rev-list to count commits
+        proc = subprocess.run(
+            ["git", "rev-list", "--count", f"{commit_a}..{commit_b}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return int(proc.stdout.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError, Exception):
+        pass
+    return 0
+
+
+def count_files_changed_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+    """
+    Count files changed between two git commits.
+
+    Args:
+        commit_a: Earlier commit SHA
+        commit_b: Later commit SHA
+        project_root: Root directory of the project
+
+    Returns:
+        int: Number of files changed (0 if error)
+    """
+    try:
+        # Use git diff to count changed files
+        proc = subprocess.run(
+            ["git", "diff", "--name-only", commit_a, commit_b],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            files = [line for line in proc.stdout.strip().split('\n') if line]
+            return len(files)
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return 0
 
 
 def check_doc_query_available() -> dict:
@@ -101,53 +183,101 @@ def check_sdd_integration_available() -> bool:
     return shutil.which("sdd-integration") is not None
 
 
-def get_task_context_from_docs(task_description: str, project_root: str = ".") -> Optional[dict]:
+def get_task_context_from_docs(
+    task_description: str,
+    project_root: str = ".",
+    file_path: Optional[str] = None,
+    spec_id: Optional[str] = None
+) -> Optional[dict]:
     """
-    Get task-relevant context from codebase documentation.
+    Get task-relevant context from codebase documentation with provenance metadata.
 
     Args:
         task_description: Description of the task to find context for
         project_root: Root directory of the project (default: current dir)
+        file_path: Optional specific file path to focus context on
+        spec_id: Optional spec ID for additional context
 
     Returns:
         dict | None: {
             "files": list[str],          # Suggested relevant files
             "dependencies": list[str],   # Related dependencies
             "similar": list[str],        # Similar implementations
-            "complexity": dict           # Complexity insights
+            "complexity": dict,          # Complexity insights
+            "provenance": {              # Metadata about doc source
+                "source_doc_id": str,    # Documentation location
+                "generated_at": str,     # ISO timestamp
+                "generated_at_commit": str,  # Git SHA when docs generated
+                "freshness_ms": int      # Query execution time
+            }
         } or None if unavailable
 
     Example:
-        >>> context = get_task_context_from_docs("implement JWT auth")
+        >>> context = get_task_context_from_docs(
+        ...     "implement JWT auth",
+        ...     file_path="src/auth.py"
+        ... )
         >>> if context:
         ...     print(f"Check these files: {context['files']}")
+        ...     print(f"Freshness: {context['provenance']['freshness_ms']}ms")
     """
     if not check_sdd_integration_available():
         return None
 
     try:
+        import time
+        start_time = time.time()
+
+        # Build command with optional parameters
+        cmd = ["sdd-integration", "task-context", task_description]
+        if file_path:
+            cmd.extend(["--file-path", file_path])
+        if spec_id:
+            cmd.extend(["--spec-id", spec_id])
+
         # Execute sdd-integration task-context command
         proc = subprocess.run(
-            ["sdd-integration", "task-context", task_description],
+            cmd,
             capture_output=True,
             text=True,
             timeout=30,
             cwd=project_root
         )
 
+        query_time_ms = int((time.time() - start_time) * 1000)
+
         if proc.returncode == 0:
             # Parse JSON output
             try:
                 context = json.loads(proc.stdout)
+
+                # Add provenance metadata
+                doc_check = check_doc_query_available()
+                generated_at = doc_check.get("stats", {}).get("generated_at")
+                generated_at_commit = doc_check.get("stats", {}).get("generated_at_commit")
+
+                context["provenance"] = {
+                    "source_doc_id": doc_check.get("location", "unknown"),
+                    "generated_at": generated_at,
+                    "generated_at_commit": generated_at_commit,
+                    "freshness_ms": query_time_ms
+                }
+
                 return context
             except json.JSONDecodeError:
-                # If not JSON, return structured text
+                # If not JSON, return structured text with provenance
                 return {
                     "files": [],
                     "dependencies": [],
                     "similar": [],
                     "complexity": {},
-                    "raw_output": proc.stdout
+                    "raw_output": proc.stdout,
+                    "provenance": {
+                        "source_doc_id": "unknown",
+                        "generated_at": None,
+                        "generated_at_commit": None,
+                        "freshness_ms": query_time_ms
+                    }
                 }
         else:
             return None

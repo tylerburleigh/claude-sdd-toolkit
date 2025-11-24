@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-doc-context-2025-11-24-001",
   "title": "Enhance prepare-task with automatic doc context",
   "generated": "2025-11-24T00:00:00Z",
-  "last_updated": "2025-11-24T15:35:16.514717Z",
+  "last_updated": "2025-11-24T15:45:04.814592Z",
   "metadata": {
     "description": "Enable sdd prepare-task to automatically pull scoped codebase documentation for referenced files when docs are fresh, delivering file-specific guidance in a single call.",
     "objectives": [
@@ -19,8 +19,8 @@
       "Doc freshness threshold (<=24h) is enforced so stale docs skip context output",
       "sdd-integration task-context command is available in PATH"
     ],
-    "progress_percentage": 33,
-    "current_phase": "phase-1-doc-readiness"
+    "progress_percentage": 50,
+    "current_phase": "phase-2-integration"
   },
   "hierarchy": {
     "spec-root": {
@@ -35,7 +35,7 @@
         "phase-3-validation"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Ship richer default prepare-task responses without extra commands.",
         "estimated_hours": 32
@@ -115,7 +115,7 @@
         "completed_at": "2025-11-24T15:35:16.511144Z",
         "needs_journaling": false,
         "actual_hours": 0.055,
-        "journaled_at": "2025-11-24T15:35:16.513086Z"
+        "journaled_at": "2025-11-24T15:39:39.263758Z"
       },
       "dependencies": {
         "depends": [
@@ -129,14 +129,14 @@
       "id": "phase-2-integration",
       "type": "phase",
       "title": "Implementation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "task-2-1",
         "task-2-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Extend helpers and wire prepare-task to emit doc context",
         "estimated_hours": 14
@@ -147,11 +147,11 @@
       "id": "task-2-1",
       "type": "task",
       "title": "Extend doc helper command inputs",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-integration",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 7,
@@ -160,7 +160,13 @@
           "Allow file_path + spec_id flags for sdd-integration task-context",
           "Normalize response into structured fields",
           "Return provenance metadata and user-facing summary (source_doc_id, generated_at, freshness_ms)"
-        ]
+        ],
+        "started_at": "2025-11-24T15:42:28.688047Z",
+        "status_note": "Starting implementation of doc helper extensions with git-based freshness",
+        "completed_at": "2025-11-24T15:45:04.811489Z",
+        "needs_journaling": false,
+        "actual_hours": 0.043,
+        "journaled_at": "2025-11-24T15:45:04.813860Z"
       },
       "dependencies": {
         "depends": [
@@ -306,6 +312,24 @@
       "content": "All child tasks in phase phase-1-doc-readiness have been completed.",
       "metadata": {},
       "task_id": "phase-1-doc-readiness"
+    },
+    {
+      "timestamp": "2025-11-24T15:39:39.263749Z",
+      "entry_type": "decision",
+      "title": "Switch to git-based freshness",
+      "author": "claude-code",
+      "content": "Design revision: Changed freshness detection from time-based (48h TTL) to git-based (10 commit threshold). Rationale: Docs should be stale when code changes, not based on arbitrary time. Benefits: more accurate, efficient for stable repos, responsive for active repos, better provenance. Trade-offs: requires git integration (gracefully degrades), slightly more complex. Updated schema, gating rules, and implementation checklist to reflect git-based approach with commits_since, files_changed, and commit SHAs.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-24T15:45:04.813855Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Extend doc helper command inputs",
+      "author": "claude-code",
+      "content": "Successfully extended doc helper command inputs with git-based freshness and provenance metadata.\n\nImplementation completed:\n1. Added 3 git helper functions to doc_helper.py:\n   - get_current_git_commit(): Returns current HEAD commit SHA\n   - count_commits_between(commit_a, commit_b): Counts commits in range  \n   - count_files_changed_between(commit_a, commit_b): Counts changed files\n   \n2. Extended get_task_context_from_docs() function with new parameters:\n   - Added file_path parameter for focused context\n   - Added spec_id parameter for additional context\n   - Added provenance metadata in response: source_doc_id, generated_at, generated_at_commit, freshness_ms\n   - Added query timing measurement\n\n3. Updated sdd-integration CLI (sdd_integration.py):\n   - Added argparse for proper flag handling\n   - Added --file-path flag support\n   - Added --spec-id flag support  \n   - Added --json flag for JSON output\n   - Implemented QueryResult serialization for JSON output\n\nTesting performed:\n- Verified JSON output works (sdd-integration task-context 'test' --json)\n- Verified --file-path flag works (returns target_file in response)\n- Verified git helpers work correctly (tested with current commit and HEAD~5 range)\n- Verified provenance metadata structure (returns freshness_ms, source_doc_id)\n\nFiles modified:\n- src/claude_skills/claude_skills/common/doc_helper.py (+95 lines: git helpers + extended function)\n- src/claude_skills/claude_skills/doc_query/sdd_integration.py (+48 lines: argparse + JSON serialization)\n\nNote: generated_at_commit currently returns None because doc generation doesn't store it yet - this will be addressed when sdd doc generate is updated to capture commit SHA (future task).\n\nReady for task-2-2 which will wire this into prepare_task().",
+      "metadata": {},
+      "task_id": "task-2-1"
     }
   ]
 }

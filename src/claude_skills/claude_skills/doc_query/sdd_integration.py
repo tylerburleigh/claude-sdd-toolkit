@@ -389,11 +389,13 @@ def get_impact_analysis(module_path: str, docs_path: Optional[str] = None) -> Di
 def main():
     """Main CLI entry point for sdd-integration commands."""
     import sys
+    import argparse
 
     if len(sys.argv) < 2:
         print("Usage: sdd-integration <command> [args...]")
         print("\nCommands:")
-        print("  task-context <description>     Get context for a task")
+        print("  task-context <description> [--file-path PATH] [--spec-id ID] [--json]")
+        print("               Get context for a task with optional file/spec focus")
         print("  suggest-files <description>    Suggest files for a task")
         print("  similar <feature>              Find similar implementations")
         print("  test-context <module>          Get test context for module")
@@ -403,12 +405,58 @@ def main():
     command = sys.argv[1]
 
     if command == 'task-context' and len(sys.argv) >= 3:
-        task_desc = ' '.join(sys.argv[2:])
-        context = get_task_context(task_desc)
-        print(f"\nTask: {task_desc}")
-        print(f"\nSuggested files ({len(context['suggested_files'])}):")
-        for f in context['suggested_files']:
-            print(f"  - {f}")
+        # Parse task-context with optional flags
+        parser = argparse.ArgumentParser(description='Get task context from documentation')
+        parser.add_argument('command', help='Command (task-context)')
+        parser.add_argument('description', nargs='+', help='Task description')
+        parser.add_argument('--file-path', type=str, help='Optional file path to focus context on')
+        parser.add_argument('--spec-id', type=str, help='Optional spec ID for additional context')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
+
+        args = parser.parse_args()
+        task_desc = ' '.join(args.description)
+
+        # Get context from SDDContextGatherer
+        gatherer = SDDContextGatherer()
+        context = gatherer.get_task_context(task_desc)
+
+        # Add file path and spec id to context if provided
+        if args.file_path:
+            context['target_file'] = args.file_path
+        if args.spec_id:
+            context['spec_id'] = args.spec_id
+
+        if args.json:
+            # Convert QueryResult objects to dicts for JSON serialization
+            import json
+
+            # Convert relevant_classes, relevant_functions, relevant_modules to dicts
+            serializable_context = {
+                'task_description': context['task_description'],
+                'keywords': context['keywords'],
+                'relevant_classes': [r.data for r in context['relevant_classes']],
+                'relevant_functions': [r.data for r in context['relevant_functions']],
+                'relevant_modules': [r.data for r in context['relevant_modules']],
+                'dependencies': [d.data if hasattr(d, 'data') else str(d) for d in context['dependencies']],
+                'suggested_files': context['suggested_files'],
+                'module_summaries': context['module_summaries'],
+                'statistics': context.get('statistics', {}),
+                'metadata': context.get('metadata', {})
+            }
+
+            # Add optional fields if present
+            if args.file_path:
+                serializable_context['target_file'] = args.file_path
+            if args.spec_id:
+                serializable_context['spec_id'] = args.spec_id
+
+            print(json.dumps(serializable_context, indent=2))
+        else:
+            # Original text format
+            print(f"\nTask: {task_desc}")
+            print(f"\nSuggested files ({len(context['suggested_files'])}):")
+            for f in context['suggested_files']:
+                print(f"  - {f}")
 
     elif command == 'suggest-files' and len(sys.argv) >= 3:
         task_desc = ' '.join(sys.argv[2:])
