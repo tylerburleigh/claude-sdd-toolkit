@@ -92,12 +92,16 @@ IMPORTANT SECURITY NOTE: This session is running in read-only mode with the foll
 OPENCODE_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
         id="default",
-        display_name="OpenCode AI Default",
+        display_name="OpenCode AI (configurable via OpenCode settings)",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
         },
-        routing_hints={"configurable": True, "source": "ai_config.yaml"},
+        routing_hints={
+            "configurable": True,
+            "source": "opencode config",
+            "note": "Accepts any model ID - validated by opencode CLI",
+        },
     ),
 ]
 
@@ -277,15 +281,9 @@ class OpenCodeProvider(ProviderContext):
                 provider=self.metadata.provider_name,
             )
 
-        # Validate against the list of supported models
-        available = {descriptor.id for descriptor in self.metadata.models}
-        if candidate not in available:
-            available_str = ", ".join(sorted(available))
-            raise ProviderExecutionError(
-                f"Model '{candidate}' is not supported. Available models: {available_str}",
-                provider=self.metadata.provider_name,
-            )
-
+        # For opencode, we accept any model ID and let opencode CLI validate it
+        # This avoids maintaining a hardcoded list that would become stale
+        # opencode CLI supports many models across providers (OpenAI, Anthropic, etc.)
         return candidate
 
     def _is_port_open(self, port: int, host: str = "localhost") -> bool:

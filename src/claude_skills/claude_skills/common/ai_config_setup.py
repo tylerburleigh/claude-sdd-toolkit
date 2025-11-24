@@ -51,7 +51,7 @@ models:
       - composer-1
   codex:
     priority:
-      - gpt-5-codex
+      - gpt-5.1-codex
 
 run-tests:
   models:

@@ -41,29 +41,32 @@ def _payload(content: str = "OpenCode output", model: str = "default") -> str:
     lines = []
 
     # Stream chunk
-    lines.append(json.dumps({
-        "type": "chunk",
-        "content": content
-    }))
+    lines.append(json.dumps({"type": "chunk", "content": content}))
 
     # Final done message
-    lines.append(json.dumps({
-        "type": "done",
-        "response": {
-            "text": content,
-            "model": model,
-            "usage": {
-                "prompt_tokens": 10,
-                "completion_tokens": 50,
-                "total_tokens": 60
+    lines.append(
+        json.dumps(
+            {
+                "type": "done",
+                "response": {
+                    "text": content,
+                    "model": model,
+                    "usage": {
+                        "prompt_tokens": 10,
+                        "completion_tokens": 50,
+                        "total_tokens": 60,
+                    },
+                },
             }
-        }
-    }))
+        )
+    )
 
     return "\n".join(lines)
 
 
-def test_opencode_provider_executes_command_with_json_stdin(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_opencode_provider_executes_command_with_json_stdin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that OpenCode provider executes wrapper with JSON payload via stdin."""
     captured: Dict[str, object] = {}
     stream_chunks: List[str] = []
@@ -76,11 +79,16 @@ def test_opencode_provider_executes_command_with_json_stdin(monkeypatch: pytest.
         return FakeProcess(stdout=_payload())
 
     # Mock server already running (port open)
-    monkeypatch.setattr("claude_skills.common.providers.opencode.OpenCodeProvider._is_port_open", lambda self, port, host="localhost": True)
+    monkeypatch.setattr(
+        "claude_skills.common.providers.opencode.OpenCodeProvider._is_port_open",
+        lambda self, port, host="localhost": True,
+    )
 
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
-        ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
+        ProviderHooks(
+            on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)
+        ),
         model="default",
         runner=runner,
         binary="node",
@@ -122,7 +130,7 @@ def test_prepare_subprocess_env_merges_environments() -> None:
         OPENCODE_METADATA,
         ProviderHooks(),
         runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
-        env={"OPENCODE_API_KEY": "test-key", "CUSTOM_VAR": "value"}
+        env={"OPENCODE_API_KEY": "test-key", "CUSTOM_VAR": "value"},
     )
 
     # Verify environment was merged
@@ -138,7 +146,7 @@ def test_prepare_subprocess_env_preserves_server_url() -> None:
         OPENCODE_METADATA,
         ProviderHooks(),
         runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
-        env={"OPENCODE_SERVER_URL": custom_url}
+        env={"OPENCODE_SERVER_URL": custom_url},
     )
 
     assert provider._env["OPENCODE_SERVER_URL"] == custom_url
@@ -188,12 +196,16 @@ def test_is_port_open_handles_socket_error() -> None:
 
     # Mock socket to raise error
     with patch("socket.socket") as mock_socket_class:
-        mock_socket_class.return_value.__enter__.side_effect = socket.error("Connection refused")
+        mock_socket_class.return_value.__enter__.side_effect = socket.error(
+            "Connection refused"
+        )
 
         assert provider._is_port_open(4096) is False
 
 
-def test_ensure_server_running_skips_if_port_open(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ensure_server_running_skips_if_port_open(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that _ensure_server_running skips startup if server already running."""
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -209,13 +221,15 @@ def test_ensure_server_running_skips_if_port_open(monkeypatch: pytest.MonkeyPatc
     assert provider._server_process is None
 
 
-def test_ensure_server_running_passes_environment_to_server(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ensure_server_running_passes_environment_to_server(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that _ensure_server_running passes environment variables to server process."""
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
         ProviderHooks(),
         runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
-        env={"OPENCODE_API_KEY": "test-key"}
+        env={"OPENCODE_API_KEY": "test-key"},
     )
 
     # Track what environment was passed to Popen
@@ -235,6 +249,7 @@ def test_ensure_server_running_passes_environment_to_server(monkeypatch: pytest.
         with patch("time.sleep"):  # Skip sleep
             # Mock port as open after startup
             call_count = [0]
+
             def mock_port_check(port, host="localhost"):
                 call_count[0] += 1
                 return call_count[0] > 1  # Second call returns True
@@ -248,7 +263,9 @@ def test_ensure_server_running_passes_environment_to_server(monkeypatch: pytest.
     assert "OPENCODE_SERVER_URL" in captured_env
 
 
-def test_ensure_server_running_raises_if_binary_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ensure_server_running_raises_if_binary_not_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that _ensure_server_running raises error if opencode binary not found."""
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -267,7 +284,9 @@ def test_ensure_server_running_raises_if_binary_not_found(monkeypatch: pytest.Mo
         assert "binary not found" in str(excinfo.value)
 
 
-def test_ensure_server_running_raises_timeout_if_server_fails_to_start(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ensure_server_running_raises_timeout_if_server_fails_to_start(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that _ensure_server_running raises timeout if server doesn't start."""
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -331,7 +350,9 @@ def test_provider_handles_non_zero_exit_code() -> None:
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
         ProviderHooks(),
-        runner=lambda *args, **kwargs: FakeProcess(returncode=1, stderr="Wrapper crashed"),
+        runner=lambda *args, **kwargs: FakeProcess(
+            returncode=1, stderr="Wrapper crashed"
+        ),
     )
 
     # Mock server already running
@@ -369,14 +390,18 @@ def test_create_provider_injects_custom_runner_and_env() -> None:
         assert result.model_fqn == "opencode:default"
 
 
-def test_is_opencode_available_checks_node_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_is_opencode_available_checks_node_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that availability check verifies Node.js runtime."""
     # Mock Node.js not found
     with patch("subprocess.run", side_effect=FileNotFoundError):
         assert is_opencode_available() is False
 
 
-def test_is_opencode_available_checks_wrapper_script(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_is_opencode_available_checks_wrapper_script(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that availability check verifies wrapper script exists."""
     # Mock Node.js OK, wrapper missing
     with patch("subprocess.run", return_value=FakeProcess(returncode=0)):
@@ -384,10 +409,13 @@ def test_is_opencode_available_checks_wrapper_script(monkeypatch: pytest.MonkeyP
             assert is_opencode_available() is False
 
 
-def test_is_opencode_available_checks_sdk_and_binary(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_is_opencode_available_checks_sdk_and_binary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that availability check verifies SDK and opencode binary."""
     # Mock Node.js OK, wrapper exists
     with patch("subprocess.run", return_value=FakeProcess(returncode=0)):
+
         def mock_exists(self):
             # Wrapper exists, SDK exists, binary in node_modules
             path_str = str(self)
@@ -403,8 +431,11 @@ def test_is_opencode_available_checks_sdk_and_binary(monkeypatch: pytest.MonkeyP
             assert is_opencode_available() is True
 
 
-def test_is_opencode_available_checks_global_binary(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_is_opencode_available_checks_global_binary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that availability check falls back to global opencode binary."""
+
     # Mock Node.js OK, wrapper exists, SDK exists, binary in PATH
     def mock_run(command, **kwargs):
         if command[0] == "node":
@@ -414,6 +445,7 @@ def test_is_opencode_available_checks_global_binary(monkeypatch: pytest.MonkeyPa
         return FakeProcess(returncode=1)
 
     with patch("subprocess.run", side_effect=mock_run):
+
         def mock_exists(self):
             path_str = str(self)
             # Wrapper and SDK exist, but not local binary
@@ -435,20 +467,28 @@ def test_provider_parses_multiple_chunks() -> None:
         json.dumps({"type": "chunk", "content": "Part 1 "}),
         json.dumps({"type": "chunk", "content": "Part 2 "}),
         json.dumps({"type": "chunk", "content": "Part 3"}),
-        json.dumps({
-            "type": "done",
-            "response": {
-                "text": "Part 1 Part 2 Part 3",
-                "model": "default",
-                "usage": {"prompt_tokens": 10, "completion_tokens": 15, "total_tokens": 25}
+        json.dumps(
+            {
+                "type": "done",
+                "response": {
+                    "text": "Part 1 Part 2 Part 3",
+                    "model": "default",
+                    "usage": {
+                        "prompt_tokens": 10,
+                        "completion_tokens": 15,
+                        "total_tokens": 25,
+                    },
+                },
             }
-        }),
+        ),
     ]
 
     stream_chunks: List[str] = []
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
-        ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
+        ProviderHooks(
+            on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)
+        ),
         runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
     )
 
@@ -464,14 +504,16 @@ def test_provider_parses_multiple_chunks() -> None:
 
 def test_provider_handles_missing_token_usage() -> None:
     """Test that provider handles responses without token usage gracefully."""
-    response = json.dumps({
-        "type": "done",
-        "response": {
-            "text": "Response without usage",
-            "model": "default"
-            # No usage field
+    response = json.dumps(
+        {
+            "type": "done",
+            "response": {
+                "text": "Response without usage",
+                "model": "default",
+                # No usage field
+            },
         }
-    })
+    )
 
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -490,14 +532,20 @@ def test_provider_handles_missing_token_usage() -> None:
 
 def test_provider_extracts_text_from_done_message_only() -> None:
     """Test that provider extracts text when only done message is present (no chunks)."""
-    response = json.dumps({
-        "type": "done",
-        "response": {
-            "text": "Complete response",
-            "model": "gpt-5.1-codex-mini",
-            "usage": {"prompt_tokens": 5, "completion_tokens": 10, "total_tokens": 15}
+    response = json.dumps(
+        {
+            "type": "done",
+            "response": {
+                "text": "Complete response",
+                "model": "gpt-5.1-codex",
+                "usage": {
+                    "prompt_tokens": 5,
+                    "completion_tokens": 10,
+                    "total_tokens": 15,
+                },
+            },
         }
-    })
+    )
 
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -519,20 +567,28 @@ def test_provider_handles_empty_chunks_gracefully() -> None:
         json.dumps({"type": "chunk", "content": ""}),
         json.dumps({"type": "chunk", "content": "Actual content"}),
         json.dumps({"type": "chunk", "content": ""}),
-        json.dumps({
-            "type": "done",
-            "response": {
-                "text": "Actual content",
-                "model": "default",
-                "usage": {"prompt_tokens": 5, "completion_tokens": 5, "total_tokens": 10}
+        json.dumps(
+            {
+                "type": "done",
+                "response": {
+                    "text": "Actual content",
+                    "model": "default",
+                    "usage": {
+                        "prompt_tokens": 5,
+                        "completion_tokens": 5,
+                        "total_tokens": 10,
+                    },
+                },
             }
-        }),
+        ),
     ]
 
     stream_chunks: List[str] = []
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
-        ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
+        ProviderHooks(
+            on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)
+        ),
         runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
     )
 
@@ -545,18 +601,20 @@ def test_provider_handles_empty_chunks_gracefully() -> None:
 
 def test_provider_extracts_model_from_response_metadata() -> None:
     """Test that provider extracts model information from response metadata."""
-    response = json.dumps({
-        "type": "done",
-        "response": {
-            "text": "Response",
-            "model": "gpt-5.1-codex",
-            "usage": {
-                "prompt_tokens": 10,
-                "completion_tokens": 20,
-                "total_tokens": 30,
-            }
+    response = json.dumps(
+        {
+            "type": "done",
+            "response": {
+                "text": "Response",
+                "model": "gpt-5.1-codex",
+                "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 20,
+                    "total_tokens": 30,
+                },
+            },
         }
-    })
+    )
 
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -572,18 +630,33 @@ def test_provider_extracts_model_from_response_metadata() -> None:
     assert result.usage.output_tokens == 20
 
 
-def test_provider_validates_unsupported_model() -> None:
-    """Test that provider raises error for unsupported model."""
-    with pytest.raises(ProviderExecutionError) as excinfo:
-        OpenCodeProvider(
-            OPENCODE_METADATA,
-            ProviderHooks(),
-            model="unsupported-model",
-            runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
-        )
+def test_provider_accepts_any_model_id() -> None:
+    """Test that provider accepts any non-empty model ID (validation delegated to opencode CLI)."""
+    # Should not raise - opencode CLI will validate the model
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        model="openai/gpt-5.1-codex-mini",  # Any model ID should be accepted
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload(model="openai/gpt-5.1-codex-mini")),
+    )
 
-    assert "unsupported-model" in str(excinfo.value).lower()
-    assert "available" in str(excinfo.value).lower()
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test"))
+        assert result.model_fqn == "opencode:openai/gpt-5.1-codex-mini"
+
+
+def test_provider_uses_default_model_when_empty() -> None:
+    """Test that provider falls back to default model when model is empty."""
+    # Empty model should fall back to default
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        model="",  # Empty model falls back to default
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    # Should use default model
+    assert provider._model == "default"
 
 
 def test_provider_calls_before_execute_hook() -> None:
@@ -615,7 +688,9 @@ def test_provider_calls_after_result_hook() -> None:
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
         ProviderHooks(after_result=after_hook),
-        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload(content="Generated content")),
+        runner=lambda *args, **kwargs: FakeProcess(
+            stdout=_payload(content="Generated content")
+        ),
     )
 
     with patch.object(provider, "_ensure_server_running"):
@@ -634,14 +709,20 @@ def test_provider_calls_on_stream_chunk_hook() -> None:
     chunks = [
         json.dumps({"type": "chunk", "content": "First"}),
         json.dumps({"type": "chunk", "content": "Second"}),
-        json.dumps({
-            "type": "done",
-            "response": {
-                "text": "FirstSecond",
-                "model": "default",
-                "usage": {"prompt_tokens": 5, "completion_tokens": 10, "total_tokens": 15}
+        json.dumps(
+            {
+                "type": "done",
+                "response": {
+                    "text": "FirstSecond",
+                    "model": "default",
+                    "usage": {
+                        "prompt_tokens": 5,
+                        "completion_tokens": 10,
+                        "total_tokens": 15,
+                    },
+                },
             }
-        }),
+        ),
     ]
 
     provider = OpenCodeProvider(
@@ -671,14 +752,20 @@ def test_provider_calls_hooks_in_correct_order() -> None:
 
     chunks = [
         json.dumps({"type": "chunk", "content": "chunk1"}),
-        json.dumps({
-            "type": "done",
-            "response": {
-                "text": "chunk1",
-                "model": "default",
-                "usage": {"prompt_tokens": 5, "completion_tokens": 5, "total_tokens": 10}
+        json.dumps(
+            {
+                "type": "done",
+                "response": {
+                    "text": "chunk1",
+                    "model": "default",
+                    "usage": {
+                        "prompt_tokens": 5,
+                        "completion_tokens": 5,
+                        "total_tokens": 10,
+                    },
+                },
             }
-        }),
+        ),
     ]
 
     provider = OpenCodeProvider(
@@ -686,7 +773,7 @@ def test_provider_calls_hooks_in_correct_order() -> None:
         ProviderHooks(
             before_execute=before_hook,
             on_stream_chunk=stream_hook,
-            after_result=after_hook
+            after_result=after_hook,
         ),
         runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
     )
@@ -756,7 +843,9 @@ def test_cleanup_config_file_removes_temp_files() -> None:
     assert provider._config_file_path is None
 
 
-def test_ensure_server_running_creates_config_and_sets_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ensure_server_running_creates_config_and_sets_env_var(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that _ensure_server_running creates config file and sets OPENCODE_CONFIG env var."""
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
@@ -777,6 +866,7 @@ def test_ensure_server_running_creates_config_and_sets_env_var(monkeypatch: pyte
 
     # Mock port closed initially, then open
     call_count = [0]
+
     def mock_port_check(port, host="localhost"):
         call_count[0] += 1
         return call_count[0] > 1

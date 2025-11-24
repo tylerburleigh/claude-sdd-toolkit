@@ -9,7 +9,7 @@ def test_parse_model_override_returns_none_when_absent() -> None:
 
 
 def test_parse_model_override_handles_global_value() -> None:
-    assert cli._parse_model_override(["gpt-5-codex"]) == "gpt-5-codex"
+    assert cli._parse_model_override(["gpt-5.1-codex"]) == "gpt-5.1-codex"
 
 
 def test_parse_model_override_handles_per_tool_entries() -> None:

@@ -245,8 +245,8 @@ def _default_runner(
 
 CODEX_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
-        id="gpt-5-codex",
-        display_name="GPT-5 Codex",
+        id="gpt-5.1-codex",
+        display_name="GPT-5.1 Codex",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
@@ -255,8 +255,8 @@ CODEX_MODELS: List[ModelDescriptor] = [
         routing_hints={"tier": "primary", "optimized_for": "codex"},
     ),
     ModelDescriptor(
-        id="gpt-5-codex-mini",
-        display_name="GPT-5 Codex Mini",
+        id="gpt-5.1-codex-mini",
+        display_name="GPT-5.1 Codex Mini",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
@@ -265,8 +265,8 @@ CODEX_MODELS: List[ModelDescriptor] = [
         routing_hints={"tier": "fast", "optimized_for": "codex"},
     ),
     ModelDescriptor(
-        id="gpt-5",
-        display_name="GPT-5",
+        id="gpt-5.1",
+        display_name="GPT-5.1",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
@@ -279,7 +279,7 @@ CODEX_MODELS: List[ModelDescriptor] = [
 CODEX_METADATA = ProviderMetadata(
     provider_name="codex",
     models=tuple(CODEX_MODELS),
-    default_model="gpt-5-codex",
+    default_model="gpt-5.1-codex",
     security_flags={"writes_allowed": False, "read_only": True, "sandbox": "read-only"},
     extra={
         "cli": "codex",

@@ -8,41 +8,41 @@ checks.
 This module provides a common interface for all skills to load their AI tool configurations.
 """
 
-import yaml
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-from claude_skills.common.ai_tools import build_tool_command
+import yaml
 
+from claude_skills.common.ai_tools import build_tool_command
 
 # Default provider/tool configuration (fallback if config file not found)
 DEFAULT_TOOLS = {
     "gemini": {
         "description": "Strategic analysis and hypothesis validation",
         "command": "gemini",
-        "enabled": True
+        "enabled": True,
     },
     "cursor-agent": {
         "description": "Repository-wide pattern discovery",
         "command": "cursor-agent",
-        "enabled": True
+        "enabled": True,
     },
     "codex": {
         "description": "Code-level review and bug fixes",
         "command": "codex",
-        "enabled": True
+        "enabled": True,
     },
     "claude": {
         "description": "Extended reasoning and analysis with read-only access",
         "command": "claude",
-        "enabled": True
+        "enabled": True,
     },
     "opencode": {
         "description": "User-configurable AI model routing and execution",
         "command": "opencode",
-        "enabled": True
-    }
+        "enabled": True,
+    },
 }
 
 # Canonical list of all supported AI tools/providers
@@ -50,25 +50,21 @@ DEFAULT_TOOLS = {
 ALL_SUPPORTED_TOOLS = ["gemini", "cursor-agent", "codex", "claude", "opencode"]
 
 DEFAULT_MODELS = {
-    "gemini": {
-        "priority": ["gemini-2.5-flash", "gemini-2.5-pro", "pro"]
-    },
-    "cursor-agent": {
-        "priority": ["composer-1", "gpt-5-codex"]
-    },
-    "codex": {
-        "priority": ["gpt-5-codex", "gpt-5-codex-mini", "gpt-5"]
-    },
-    "claude": {
-        "priority": ["sonnet", "haiku"]
-    },
-    "opencode": {
-        "priority": ["gpt-5.1-codex-mini"]
-    }
+    "gemini": {"priority": ["gemini-2.5-flash", "gemini-2.5-pro", "pro"]},
+    "cursor-agent": {"priority": ["composer-1", "gpt-5.1-codex"]},
+    "codex": {"priority": ["gpt-5.1-codex", "gpt-5.1-codex-mini", "gpt-5.1"]},
+    "claude": {"priority": ["sonnet", "haiku"]},
+    "opencode": {"priority": ["gpt-5.1-codex"]},
 }
 
 
-DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude", "opencode"]
+DEFAULT_CONSENSUS_AGENTS: List[str] = [
+    "cursor-agent",
+    "gemini",
+    "codex",
+    "claude",
+    "opencode",
+]
 
 DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
     "default": False,
@@ -273,7 +269,9 @@ def _extract_model_priority(
                 normalized = skill_default.strip()
                 if normalized:
                     return [normalized]
-            elif isinstance(skill_default, Sequence) and not isinstance(skill_default, (str, bytes)):
+            elif isinstance(skill_default, Sequence) and not isinstance(
+                skill_default, (str, bytes)
+            ):
                 priority = _normalize_priority_entry(skill_default)
                 if priority:
                     return priority
@@ -291,7 +289,9 @@ def _extract_model_priority(
                 normalized = skill_default.strip()
                 if normalized:
                     return [normalized]
-            elif isinstance(skill_default, Sequence) and not isinstance(skill_default, (str, bytes)):
+            elif isinstance(skill_default, Sequence) and not isinstance(
+                skill_default, (str, bytes)
+            ):
                 priority = _normalize_priority_entry(skill_default)
                 if priority:
                     return priority
@@ -300,7 +300,9 @@ def _extract_model_priority(
                 if priority:
                     return priority
 
-    elif isinstance(models_config, Sequence) and not isinstance(models_config, (str, bytes)):
+    elif isinstance(models_config, Sequence) and not isinstance(
+        models_config, (str, bytes)
+    ):
         # Legacy support where models config may just be a list of priorities.
         return _normalize_priority_entry(models_config)
     elif isinstance(models_config, str):
@@ -435,7 +437,9 @@ def resolve_tool_model(
         return default_override
 
     skill_config = load_skill_config(skill_name)
-    models_config = skill_config.get("models") if isinstance(skill_config, Mapping) else {}
+    models_config = (
+        skill_config.get("models") if isinstance(skill_config, Mapping) else {}
+    )
     tool_context = _resolve_context_for_tool(context, normalized_tool)
 
     priority = _extract_model_priority(models_config, normalized_tool, tool_context)
@@ -490,12 +494,16 @@ def resolve_models_for_tools(
         resolved_model = resolve_tool_model(
             skill_name=skill_name,
             tool=tool_name,
-            override=per_tool_override if per_tool_override is not None else default_override,
+            override=per_tool_override
+            if per_tool_override is not None
+            else default_override,
             context=tool_context,
         )
         resolved[tool_name] = resolved_model
 
     return resolved
+
+
 def get_preferred_model(skill_name: str, tool_name: str) -> Optional[str]:
     """Return the highest-priority configured model for a tool if available."""
     return resolve_tool_model(skill_name, tool_name)
@@ -556,7 +564,7 @@ def load_global_config() -> Dict:
         if not config_path.exists():
             return {}
 
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             config_data = yaml.safe_load(f)
 
         if not config_data:
@@ -614,9 +622,15 @@ def get_config_path(skill_name: str) -> Path:
     # Try multiple possible locations
     possible_paths = [
         # From installed package location
-        Path(__file__).parent.parent.parent.parent.parent / "skills" / skill_name / "config.yaml",
+        Path(__file__).parent.parent.parent.parent.parent
+        / "skills"
+        / skill_name
+        / "config.yaml",
         # From development location
-        Path(__file__).parent.parent.parent.parent / "skills" / skill_name / "config.yaml",
+        Path(__file__).parent.parent.parent.parent
+        / "skills"
+        / skill_name
+        / "config.yaml",
     ]
 
     for path in possible_paths:
@@ -646,10 +660,7 @@ def load_skill_config(skill_name: str) -> Dict:
     """
     try:
         # Start with code defaults
-        result = {
-            "tools": DEFAULT_TOOLS.copy(),
-            "models": DEFAULT_MODELS.copy()
-        }
+        result = {"tools": DEFAULT_TOOLS.copy(), "models": DEFAULT_MODELS.copy()}
 
         # Load global config
         global_config = load_global_config()
@@ -683,10 +694,9 @@ def load_skill_config(skill_name: str) -> Dict:
 
     except (yaml.YAMLError, IOError, KeyError) as e:
         # Error loading config, fall back to defaults
-        return _normalize_provider_settings({
-            "tools": DEFAULT_TOOLS.copy(),
-            "models": DEFAULT_MODELS.copy()
-        })
+        return _normalize_provider_settings(
+            {"tools": DEFAULT_TOOLS.copy(), "models": DEFAULT_MODELS.copy()}
+        )
 
 
 def get_enabled_tools(skill_name: str) -> Dict[str, Dict]:
@@ -704,11 +714,13 @@ def get_enabled_tools(skill_name: str) -> Dict[str, Dict]:
     return {
         name: tool_config
         for name, tool_config in providers.items()
-        if tool_config.get('enabled', True)
+        if tool_config.get("enabled", True)
     }
 
 
-def get_agent_priority(skill_name: str, default_order: Optional[List[str]] = None) -> List[str]:
+def get_agent_priority(
+    skill_name: str, default_order: Optional[List[str]] = None
+) -> List[str]:
     """Get the priority-ordered list of agents to try.
 
     Args:
@@ -721,16 +733,16 @@ def get_agent_priority(skill_name: str, default_order: Optional[List[str]] = Non
     config = load_skill_config(skill_name)
 
     # Try skill-specific rendering config first
-    if 'rendering' in config:
-        rendering_config = config['rendering']
-        if 'agent_priority' in rendering_config:
-            return rendering_config['agent_priority']
+    if "rendering" in config:
+        rendering_config = config["rendering"]
+        if "agent_priority" in rendering_config:
+            return rendering_config["agent_priority"]
 
     # Fall back to consultation config (for run-tests compatibility)
-    if 'consultation' in config:
-        consultation_config = config['consultation']
-        if 'agent_priority' in consultation_config:
-            return consultation_config['agent_priority']
+    if "consultation" in config:
+        consultation_config = config["consultation"]
+        if "agent_priority" in consultation_config:
+            return consultation_config["agent_priority"]
 
     # Use provided default or sensible fallback
     return default_order or ALL_SUPPORTED_TOOLS
@@ -770,7 +782,7 @@ def get_agent_command(
         return [agent_name, prompt]
 
 
-def get_timeout(skill_name: str, timeout_type: str = 'default') -> int:
+def get_timeout(skill_name: str, timeout_type: str = "default") -> int:
     """Get timeout value in seconds.
 
     Args:
@@ -783,19 +795,19 @@ def get_timeout(skill_name: str, timeout_type: str = 'default') -> int:
     config = load_skill_config(skill_name)
 
     # Try rendering config (sdd-render)
-    if 'rendering' in config:
-        rendering_config = config['rendering']
-        if timeout_type == 'narrative':
-            return rendering_config.get('narrative_timeout_seconds', 30)
-        return rendering_config.get('timeout_seconds', 90)
+    if "rendering" in config:
+        rendering_config = config["rendering"]
+        if timeout_type == "narrative":
+            return rendering_config.get("narrative_timeout_seconds", 30)
+        return rendering_config.get("timeout_seconds", 90)
 
     # Try consultation config (run-tests)
-    if 'consultation' in config:
-        consultation_config = config['consultation']
-        return consultation_config.get('timeout_seconds', 90)
+    if "consultation" in config:
+        consultation_config = config["consultation"]
+        return consultation_config.get("timeout_seconds", 90)
 
     # Default fallback
-    return 90 if timeout_type == 'default' else 30
+    return 90 if timeout_type == "default" else 30
 
 
 def get_tool_config(skill_name: str, tool_name: str) -> Optional[Dict]:
@@ -826,7 +838,7 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
     tool_config = get_tool_config(skill_name, tool_name)
     if not tool_config:
         return False
-    return tool_config.get('enabled', True)
+    return tool_config.get("enabled", True)
 
 
 def _normalize_auto_trigger_value(value: object) -> bool:

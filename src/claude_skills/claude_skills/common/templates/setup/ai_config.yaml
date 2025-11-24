@@ -34,8 +34,8 @@ models:
       - composer-1
   codex:
     priority:
-      - gpt-5-codex
-      - gpt-5-codex-mini
+      - gpt-5.1-codex
+      - gpt-5.1-codex-mini
   claude:
     priority:
       - sonnet
@@ -81,7 +81,7 @@ run-tests:
   models:
     gemini: pro
     cursor-agent: composer-1
-    codex: gpt-5-codex
+    codex: gpt-5.1-codex
     claude: sonnet
     opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on failure type
@@ -89,12 +89,12 @@ run-tests:
     #  failure_type:
     #    assertion:
     #      gemini: pro
-    #      codex: gpt-5-codex
+    #      codex: gpt-5.1-codex
     #      cursor-agent: composer-1
     #      claude: haiku
     #    timeout:
     #      gemini: gemini-2.5-flash
-    #      codex: gpt-5-codex-mini
+    #      codex: gpt-5.1-codex-mini
     #      cursor-agent: composer-1
     #      claude: haiku
 
@@ -108,7 +108,7 @@ sdd-plan-review:
   models:
     gemini: pro
     cursor-agent: composer-1
-    codex: gpt-5-codex
+    codex: gpt-5.1-codex
     claude: sonnet
     opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on review type
@@ -116,12 +116,12 @@ sdd-plan-review:
     #  review_type:
     #    full:
     #      gemini: pro
-    #      codex: gpt-5-codex
+    #      codex: gpt-5.1-codex
     #      cursor-agent: composer-1
     #      claude: sonnet
     #    quick:
     #      gemini: gemini-2.5-flash
-    #      codex: gpt-5-codex-mini
+    #      codex: gpt-5.1-codex-mini
     #      cursor-agent: composer-1
     #      claude: haiku
 
@@ -135,7 +135,7 @@ sdd-render:
   models:
     gemini: gemini-2.5-flash
     cursor-agent: composer-1
-    codex: gpt-5-codex-mini
+    codex: gpt-5.1-codex-mini
     claude: haiku
     opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on feature
@@ -143,12 +143,12 @@ sdd-render:
     #  feature:
     #    executive_summary:
     #      gemini: pro
-    #      codex: gpt-5-codex
+    #      codex: gpt-5.1-codex
     #      cursor-agent: composer-1
     #      claude: haiku
     #    narrative:
     #      gemini: gemini-2.5-flash
-    #      codex: gpt-5-codex-mini
+    #      codex: gpt-5.1-codex-mini
     #      cursor-agent: composer-1
     #      claude: haiku
 
@@ -162,7 +162,7 @@ sdd-fidelity-review:
   models:
     gemini: pro
     cursor-agent: composer-1
-    codex: gpt-5-codex
+    codex: gpt-5.1-codex
     claude: sonnet
     opencode: openai/gpt-5.1-codex-mini
 
@@ -176,7 +176,7 @@ llm-doc-gen:
   models:
     gemini: gemini-2.5-flash
     cursor-agent: composer-1
-    codex: gpt-5-codex-mini
+    codex: gpt-5.1-codex-mini
     claude: haiku
     opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on documentation type
@@ -184,17 +184,17 @@ llm-doc-gen:
     #  doc_type:
     #    architecture:
     #      gemini: pro
-    #      codex: gpt-5-codex
+    #      codex: gpt-5.1-codex
     #      cursor-agent: composer-1
     #      claude: sonnet
     #    tutorial:
     #      gemini: gemini-2.5-flash
-    #      codex: gpt-5-codex-mini
+    #      codex: gpt-5.1-codex-mini
     #      cursor-agent: composer-1
     #      claude: haiku
     #    api:
     #      gemini: gemini-2.5-flash
-    #      codex: gpt-5-codex-mini
+    #      codex: gpt-5.1-codex-mini
     #      cursor-agent: composer-1
     #      claude: haiku
 
@@ -223,7 +223,7 @@ consensus:
   models:
     gemini: pro
     cursor-agent: composer-1
-    codex: gpt-5-codex
+    codex: gpt-5.1-codex
     claude: sonnet
     opencode: openai/gpt-5.1-codex-mini
   auto_trigger:

@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
-import tempfile
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
 
@@ -164,8 +165,8 @@ IMPORTANT SECURITY NOTE: This session is running in read-only mode with the foll
 1. File write operations (Write, Edit, Patch, Delete) are disabled via Cursor Agent config
 2. Only approved read-only shell commands are permitted
 3. Cursor Agent's security model is weaker than other CLIs - be cautious
-4. Configuration is enforced via temporary .cursor/cli-config.json file
-5. Note: Cursor Agent's deprecated denylist approach had known bypasses - this uses allowlist
+4. Configuration is enforced via ~/.cursor/cli-config.json (original config backed up and restored automatically)
+5. Note: This uses allowlist mode for maximum security - only explicitly allowed operations are permitted
 """
 
 
@@ -211,8 +212,8 @@ CURSOR_MODELS: List[ModelDescriptor] = [
         routing_hints={"tier": "default"},
     ),
     ModelDescriptor(
-        id="gpt-5-codex",
-        display_name="GPT-5 Codex",
+        id="gpt-5.1-codex",
+        display_name="GPT-5.1 Codex",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.FUNCTION_CALLING,
@@ -258,8 +259,9 @@ class CursorAgentProvider(ProviderContext):
         self._model = self._ensure_model(
             model or metadata.default_model or self._first_model_id()
         )
-        self._config_dir: Optional[Path] = None
-        self._config_file_path: Optional[Path] = None
+        self._config_backup_path: Optional[Path] = None
+        self._original_config_existed: bool = False
+        self._cleanup_done: bool = False
 
     def __del__(self) -> None:
         """Clean up temporary config directory on provider destruction."""
@@ -284,33 +286,42 @@ class CursorAgentProvider(ProviderContext):
 
     def _create_readonly_config(self) -> Path:
         """
-        Create temporary .cursor/cli-config.json with read-only permissions.
+        Backup and replace ~/.cursor/cli-config.json with read-only permissions.
 
         Cursor Agent uses a permission configuration system with the format:
-        - Read(pathOrGlob): Controls read access
-        - Write(pathOrGlob): Controls write access
-        - Shell(commandBase): Controls shell commands (first token only)
+        - {"allow": "Read(**)"}: Allow read access to all paths
+        - {"allow": "Shell(command)"}: Allow specific shell commands
+        - {"deny": "Write(**)"}: Deny write access
 
         Returns:
-            Path to the temporary config directory
+            Path to the HOME .cursor directory
 
         Note:
-            The config directory will be used as --working-directory for cursor-agent,
-            which makes it look for .cursor/cli-config.json in that directory.
+            This method backs up the original config to a unique timestamped file,
+            then writes a read-only config. The backup is restored by _cleanup_config_file().
         """
-        # Create temp directory for config
-        temp_dir = Path(tempfile.mkdtemp(prefix="cursor_readonly_"))
-        cursor_dir = temp_dir / ".cursor"
-        cursor_dir.mkdir(exist_ok=True)
+        # Get HOME .cursor config path
+        cursor_dir = Path.home() / ".cursor"
+        config_path = cursor_dir / "cli-config.json"
 
-        # Build permission list
+        # Create unique backup path for thread-safety
+        backup_suffix = f".sdd-backup.{os.getpid()}.{int(time.time())}"
+        backup_path = Path(str(config_path) + backup_suffix)
+
+        # Backup original config if it exists
+        self._original_config_existed = config_path.exists()
+        if self._original_config_existed:
+            shutil.copy2(config_path, backup_path)
+            self._config_backup_path = backup_path
+
+        # Build permission list in new format
         permissions = []
 
-        # Allow read access to all paths (using glob pattern)
-        permissions.append("Read(**/*)")
-
-        # Deny write access to all paths
-        permissions.append("Write()")  # Empty means deny all
+        # Allow read access to all paths
+        permissions.append({"allow": "Read(**)"})
+        permissions.append({"allow": "Grep(**)"})
+        permissions.append({"allow": "Glob(**)"})
+        permissions.append({"allow": "List(**)"})
 
         # Add allowed shell commands (extract command names from ALLOWED_TOOLS)
         for tool in ALLOWED_TOOLS:
@@ -320,50 +331,75 @@ class CursorAgentProvider(ProviderContext):
                 # Cursor Agent Shell permissions use first token only
                 # "git log" becomes "git" in the config
                 base_command = command.split()[0]
-                permissions.append(f"Shell({base_command})")
+                permissions.append({"allow": f"Shell({base_command})"})
 
-        # Create config file
-        config_path = cursor_dir / "cli-config.json"
+        # Create read-only config file
+        cursor_dir.mkdir(parents=True, exist_ok=True)
         config_data = {
             "permissions": permissions,
             "description": "Read-only mode enforced by claude-sdd-toolkit",
+            "approvalMode": "allowlist",  # Use allowlist mode for security
         }
 
         with open(config_path, 'w') as f:
             json.dump(config_data, f, indent=2)
 
-        self._config_dir = temp_dir
-        self._config_file_path = config_path
-        return temp_dir
+        return cursor_dir
 
     def _cleanup_config_file(self) -> None:
-        """Remove temporary config directory and all contents."""
-        if hasattr(self, '_config_dir') and self._config_dir is not None:
-            try:
-                # Remove config file
-                if self._config_file_path and self._config_file_path.exists():
-                    self._config_file_path.unlink()
+        """Restore original ~/.cursor/cli-config.json from backup."""
+        # Prevent double-cleanup (e.g., from finally block + __del__)
+        if hasattr(self, '_cleanup_done') and self._cleanup_done:
+            return
 
-                # Remove .cursor directory
-                cursor_dir = self._config_dir / ".cursor"
-                if cursor_dir.exists():
-                    cursor_dir.rmdir()
+        cursor_dir = Path.home() / ".cursor"
+        config_path = cursor_dir / "cli-config.json"
 
-                # Remove temp directory
-                if self._config_dir.exists():
-                    self._config_dir.rmdir()
-            except (OSError, FileNotFoundError):
-                # Files already removed or don't exist, ignore
-                pass
-            finally:
-                self._config_dir = None
-                self._config_file_path = None
+        try:
+            # Restore original config from backup if it existed
+            if (
+                hasattr(self, '_config_backup_path')
+                and self._config_backup_path is not None
+                and self._config_backup_path.exists()
+            ):
+                shutil.move(self._config_backup_path, config_path)
+            elif (
+                hasattr(self, '_original_config_existed')
+                and not self._original_config_existed
+                and config_path.exists()
+            ):
+                # No original config existed - remove our temporary one
+                config_path.unlink()
+
+            # Clean up any leftover backup files
+            if (
+                hasattr(self, '_config_backup_path')
+                and self._config_backup_path is not None
+                and self._config_backup_path.exists()
+            ):
+                self._config_backup_path.unlink()
+
+            # Clean up any .bad files created by cursor-agent CLI
+            bad_config_path = Path(str(config_path) + ".bad")
+            if bad_config_path.exists():
+                bad_config_path.unlink()
+
+        except (OSError, FileNotFoundError):
+            # Files already removed or don't exist, ignore
+            pass
+        finally:
+            # Mark cleanup as done to prevent double-cleanup
+            if hasattr(self, '_cleanup_done'):
+                self._cleanup_done = True
+            if hasattr(self, '_config_backup_path'):
+                self._config_backup_path = None
+            if hasattr(self, '_original_config_existed'):
+                self._original_config_existed = False
 
     def _build_command(
         self,
         request: GenerationRequest,
         model: str,
-        config_dir: Optional[Path] = None,
     ) -> List[str]:
         """
         Assemble the cursor-agent CLI invocation with read-only config.
@@ -371,36 +407,19 @@ class CursorAgentProvider(ProviderContext):
         Args:
             request: Generation request
             model: Model ID to use
-            config_dir: Directory containing .cursor/cli-config.json (if provided,
-                       will be used as --working-directory to enforce permissions)
+
+        Note:
+            Config is read from ~/.cursor/cli-config.json (managed by _create_readonly_config).
+            Uses --print mode for non-interactive execution with JSON output.
         """
-        # cursor-agent requires "chat" subcommand and --json flag
-        command = [self._binary, "chat", "--json"]
-
-        # Use config directory as working directory to enforce permissions
-        # User-provided working_directory is ignored when using read-only config
-        working_dir = config_dir if config_dir else (request.metadata or {}).get("working_directory")
-        if working_dir:
-            command.extend(["--working-directory", str(working_dir)])
-
-        if request.temperature is not None:
-            command.extend(["--temperature", str(request.temperature)])
-
-        if request.max_tokens is not None:
-            command.extend(["--max-tokens", str(request.max_tokens)])
+        # cursor-agent in headless mode: --print --output-format json
+        command = [self._binary, "--print", "--output-format", "json"]
 
         if model:
             command.extend(["--model", model])
 
-        # Build system prompt with security warning
-        system_prompt = request.system_prompt or ""
-        if system_prompt:
-            system_prompt = f"{system_prompt.strip()}\n\n{SHELL_COMMAND_WARNING.strip()}"
-        else:
-            system_prompt = SHELL_COMMAND_WARNING.strip()
-
-        if system_prompt:
-            command.extend(["--system", system_prompt])
+        # Note: cursor-agent doesn't support --temperature or --max-tokens in --print mode
+        # These flags are silently ignored if provided
 
         extra_flags = (request.metadata or {}).get("cursor_agent_flags")
         if isinstance(extra_flags, list):
@@ -408,8 +427,15 @@ class CursorAgentProvider(ProviderContext):
                 if isinstance(flag, str) and flag.strip():
                     command.append(flag.strip())
 
-        # Prompt is passed as --prompt flag
-        command.extend(["--prompt", request.prompt])
+        # Prompt is passed as positional argument (not --prompt flag in --print mode)
+        # Build full prompt with system context
+        full_prompt = request.prompt
+        if request.system_prompt:
+            full_prompt = f"{request.system_prompt.strip()}\n\n{SHELL_COMMAND_WARNING.strip()}\n\n{request.prompt}"
+        else:
+            full_prompt = f"{SHELL_COMMAND_WARNING.strip()}\n\n{request.prompt}"
+
+        command.append(full_prompt)
         return command
 
     def _run(
@@ -436,20 +462,29 @@ class CursorAgentProvider(ProviderContext):
         timeout: Optional[int],
     ) -> Tuple[subprocess.CompletedProcess[str], bool]:
         """
-        Execute the command and retry without --json when the CLI lacks support.
+        Execute the command and retry without --output-format json when the CLI lacks support.
         """
         completed = self._run(command, timeout=timeout)
         if completed.returncode == 0:
             return completed, True
 
         stderr_text = (completed.stderr or "").lower()
-        # Check if --json flag is in command
-        has_json_flag = "--json" in command
+        # Check if --output-format flag is in command
+        has_json_flag = "--output-format" in command
         if has_json_flag and any(
             phrase in stderr_text for phrase in ("unknown option", "unrecognized option")
         ):
-            # Remove --json from command for retry
-            retry_command = [part for part in command if part != "--json"]
+            # Remove --output-format json from command for retry
+            retry_command = []
+            skip_next = False
+            for i, part in enumerate(command):
+                if skip_next:
+                    skip_next = False
+                    continue
+                if part == "--output-format":
+                    skip_next = True  # Skip next arg (the "json" value)
+                    continue
+                retry_command.append(part)
 
             retry_process = self._run(retry_command, timeout=timeout)
             if retry_process.returncode == 0:
@@ -520,16 +555,16 @@ class CursorAgentProvider(ProviderContext):
             else self._model
         )
 
-        # Create read-only config directory
-        config_dir = self._create_readonly_config()
+        # Backup and replace HOME config with read-only version
+        self._create_readonly_config()
 
         try:
-            # Build command with config directory
-            command = self._build_command(request, model, config_dir=config_dir)
+            # Build command (config is read from ~/.cursor/cli-config.json)
+            command = self._build_command(request, model)
             timeout = request.timeout or self._timeout
             completed, json_mode = self._run_with_retry(command, timeout)
         finally:
-            # Always clean up config file, even if command fails
+            # Always restore original config, even if command fails
             self._cleanup_config_file()
 
         if json_mode:
