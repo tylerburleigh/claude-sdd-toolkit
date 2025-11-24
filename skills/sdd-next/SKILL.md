@@ -115,7 +115,7 @@ or
   - **No**: Stick with prepare-task output; avoid redundant commands.
 
 **Anti-patterns to avoid**
-- Running `task-info`, `check-deps`, and `get-task` back-to-back “just in case.” Call them only when `context` is insufficient.
+- Running `task-info`, `check-deps`, and `get-task` back-to-back "just in case." The default `prepare-task` response now includes all dependency details in `context.dependencies`, eliminating the need for `check-deps` in 95% of cases. Call these commands only when `context` is insufficient for special requirements.
 - Re-running `sdd progress` or `sdd list-phases` after every plan change. Use `context.phase` for quick updates and run `sdd progress` only before reporting global status.
 - Fetching the entire spec or invoking doc-query before inspecting the prepare-task payload.
 
@@ -123,7 +123,7 @@ or
 
 | Command | Returns | Use when | Redundant / Notes |
 | --- | --- | --- | --- |
-| `sdd prepare-task` | Recommended task plus `context` (previous sibling, parent, phase, sibling files, journal summary) | **Always** – first call for every task | N/A |
+| `sdd prepare-task` | Recommended task plus `context` (previous sibling, parent, phase, sibling files, journal summary, dependencies) | **Always** – first call for every task | N/A |
 | `sdd task-info` | Raw task metadata straight from the spec | Spec explicitly references metadata not surfaced in `context` (acceptance criteria, detailed instructions) | Usually covered by `prepare-task`; only call when spec requires |
 | `sdd get-task` | Full JSON node, including deep metadata blobs | Rare audits where you must inspect the spec data exactly as stored | Redundant with `task-info` for normal flows |
 | `sdd progress` | Spec-wide counts, percentages, current phase | Preparing a status report or verifying completion prompts | `context.phase` already shows local progress; only run when reporting overall stats |
@@ -254,8 +254,8 @@ sdd prepare-task {spec-id} {task-id}
 
 That response already contains everything you need:
 - `task_data` → title, metadata, instructions pulled from the spec
-- `dependencies` → current blocking status plus any downstream tasks
-- `context` → stitched data from the previous sibling, parent task, current phase, sibling files, and the latest journal summary
+- `dependencies` → top-level blocking status (can_start, blocked_by list)
+- `context` → stitched data from the previous sibling, parent task, current phase, sibling files, task journal, AND detailed dependency information (context.dependencies) with full task titles, statuses, and file paths
 
 Treat `context` as the authoritative source rather than chaining `sdd task-info`, `sdd check-deps`, and `sdd get-task`. Typical fields:
 
@@ -278,7 +278,23 @@ Treat `context` as the authoritative source rather than chaining `sdd task-info`
   },
   "sibling_files": [
     {"path": "skills/sdd-next/SKILL.md", "reason": "Touched by previous sibling"}
-  ]
+  ],
+  "task_journal": {
+    "entry_count": 0,
+    "entries": []
+  },
+  "dependencies": {
+    "blocking": [],
+    "blocked_by_details": [
+      {
+        "id": "task-2-3",
+        "title": "Update context gathering",
+        "status": "in_progress",
+        "file_path": "src/context.py"
+      }
+    ],
+    "soft_depends": []
+  }
 }
 ```
 
@@ -286,6 +302,8 @@ Treat `context` as the authoritative source rather than chaining `sdd task-info`
 - `context.parent_task`: verify how this subtask fits into the backlog; use `context.parent_task.position_label` to show progress.
 - `context.phase`: surface phase health (`context.phase.percentage`, `context.phase.blockers`) without calling `sdd progress`.
 - `context.sibling_files`: prime file navigation by reviewing whatever the spec already touched before opening new files.
+- `context.task_journal`: access journal entries for this task showing decision history and status changes without separate calls.
+- `context.dependencies`: detailed dependency information with task titles, statuses, and file paths for `blocking` (tasks this blocks), `blocked_by_details` (tasks blocking this), and `soft_depends` (soft dependencies)—eliminates need for separate `sdd check-deps` call in 95% of cases.
 
 Only fall back to `sdd task-info` or `sdd check-deps` when the spec explicitly calls for metadata that is not surfaced through the standard payload.
 
@@ -749,10 +767,10 @@ sdd progress {spec-id}
 sdd list-phases {spec-id}
 
 # Task Selection
-sdd prepare-task {spec-id}
-sdd next-task {spec-id}
-sdd task-info {spec-id} {task-id}
-sdd check-deps {spec-id} {task-id}
+sdd prepare-task {spec-id}              # Primary command - includes all context
+sdd next-task {spec-id}                 # Simpler alternative - just task ID
+sdd task-info {spec-id} {task-id}       # Rarely needed - only for non-recommended tasks
+sdd check-deps {spec-id} {task-id}      # Rarely needed - now in context.dependencies
 
 # Context Checking (TWO STEPS)
 sdd session-marker

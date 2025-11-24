@@ -213,7 +213,7 @@ sdd stats {spec-id}
 
 Analyze dependencies for cycles, orphans, deadlocks, and bottlenecks.
 
-**Note:** This command analyzes spec-wide dependency issues. For checking individual task dependencies, use `sdd check-deps` from sdd-next (e.g., `sdd check-deps {spec-id} {task-id}`).
+**Note:** This command analyzes spec-wide dependency issues. For checking individual task dependencies, use `sdd prepare-task` from sdd-next which includes dependency details by default in `context.dependencies` (e.g., `sdd prepare-task {spec-id} {task-id}`). The standalone `sdd check-deps` command is rarely needed now.
 
 ```bash
 sdd analyze-deps {spec-id} [--bottleneck-threshold N]
