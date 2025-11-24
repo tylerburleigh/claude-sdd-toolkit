@@ -1,0 +1,284 @@
+{
+  "spec_id": "prepare-task-doc-context-2025-11-24-001",
+  "title": "Enhance prepare-task with automatic doc context",
+  "generated": "2025-11-24T00:00:00Z",
+  "last_updated": "2025-11-24T15:23:22.748648Z",
+  "metadata": {
+    "description": "Enable sdd prepare-task to automatically pull scoped codebase documentation for referenced files when docs are fresh, delivering file-specific guidance in a single call.",
+    "objectives": [
+      "Surface doc-query insights in the default prepare-task payload",
+      "Target documentation lookups using task metadata and file paths",
+      "Document schema/contract changes so agents can safely consume new fields"
+    ],
+    "complexity": "medium",
+    "estimated_hours": 32,
+    "status": "active",
+    "owner": "automation",
+    "assumptions": [
+      "Codebase documentation has been generated and is not stale",
+      "Doc freshness threshold (<=24h) is enforced so stale docs skip context output",
+      "sdd-integration task-context command is available in PATH"
+    ],
+    "progress_percentage": 16,
+    "current_phase": "phase-1-doc-readiness"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "title": "Auto doc context for prepare-task",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1-doc-readiness",
+        "phase-2-integration",
+        "phase-3-validation"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Ship richer default prepare-task responses without extra commands.",
+        "estimated_hours": 32
+      },
+      "dependencies": {}
+    },
+    "phase-1-doc-readiness": {
+      "id": "phase-1-doc-readiness",
+      "type": "phase",
+      "title": "Doc availability + design",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Confirm doc-query status handling and design new payload contract",
+        "estimated_hours": 10
+      },
+      "dependencies": {}
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Audit doc helper + schema needs",
+      "status": "completed",
+      "parent": "phase-1-doc-readiness",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 4,
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "details": [
+          "Review check_doc_availability, check_doc_query_available, get_task_context_from_docs",
+          "Document required inputs (task description, file path, spec id) for precise lookups",
+          "Capture schema additions for doc_context payload"
+        ],
+        "reasoning": "Need a concrete contract for doc-derived context before wiring it into prepare-task.",
+        "started_at": "2025-11-24T15:19:10.095721Z",
+        "status_note": "Starting audit of doc helper functions and schema requirements",
+        "completed_at": "2025-11-24T15:23:22.745906Z",
+        "needs_journaling": false,
+        "actual_hours": 0.07,
+        "journaled_at": "2025-11-24T15:23:22.747980Z"
+      },
+      "dependencies": {}
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Design context contract + fallbacks",
+      "status": "pending",
+      "parent": "phase-1-doc-readiness",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "decision",
+        "estimated_hours": 6,
+        "file_path": "analysis/prepare-task-default-context.md",
+        "details": [
+          "Specify context.file_docs structure",
+          "Define gating rules for stale vs available docs",
+          "Document freshness TTL and cache bust rules for doc_context usage",
+          "List telemetry/provenance fields for consumers"
+        ]
+      },
+      "dependencies": {
+        "depends": [
+          "task-1-1"
+        ],
+        "blocked_by": [],
+        "blocks": []
+      }
+    },
+    "phase-2-integration": {
+      "id": "phase-2-integration",
+      "type": "phase",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Extend helpers and wire prepare-task to emit doc context",
+        "estimated_hours": 14
+      },
+      "dependencies": {}
+    },
+    "task-2-1": {
+      "id": "task-2-1",
+      "type": "task",
+      "title": "Extend doc helper command inputs",
+      "status": "pending",
+      "parent": "phase-2-integration",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 7,
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "details": [
+          "Allow file_path + spec_id flags for sdd-integration task-context",
+          "Normalize response into structured fields",
+          "Return provenance metadata and user-facing summary (source_doc_id, generated_at, freshness_ms)"
+        ]
+      },
+      "dependencies": {
+        "depends": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "blocks": [
+          "task-2-2"
+        ]
+      }
+    },
+    "task-2-2": {
+      "id": "task-2-2",
+      "type": "task",
+      "title": "Wire prepare_task doc_context block",
+      "status": "pending",
+      "parent": "phase-2-integration",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 7,
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "details": [
+          "Pass task metadata file_path into doc helper",
+          "Populate context.file_docs when docs available",
+          "Preserve doc_prompt_needed fallback for stale docs"
+        ]
+      },
+      "dependencies": {
+        "depends": [
+          "task-2-1"
+        ],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "blocks": [
+          "task-3-1"
+        ]
+      }
+    },
+    "phase-3-validation": {
+      "id": "phase-3-validation",
+      "type": "phase",
+      "title": "Docs, schema, validation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update schema/docs and verify CLI output",
+        "estimated_hours": 8
+      },
+      "dependencies": {}
+    },
+    "task-3-1": {
+      "id": "task-3-1",
+      "type": "task",
+      "title": "Update schema + docs",
+      "status": "pending",
+      "parent": "phase-3-validation",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "file_path": "src/claude_skills/schemas/documentation-schema.json",
+        "details": [
+          "Document new context.file_docs shape",
+          "Update CLI reference + workflows to mention doc pull",
+          "Add changelog entry"
+        ]
+      },
+      "dependencies": {
+        "depends": [
+          "task-2-2"
+        ],
+        "blocked_by": [
+          "task-2-2"
+        ],
+        "blocks": []
+      }
+    },
+    "task-3-2": {
+      "id": "task-3-2",
+      "type": "task",
+      "title": "Validate prepare-task output",
+      "status": "pending",
+      "parent": "phase-3-validation",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "file_path": "tests/sdd_next/test_prepare_task_context.py",
+        "verification_type": "manual",
+        "details": [
+          "Add integration coverage proving doc context wires through",
+          "Ensure fallback behavior when docs missing",
+          "Record benchmark impact (<30ms over baseline) using 10-call median measurement"
+        ]
+      },
+      "dependencies": {
+        "depends": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "blocks": []
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-24T15:23:22.747975Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Audit doc helper + schema needs",
+      "author": "claude-code",
+      "content": "Comprehensive audit completed of doc helper functions and schema requirements for prepare-task integration.\n\nKey findings:\n1. Reviewed existing doc_helper.py with 3 main functions: check_doc_query_available(), check_sdd_integration_available(), get_task_context_from_docs()\n2. Analyzed sdd_integration.py providing SDDContextGatherer class with methods: get_task_context(), suggest_files_for_task(), find_similar_implementations(), get_test_context(), get_impact_analysis()\n3. Confirmed prepare_task() in discovery.py already calls get_task_context_from_docs() and includes doc_context in result payload\n4. Reviewed analysis/prepare-task-default-context.md documenting contract v1-v3 evolution and context payload structure\n5. Identified required inputs for doc queries: task description (title + details), optional file_path, spec_id (for context)\n6. Documented schema additions needed: doc_context block with files[], dependencies[], similar[], complexity{}, plus availability messaging\n\nCurrent integration status: Basic doc_context already exists in prepare-task but returns minimal structure from get_task_context_from_docs(). Schema can be enhanced to match rich SDDContextGatherer.get_task_context() output format.\n\nFiles analyzed:\n- src/claude_skills/claude_skills/common/doc_helper.py (294 lines)\n- src/claude_skills/claude_skills/doc_query/sdd_integration.py (453 lines)  \n- src/claude_skills/claude_skills/sdd_next/discovery.py (prepare_task function)\n- analysis/prepare-task-default-context.md (existing contract analysis)\n\nVerified: sdd doc scope --plan and --implement presets available for contextual queries\nVerified: sdd-integration CLI commands work (task-context, suggest-files, similar, test-context, impact)\n\nNo blockers. Ready for task-1-2 design phase.",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ]
+}
