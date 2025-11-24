@@ -636,13 +636,13 @@ def test_provider_accepts_any_model_id() -> None:
     provider = OpenCodeProvider(
         OPENCODE_METADATA,
         ProviderHooks(),
-        model="openai/gpt-5.1-codex-mini",  # Any model ID should be accepted
-        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload(model="openai/gpt-5.1-codex-mini")),
+        model="openai/gpt-5.1-codex",  # Any model ID should be accepted
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload(model="openai/gpt-5.1-codex")),
     )
 
     with patch.object(provider, "_ensure_server_running"):
         result = provider.generate(GenerationRequest(prompt="test"))
-        assert result.model_fqn == "opencode:openai/gpt-5.1-codex-mini"
+        assert result.model_fqn == "opencode:openai/gpt-5.1-codex"
 
 
 def test_provider_uses_default_model_when_empty() -> None:

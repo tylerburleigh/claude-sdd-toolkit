@@ -52,9 +52,9 @@ ALL_SUPPORTED_TOOLS = ["gemini", "cursor-agent", "codex", "claude", "opencode"]
 DEFAULT_MODELS = {
     "gemini": {"priority": ["gemini-2.5-flash", "gemini-2.5-pro", "pro"]},
     "cursor-agent": {"priority": ["composer-1", "gpt-5.1-codex"]},
-    "codex": {"priority": ["gpt-5.1-codex", "gpt-5.1-codex-mini", "gpt-5.1"]},
+    "codex": {"priority": ["gpt-5.1-codex", "gpt-5.1-codex-mini"]},
     "claude": {"priority": ["sonnet", "haiku"]},
-    "opencode": {"priority": ["gpt-5.1-codex"]},
+    "opencode": {"priority": ["gpt-5.1-codex", "gpt-5.1-codex-mini"]},
 }
 
 
