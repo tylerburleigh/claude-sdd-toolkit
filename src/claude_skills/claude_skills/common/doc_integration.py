@@ -11,9 +11,20 @@ sdd-next, sdd-update) and the documentation system (llm-doc-gen, doc-query).
 from enum import Enum
 import subprocess
 import json
+import os
 from typing import Optional
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Import git helpers for commit-based staleness detection
+try:
+    from .doc_helper import get_current_git_commit, count_commits_between
+except ImportError:
+    # Fallback if doc_helper not available
+    def get_current_git_commit(project_root: str = ".") -> Optional[str]:
+        return None
+    def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+        return 0
 
 
 class DocStatus(Enum):
@@ -104,9 +115,26 @@ def check_doc_availability(force_refresh: bool = False) -> DocStatus:
         return DocStatus.ERROR
 
 
+def get_staleness_threshold() -> int:
+    """
+    Get the commit-based staleness threshold from environment variable.
+
+    Returns:
+        int: Number of commits after which docs are considered stale (default: 10)
+    """
+    try:
+        threshold = os.environ.get('SDD_STALENESS_COMMIT_THRESHOLD', '10')
+        return int(threshold)
+    except (ValueError, TypeError):
+        return 10
+
+
 def _determine_status_from_stats(stats: dict) -> DocStatus:
     """
     Determine documentation status from parsed stats JSON.
+
+    Uses commit-based staleness detection when git metadata is available,
+    falls back to time-based detection (7 days) otherwise.
 
     Args:
         stats: Parsed JSON from 'sdd doc stats --json'
@@ -121,8 +149,29 @@ def _determine_status_from_stats(stats: dict) -> DocStatus:
             return DocStatus.STALE
         return DocStatus.AVAILABLE
 
-    # Fallback: Check if generated_at exists and is recent
-    generated_at = stats.get('generated_at')
+    # Primary: Git-based staleness detection (commit count)
+    metadata = stats.get('metadata', {})
+    generated_at_commit = metadata.get('generated_at_commit')
+
+    if generated_at_commit:
+        # We have git metadata - use commit-based staleness
+        current_commit = get_current_git_commit()
+
+        if current_commit and current_commit != generated_at_commit:
+            # Commits have changed - check how many
+            commits_since = count_commits_between(generated_at_commit, current_commit)
+            threshold = get_staleness_threshold()
+
+            if commits_since >= threshold:
+                return DocStatus.STALE
+            # Within threshold - docs are current
+            return DocStatus.AVAILABLE
+
+        # Same commit or can't get current commit - docs are current
+        return DocStatus.AVAILABLE
+
+    # Fallback: Time-based staleness detection (7 days)
+    generated_at = stats.get('generated_at') or metadata.get('generated_at')
     if not generated_at:
         # No timestamp - assume available but can't verify staleness
         return DocStatus.AVAILABLE
