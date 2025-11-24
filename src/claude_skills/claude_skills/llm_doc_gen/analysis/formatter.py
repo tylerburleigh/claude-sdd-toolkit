@@ -14,9 +14,9 @@ from pathlib import Path
 try:
     from .schema import SCHEMA_VERSION
     from .optimization.streaming import StreamingJSONWriter
-    from ..common.doc_helper import get_current_git_commit
+    from ...common.doc_helper import get_current_git_commit
 except ImportError:
-    from schema import SCHEMA_VERSION
+    from .schema import SCHEMA_VERSION
     from optimization.streaming import StreamingJSONWriter
     # When running standalone, import from absolute path
     try:
