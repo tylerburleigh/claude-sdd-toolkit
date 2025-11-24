@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-doc-context-2025-11-24-001",
   "title": "Enhance prepare-task with automatic doc context",
   "generated": "2025-11-24T00:00:00Z",
-  "last_updated": "2025-11-24T16:03:34.080735Z",
+  "last_updated": "2025-11-24T16:06:23.894009Z",
   "metadata": {
     "description": "Enable sdd prepare-task to automatically pull scoped codebase documentation for referenced files when docs are fresh, delivering file-specific guidance in a single call.",
     "objectives": [
@@ -19,8 +19,8 @@
       "Doc freshness threshold (<=24h) is enforced so stale docs skip context output",
       "sdd-integration task-context command is available in PATH"
     ],
-    "progress_percentage": 66,
-    "current_phase": "phase-2-integration"
+    "progress_percentage": 83,
+    "current_phase": "phase-3-validation"
   },
   "hierarchy": {
     "spec-root": {
@@ -35,7 +35,7 @@
         "phase-3-validation"
       ],
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Ship richer default prepare-task responses without extra commands.",
         "estimated_hours": 32
@@ -222,14 +222,14 @@
       "id": "phase-3-validation",
       "type": "phase",
       "title": "Docs, schema, validation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "task-3-1",
         "task-3-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Update schema/docs and verify CLI output",
         "estimated_hours": 8
@@ -240,11 +240,11 @@
       "id": "task-3-1",
       "type": "task",
       "title": "Update schema + docs",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-validation",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 4,
@@ -253,7 +253,13 @@
           "Document new context.file_docs shape",
           "Update CLI reference + workflows to mention doc pull",
           "Add changelog entry"
-        ]
+        ],
+        "started_at": "2025-11-24T16:04:04.993239Z",
+        "status_note": "Starting documentation and schema updates",
+        "completed_at": "2025-11-24T16:06:23.890711Z",
+        "needs_journaling": false,
+        "actual_hours": 0.039,
+        "journaled_at": "2025-11-24T16:06:23.893153Z"
       },
       "dependencies": {
         "depends": [
@@ -357,6 +363,15 @@
       "content": "All child tasks in phase phase-2-integration have been completed.",
       "metadata": {},
       "task_id": "phase-2-integration"
+    },
+    {
+      "timestamp": "2025-11-24T16:06:23.893148Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update schema + docs",
+      "author": "claude-code",
+      "content": "Successfully updated schema and documentation for the new context.file_docs feature.\n\nImplementation details:\n1. Updated prepare-task-default-context.md (lines 414-417):\n   - Added context.file_docs to Context Block Fields table\n   - Documented sub-fields: files, dependencies, and provenance\n   - Marked as conditional (present when doc-query is available)\n\n2. Updated skills/sdd-next/SKILL.md:\n   - Line 100: Added file_docs mention to default workflow description\n   - Line 126: Added file_docs to Command Value Matrix with note about automatic inclusion\n\n3. Updated docs/changelog.md (Unreleased section):\n   - Added ### Added section documenting automatic documentation context\n   - Added ### Changed section documenting doc helper enhancements\n   - Added ### Documentation section listing all documentation updates\n\nAll three task requirements met:\n\u2713 Document new context.file_docs shape\n\u2713 Update CLI reference + workflows to mention doc pull  \n\u2713 Add changelog entry\n\nFiles modified:\n- analysis/prepare-task-default-context.md (+4 lines documenting file_docs fields)\n- skills/sdd-next/SKILL.md (+2 edits: default workflow and command matrix)\n- docs/changelog.md (+17 lines in Unreleased section)\n\nNo deviations from plan. Documentation is clear, comprehensive, and follows existing format conventions.",
+      "metadata": {},
+      "task_id": "task-3-1"
     }
   ]
 }

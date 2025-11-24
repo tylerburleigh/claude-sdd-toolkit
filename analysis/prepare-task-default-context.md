@@ -411,6 +411,10 @@ Target: <30ms additional overhead
 | `context.phase.blockers` | array[string] | Phase-level blockers | If present |
 | `context.sibling_files` | array[object] | Files modified by siblings | Yes (may be empty) |
 | `context.task_journal` | object | Journal entries for current task | Yes |
+| `context.file_docs` | object\|null | Documentation context from doc-query (when available) | Conditional |
+| `context.file_docs.files` | array[string] | Relevant file paths from documentation | If file_docs present |
+| `context.file_docs.dependencies` | array[string] | Module dependencies | If file_docs present |
+| `context.file_docs.provenance` | object | Doc metadata (source, timestamp, git SHA, freshness) | If file_docs present |
 
 ### Optional Fields (Conditionally Included)
 

@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+### Added
+- **Automatic documentation context in prepare-task**: `sdd prepare-task` now automatically populates `context.file_docs` with file-focused documentation when doc-query is available
+  - Includes relevant files, dependencies, and provenance metadata (source, timestamp, git SHA, freshness)
+  - Eliminates need to manually call doc-query helpers after running prepare-task
+  - Falls back gracefully when documentation is unavailable or stale
+  - Integration leverages `file_path` from task metadata for focused context
+
+### Changed
+- Enhanced doc helper (`get_task_context_from_docs()`) to accept `file_path` and `spec_id` parameters for targeted documentation queries
+- Updated `prepare_task()` to pass task metadata through to doc helper for richer context gathering
+
+### Documentation
+- Updated `analysis/prepare-task-default-context.md` with `context.file_docs` field documentation
+- Updated `skills/sdd-next/SKILL.md` to document automatic file_docs inclusion in default workflow
+- Added `context.file_docs` to Command Value Matrix in sdd-next skill documentation
+
 ## [0.7.6] - 2025-11-23
 
 ### Changed
