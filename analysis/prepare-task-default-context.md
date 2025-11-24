@@ -572,15 +572,490 @@ if context["previous_sibling"]:
 3. **Compatibility**: Existing consumers continue to work without changes
 4. **Agent satisfaction**: sdd-next playbook shows reduced command usage in workflow sections
 
+## Doc Context Integration Design (Task 1-2)
+
+### Overview
+
+This section defines the contract for integrating codebase documentation context into `sdd prepare-task` output. The design balances rich context delivery with performance constraints and graceful degradation when documentation is unavailable.
+
+### Enhanced doc_context Schema
+
+```python
+"doc_context": {
+    # Core availability fields (always present)
+    "available": bool,              # True if documentation exists and is accessible
+    "status": str,                  # "available", "stale", "unavailable", "generating"
+    "message": str,                 # Human-readable status message
+
+    # Context payload (present when available=True)
+    "suggested_files": List[str],   # File paths ranked by relevance
+    "relevant_modules": List[Dict], # Module summaries with statistics
+    "relevant_functions": List[Dict], # Function matches with signatures
+    "relevant_classes": List[Dict], # Class matches with methods
+    "dependencies": List[str],      # Module dependencies extracted from docs
+    "similar_implementations": List[Dict], # Similar code patterns for reference
+    "complexity_insights": Dict,    # Complexity analysis for suggested files
+    "test_context": Optional[Dict], # Test files and coverage estimates (if file_path specified)
+
+    # Telemetry and provenance (always present)
+    "telemetry": {
+        "query_time_ms": int,       # Time taken to gather context
+        "keywords_extracted": List[str], # Keywords used for search
+        "result_count": Dict,       # Counts by entity type
+        "doc_generation_date": Optional[str], # ISO timestamp when docs were generated
+        "doc_location": Optional[str] # Path to codebase.json
+    },
+
+    # Freshness metadata (present when available=True)
+    "freshness": {
+        "generated_at": str,        # ISO timestamp
+        "age_hours": float,         # Hours since generation
+        "is_stale": bool,           # True if age exceeds TTL threshold
+        "stale_reason": Optional[str], # Explanation if stale
+        "refresh_recommended": bool # True if refresh would improve quality
+    }
+}
+```
+
+### Schema Field Definitions
+
+#### Core Fields
+
+| Field | Type | Always Present | Description |
+|-------|------|----------------|-------------|
+| `available` | bool | Yes | True if documentation query succeeded |
+| `status` | str | Yes | One of: "available", "stale", "unavailable", "generating" |
+| `message` | str | Yes | User-facing status description |
+
+#### Context Payload Fields (when available=True)
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `suggested_files` | List[str] | File paths ranked by relevance score | `["src/auth.py", "tests/test_auth.py"]` |
+| `relevant_modules` | List[Dict] | Module summaries with stats | `[{"name": "auth", "file": "src/auth.py", "statistics": {...}}]` |
+| `relevant_functions` | List[Dict] | Function matches | `[{"name": "login", "file": "src/auth.py", "signature": "def login(user, pwd)"}]` |
+| `relevant_classes` | List[Dict] | Class matches with methods | `[{"name": "AuthHandler", "methods": ["login", "logout"]}]` |
+| `dependencies` | List[str] | Module dependencies | `["jwt", "bcrypt", "database"]` |
+| `similar_implementations` | List[Dict] | Similar patterns | `[{"name": "oauth_login", "file": "src/oauth.py"}]` |
+| `complexity_insights` | Dict | Complexity analysis | `{"high_complexity_functions": [...], "refactor_candidates": [...]}` |
+| `test_context` | Dict\|None | Test coverage info (only when task has file_path) | `{"test_files": [...], "coverage_estimate": "medium"}` |
+
+#### Telemetry Fields (always present)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `query_time_ms` | int | Milliseconds spent gathering doc context |
+| `keywords_extracted` | List[str] | Keywords extracted from task description |
+| `result_count` | Dict | Entity counts: `{"classes": 3, "functions": 12, "modules": 5}` |
+| `doc_generation_date` | str\|None | ISO timestamp when docs were generated |
+| `doc_location` | str\|None | Path to codebase.json |
+
+#### Freshness Fields (when available=True)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `generated_at` | str | ISO timestamp of doc generation |
+| `age_hours` | float | Hours since generation |
+| `is_stale` | bool | True if age exceeds TTL threshold |
+| `stale_reason` | str\|None | Explanation if stale (e.g., "Documentation is 72 hours old") |
+| `refresh_recommended` | bool | True if refresh would improve quality |
+
+### Gating Rules and Status States
+
+#### Status State Definitions
+
+| Status | Condition | Behavior |
+|--------|-----------|----------|
+| `"available"` | Docs exist, fresh (age < TTL), query succeeded | Return full context payload |
+| `"stale"` | Docs exist but age ≥ TTL | Return context payload with freshness warning |
+| `"unavailable"` | No docs found or `check_doc_query_available()` failed | Return minimal payload with generation suggestion |
+| `"generating"` | Doc generation in progress (reserved for future) | Return minimal payload with wait message |
+
+#### Gating Logic Flow
+
+```python
+def determine_doc_context_status(task_data):
+    # Check availability first
+    doc_check = check_doc_query_available()
+
+    if not doc_check["available"]:
+        return {
+            "available": False,
+            "status": "unavailable",
+            "message": "No documentation found. Run `sdd doc generate` to enable context gathering."
+        }
+
+    # Check freshness
+    generated_at = doc_check["stats"].get("generated_at")
+    if not generated_at:
+        # Missing metadata, treat as available but unknown freshness
+        return query_docs_and_build_payload(task_data, is_stale=False)
+
+    age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
+    ttl_hours = get_staleness_ttl()  # See Freshness Policy section
+
+    is_stale = age_hours >= ttl_hours
+
+    if is_stale:
+        return {
+            "available": True,
+            "status": "stale",
+            "message": f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h). Consider running `sdd doc generate --refresh`.",
+            **query_docs_and_build_payload(task_data, is_stale=True)
+        }
+
+    # Fresh and available
+    return {
+        "available": True,
+        "status": "available",
+        "message": f"Found {result_count} relevant entities from fresh documentation",
+        **query_docs_and_build_payload(task_data, is_stale=False)
+    }
+```
+
+### Freshness Policy
+
+#### TTL Thresholds
+
+| Documentation Type | TTL (hours) | Rationale |
+|-------------------|-------------|-----------|
+| **Default** | 48 hours | Balance between freshness and regeneration cost |
+| **Fast-changing repos** | 24 hours | High commit velocity projects |
+| **Stable repos** | 168 hours (7 days) | Infrequent changes, stable APIs |
+
+Configuration via `.claude/sdd_config.json`:
+```json
+{
+  "doc_context": {
+    "staleness_ttl_hours": 48,
+    "auto_refresh_on_stale": false,
+    "skip_stale_warning": false
+  }
+}
+```
+
+#### Staleness Detection
+
+```python
+def is_documentation_stale(doc_stats, ttl_hours=48):
+    """
+    Determine if documentation is stale based on age.
+
+    Returns:
+        tuple[bool, str]: (is_stale, reason)
+    """
+    generated_at = doc_stats.get("generated_at")
+    if not generated_at:
+        return (False, "Unknown generation time")
+
+    age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
+
+    if age_hours >= ttl_hours:
+        return (True, f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h)")
+
+    return (False, None)
+```
+
+#### Cache Invalidation Triggers
+
+Documentation should be regenerated when:
+
+1. **Age-based**: Documentation age exceeds TTL threshold
+2. **Content-based**: Significant code changes detected
+   - New files added in tracked directories
+   - Major refactoring (>20% of files modified)
+   - Dependency changes (package.json, requirements.txt modified)
+3. **Manual**: User runs `sdd doc generate --force`
+
+#### Refresh Strategies
+
+| Strategy | When to Use | Implementation |
+|----------|-------------|----------------|
+| **Passive** | Default behavior | Show staleness warning, suggest refresh |
+| **Auto-refresh** | CI/CD pipelines | Set `auto_refresh_on_stale: true` in config |
+| **On-demand** | User-triggered | Call `sdd doc generate` before prepare-task |
+
+### Fallback Behavior
+
+#### When Documentation Unavailable
+
+```python
+{
+    "available": False,
+    "status": "unavailable",
+    "message": "No documentation found. Run `sdd doc generate` to enable context gathering.",
+    "telemetry": {
+        "query_time_ms": 0,
+        "keywords_extracted": [],
+        "result_count": {},
+        "doc_generation_date": None,
+        "doc_location": None
+    }
+}
+```
+
+**Agent behavior:**
+- Proceed with task using only spec-provided context
+- Rely on manual exploration (`Read`, `Glob`, `Grep`)
+- Log recommendation to generate docs
+
+#### When Documentation Stale
+
+```python
+{
+    "available": True,
+    "status": "stale",
+    "message": "Documentation is 72.3 hours old (threshold: 48h). Results may be outdated.",
+    "suggested_files": [...],  # Include results despite staleness
+    "freshness": {
+        "generated_at": "2025-11-21T12:00:00Z",
+        "age_hours": 72.3,
+        "is_stale": True,
+        "stale_reason": "Documentation is 72.3 hours old (threshold: 48h)",
+        "refresh_recommended": True
+    },
+    "telemetry": {...}
+}
+```
+
+**Agent behavior:**
+- Use stale context as starting point
+- Verify critical files with `Read` before implementation
+- Recommend refresh if results seem outdated
+
+#### When Query Fails
+
+```python
+{
+    "available": False,
+    "status": "unavailable",
+    "message": "Documentation query failed: TimeoutError",
+    "telemetry": {
+        "query_time_ms": 5000,
+        "keywords_extracted": ["auth", "login"],
+        "result_count": {},
+        "doc_generation_date": None,
+        "doc_location": "/path/to/codebase.json"
+    }
+}
+```
+
+**Agent behavior:**
+- Log error for debugging
+- Fall back to manual exploration
+- Continue with task using spec context only
+
+### Integration with prepare_task()
+
+#### Modified prepare_task() Flow
+
+```python
+def prepare_task(spec_id, task_id=None, ...):
+    # ... existing logic ...
+
+    # Gather doc context (enhanced)
+    doc_context = None
+    if check_sdd_integration_available():
+        try:
+            # Build task description for query
+            task_description = build_task_description(task_data)
+
+            # Gather context with timeout
+            gatherer = SDDContextGatherer()
+            start_time = time.time()
+
+            context_data = gatherer.get_task_context(task_description)
+            query_time_ms = int((time.time() - start_time) * 1000)
+
+            # Build enhanced payload
+            doc_context = build_doc_context_payload(
+                context_data,
+                query_time_ms,
+                task_data
+            )
+
+        except Exception as e:
+            # Graceful degradation
+            doc_context = {
+                "available": False,
+                "status": "unavailable",
+                "message": f"Documentation query failed: {type(e).__name__}",
+                "telemetry": {
+                    "query_time_ms": 0,
+                    "keywords_extracted": [],
+                    "result_count": {},
+                    "doc_generation_date": None,
+                    "doc_location": None
+                }
+            }
+
+    result["doc_context"] = doc_context
+    # ... rest of prepare_task ...
+```
+
+#### Helper Functions
+
+```python
+def build_task_description(task_data):
+    """
+    Build comprehensive task description for doc query.
+
+    Combines:
+    - Task title
+    - Metadata details
+    - File path (if specified)
+    """
+    parts = [task_data["title"]]
+
+    if "details" in task_data.get("metadata", {}):
+        parts.extend(task_data["metadata"]["details"])
+
+    if "file_path" in task_data.get("metadata", {}):
+        parts.append(f"Target file: {task_data['metadata']['file_path']}")
+
+    return " ".join(parts)
+
+def build_doc_context_payload(context_data, query_time_ms, task_data):
+    """
+    Build standardized doc_context payload from SDDContextGatherer results.
+    """
+    doc_stats = context_data.get("metadata", {})
+    generated_at = doc_stats.get("generated_at")
+
+    # Calculate freshness
+    freshness = None
+    is_stale = False
+    if generated_at:
+        age_hours = (datetime.now() - parse_iso(generated_at)).total_seconds() / 3600
+        ttl_hours = get_staleness_ttl()
+        is_stale = age_hours >= ttl_hours
+
+        freshness = {
+            "generated_at": generated_at,
+            "age_hours": round(age_hours, 1),
+            "is_stale": is_stale,
+            "stale_reason": f"Documentation is {age_hours:.1f} hours old (threshold: {ttl_hours}h)" if is_stale else None,
+            "refresh_recommended": is_stale
+        }
+
+    # Determine status
+    status = "stale" if is_stale else "available"
+    message = (
+        f"Documentation is {freshness['age_hours']}h old. Consider refreshing." if is_stale
+        else f"Found {len(context_data['suggested_files'])} relevant files from fresh documentation"
+    )
+
+    return {
+        "available": True,
+        "status": status,
+        "message": message,
+        "suggested_files": context_data["suggested_files"],
+        "relevant_modules": context_data["module_summaries"],
+        "relevant_functions": [f.data for f in context_data["relevant_functions"]],
+        "relevant_classes": [c.data for c in context_data["relevant_classes"]],
+        "dependencies": context_data["dependencies"],
+        "similar_implementations": [],  # TODO: implement in Phase 2
+        "complexity_insights": {},      # TODO: implement in Phase 2
+        "test_context": None,           # TODO: implement if file_path specified
+        "telemetry": {
+            "query_time_ms": query_time_ms,
+            "keywords_extracted": context_data["keywords"],
+            "result_count": {
+                "classes": len(context_data["relevant_classes"]),
+                "functions": len(context_data["relevant_functions"]),
+                "modules": len(context_data["relevant_modules"]),
+                "files": len(context_data["suggested_files"])
+            },
+            "doc_generation_date": generated_at,
+            "doc_location": doc_stats.get("location")
+        },
+        "freshness": freshness
+    }
+```
+
+### Performance Considerations
+
+#### Latency Budget
+
+| Operation | Target | Maximum |
+|-----------|--------|---------|
+| Doc availability check | <5ms | 10ms |
+| Context query | <50ms | 200ms |
+| Total overhead | <55ms | 210ms |
+
+#### Optimization Strategies
+
+1. **Cache availability check**: Store `check_doc_query_available()` result for session
+2. **Limit result sets**: Cap entities per type (e.g., top 10 functions, top 5 modules)
+3. **Lazy loading**: Defer `test_context` and `complexity_insights` to Phase 2
+4. **Timeout handling**: Abort query after 200ms, return partial results
+
+#### Token Usage Impact
+
+| Scenario | Token Increase | Justification |
+|----------|----------------|---------------|
+| Docs unavailable | +50 tokens | Minimal fallback payload |
+| Docs available, few results | +200 tokens | Small suggested_files list |
+| Docs available, many results | +500 tokens | Full payload with modules/functions |
+| Docs stale | +550 tokens | Full payload + freshness warning |
+
+**Trade-off:** 200-500 token increase eliminates 2-3 subsequent CLI calls (saving 600-1200 tokens net).
+
+### Configuration Options
+
+Add to `.claude/sdd_config.json`:
+
+```json
+{
+  "doc_context": {
+    "enabled": true,
+    "staleness_ttl_hours": 48,
+    "auto_refresh_on_stale": false,
+    "skip_stale_warning": false,
+    "max_suggested_files": 20,
+    "max_results_per_type": 10,
+    "query_timeout_ms": 200,
+    "include_test_context": true,
+    "include_complexity_insights": false
+  }
+}
+```
+
+### Testing Scenarios
+
+| Scenario | Expected Behavior |
+|----------|-------------------|
+| Docs never generated | `status: "unavailable"`, suggest generation |
+| Docs fresh (<48h) | `status: "available"`, full payload |
+| Docs stale (≥48h) | `status: "stale"`, full payload with warning |
+| Query timeout | `status: "unavailable"`, graceful degradation |
+| Empty results | `status: "available"`, empty lists, message indicates no matches |
+| Task with file_path | Include `test_context` field |
+| Task without file_path | Omit `test_context` field |
+
+### Implementation Checklist
+
+- [ ] Add `doc_context` field to prepare-task contract extraction
+- [ ] Implement `build_task_description()` helper
+- [ ] Implement `build_doc_context_payload()` helper
+- [ ] Implement `get_staleness_ttl()` config reader
+- [ ] Add freshness calculation logic
+- [ ] Add gating logic for status determination
+- [ ] Add telemetry tracking
+- [ ] Update contract tests for new schema
+- [ ] Document agent consumption patterns in sdd-next SKILL.md
+
 ## References
 
 - **Source files**:
   - `src/claude_skills/claude_skills/sdd_next/discovery.py`: prepare_task() implementation
   - `src/claude_skills/claude_skills/sdd_next/context_utils.py`: Context gathering functions
   - `src/claude_skills/claude_skills/common/contracts.py`: Contract extraction logic
+  - `src/claude_skills/claude_skills/common/doc_helper.py`: Documentation availability checks
+  - `src/claude_skills/claude_skills/doc_query/sdd_integration.py`: SDDContextGatherer implementation
 
 - **Related specs**:
-  - None (this is the foundational analysis)
+  - prepare-task-doc-context-2025-11-24-001: Current specification
 
 - **Documentation**:
   - sdd-next SKILL.md (lines 430-460): Context gathering best practices

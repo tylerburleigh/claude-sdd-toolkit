@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-doc-context-2025-11-24-001",
   "title": "Enhance prepare-task with automatic doc context",
   "generated": "2025-11-24T00:00:00Z",
-  "last_updated": "2025-11-24T15:23:22.748648Z",
+  "last_updated": "2025-11-24T15:35:16.514717Z",
   "metadata": {
     "description": "Enable sdd prepare-task to automatically pull scoped codebase documentation for referenced files when docs are fresh, delivering file-specific guidance in a single call.",
     "objectives": [
@@ -19,7 +19,7 @@
       "Doc freshness threshold (<=24h) is enforced so stale docs skip context output",
       "sdd-integration task-context command is available in PATH"
     ],
-    "progress_percentage": 16,
+    "progress_percentage": 33,
     "current_phase": "phase-1-doc-readiness"
   },
   "hierarchy": {
@@ -35,7 +35,7 @@
         "phase-3-validation"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Ship richer default prepare-task responses without extra commands.",
         "estimated_hours": 32
@@ -46,17 +46,20 @@
       "id": "phase-1-doc-readiness",
       "type": "phase",
       "title": "Doc availability + design",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "task-1-1",
         "task-1-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Confirm doc-query status handling and design new payload contract",
-        "estimated_hours": 10
+        "estimated_hours": 10,
+        "needs_journaling": false,
+        "completed_at": "2025-11-24T15:35:16.511296Z",
+        "journaled_at": "2025-11-24T15:35:16.514700Z"
       },
       "dependencies": {}
     },
@@ -92,11 +95,11 @@
       "id": "task-1-2",
       "type": "task",
       "title": "Design context contract + fallbacks",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-doc-readiness",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "decision",
         "estimated_hours": 6,
@@ -106,7 +109,13 @@
           "Define gating rules for stale vs available docs",
           "Document freshness TTL and cache bust rules for doc_context usage",
           "List telemetry/provenance fields for consumers"
-        ]
+        ],
+        "started_at": "2025-11-24T15:31:58.055847Z",
+        "status_note": "Starting design of doc_context contract, gating rules, and telemetry fields",
+        "completed_at": "2025-11-24T15:35:16.511144Z",
+        "needs_journaling": false,
+        "actual_hours": 0.055,
+        "journaled_at": "2025-11-24T15:35:16.513086Z"
       },
       "dependencies": {
         "depends": [
@@ -279,6 +288,24 @@
       "content": "Comprehensive audit completed of doc helper functions and schema requirements for prepare-task integration.\n\nKey findings:\n1. Reviewed existing doc_helper.py with 3 main functions: check_doc_query_available(), check_sdd_integration_available(), get_task_context_from_docs()\n2. Analyzed sdd_integration.py providing SDDContextGatherer class with methods: get_task_context(), suggest_files_for_task(), find_similar_implementations(), get_test_context(), get_impact_analysis()\n3. Confirmed prepare_task() in discovery.py already calls get_task_context_from_docs() and includes doc_context in result payload\n4. Reviewed analysis/prepare-task-default-context.md documenting contract v1-v3 evolution and context payload structure\n5. Identified required inputs for doc queries: task description (title + details), optional file_path, spec_id (for context)\n6. Documented schema additions needed: doc_context block with files[], dependencies[], similar[], complexity{}, plus availability messaging\n\nCurrent integration status: Basic doc_context already exists in prepare-task but returns minimal structure from get_task_context_from_docs(). Schema can be enhanced to match rich SDDContextGatherer.get_task_context() output format.\n\nFiles analyzed:\n- src/claude_skills/claude_skills/common/doc_helper.py (294 lines)\n- src/claude_skills/claude_skills/doc_query/sdd_integration.py (453 lines)  \n- src/claude_skills/claude_skills/sdd_next/discovery.py (prepare_task function)\n- analysis/prepare-task-default-context.md (existing contract analysis)\n\nVerified: sdd doc scope --plan and --implement presets available for contextual queries\nVerified: sdd-integration CLI commands work (task-context, suggest-files, similar, test-context, impact)\n\nNo blockers. Ready for task-1-2 design phase.",
       "metadata": {},
       "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-11-24T15:35:16.513082Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Design context contract + fallbacks",
+      "author": "claude-code",
+      "content": "Comprehensive doc_context contract design completed and documented in analysis/prepare-task-default-context.md.\n\nDesign deliverables:\n1. Enhanced doc_context schema with 3 top-level sections: availability fields, context payload (8 entity types), and telemetry/freshness metadata\n2. Status state definitions: \"available\" (fresh docs), \"stale\" (aged docs), \"unavailable\" (no docs), \"generating\" (reserved)\n3. Gating logic flow with availability checks and TTL-based freshness calculation\n4. Freshness policy: 48h default TTL, configurable per repo type (24h fast-changing, 168h stable)\n5. Cache invalidation triggers: age-based (TTL), content-based (code changes), manual (force regenerate)\n6. Fallback behavior documented for 3 scenarios: unavailable (suggest generation), stale (use with warning), query failure (graceful degradation)\n7. Integration patterns: build_task_description() and build_doc_context_payload() helper functions with pseudocode\n8. Performance budgets: <210ms total overhead, 200-500 token increase (net savings 600-1200 tokens)\n9. Configuration schema for .claude/sdd_config.json with 8 tuneable parameters\n10. Testing scenarios matrix: 7 test cases covering all status states\n11. Implementation checklist: 9 concrete implementation tasks\n\nKey design decisions:\n- Telemetry always included (even when unavailable) for debugging\n- Freshness metadata only when docs available\n- test_context conditional on file_path presence\n- Similar implementations and complexity insights deferred to Phase 2\n- Graceful degradation prioritized over failing fast\n\nFile updated: analysis/prepare-task-default-context.md (+487 lines, new section from line 575)\n\nReady for Phase 2 implementation tasks.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-24T15:35:16.514696Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Doc availability + design",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-1-doc-readiness have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-doc-readiness"
     }
   ]
 }
