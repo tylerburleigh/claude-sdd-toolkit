@@ -448,8 +448,16 @@ def prepare_task(
         task_title = task_data.get("title", "")
         task_description = task_data.get("description", task_title)
 
-        # Get context from documentation
-        doc_context = get_task_context_from_docs(task_description)
+        # Extract file_path from task metadata if available
+        task_file_path = task_data.get("metadata", {}).get("file_path")
+
+        # Get context from documentation with enhanced parameters
+        doc_context = get_task_context_from_docs(
+            task_description,
+            project_root=str(spec_path.parent),
+            file_path=task_file_path,
+            spec_id=spec_id
+        )
         if doc_context:
             result["doc_context"] = doc_context
 
@@ -490,6 +498,10 @@ def prepare_task(
             "task_journal": task_journal,
             "dependencies": dependency_details,
         }
+
+        # Add file_docs to context if doc_context is available
+        if result.get("doc_context"):
+            result["context"]["file_docs"] = result["doc_context"]
 
         # Add plan validation only if task has a plan
         if plan_validation:
