@@ -245,3 +245,119 @@ def test_prepare_task_latency_budget_100ms(sample_json_spec_simple, specs_struct
     # Use median to avoid outliers
     median_ms = sorted(timings)[len(timings) // 2]
     assert median_ms < 100, f"Median latency {median_ms:.2f}ms exceeds 100ms budget"
+
+
+def test_prepare_task_includes_doc_context_when_available(sample_json_spec_simple, specs_structure):
+    """Test that context.file_docs is populated when doc-query is available"""
+    mock_doc_context = {
+        "files": ["src/test.py", "src/utils.py"],
+        "dependencies": ["json", "pathlib"],
+        "similar": [],
+        "complexity": {},
+        "provenance": {
+            "source_doc_id": "/tmp/docs",
+            "generated_at": "2025-11-24T10:00:00Z",
+            "generated_at_commit": "abc123",
+            "freshness_ms": 45
+        }
+    }
+
+    with ExitStack() as stack:
+        # Mock doc-query availability (patch where it's used in discovery.py)
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_query_available", return_value={"available": True})
+        )
+        # Mock doc context response (patch where it's used in discovery.py)
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.get_task_context_from_docs", return_value=mock_doc_context)
+        )
+        # Mock doc availability status
+        from claude_skills.common.doc_integration import DocStatus
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_availability", return_value=DocStatus.AVAILABLE)
+        )
+
+        result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+
+    # Verify doc_context is in result
+    assert result.get("doc_context") == mock_doc_context
+
+    # Verify file_docs is in context
+    context = result["context"]
+    assert "file_docs" in context
+    assert context["file_docs"] == mock_doc_context
+    assert context["file_docs"]["files"] == ["src/test.py", "src/utils.py"]
+    assert context["file_docs"]["dependencies"] == ["json", "pathlib"]
+
+
+def test_prepare_task_fallback_when_docs_unavailable(sample_json_spec_simple, specs_structure):
+    """Test that prepare_task works gracefully when doc-query is unavailable"""
+    with ExitStack() as stack:
+        # Mock doc-query unavailable (patch where it's used in discovery.py)
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_query_available", return_value={"available": False})
+        )
+
+        result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+
+    # Verify doc_context is None
+    assert result.get("doc_context") is None
+
+    # Verify file_docs is NOT in context
+    context = result["context"]
+    assert "file_docs" not in context
+
+    # Verify other context fields are still populated
+    assert context["previous_sibling"] is not None or context["parent_task"] is not None
+    assert "phase" in context
+    assert "sibling_files" in context
+
+
+def test_prepare_task_doc_context_overhead_under_30ms(sample_json_spec_simple, specs_structure):
+    """Test that doc context integration adds <30ms overhead (10-call median)"""
+    def measure_median(repetitions: int = 10) -> float:
+        """Measure median latency over N repetitions"""
+        timings = []
+        for _ in range(repetitions):
+            start = perf_counter()
+            prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+            timings.append((perf_counter() - start) * 1000)  # Convert to ms
+        return sorted(timings)[len(timings) // 2]  # Return median
+
+    # Warm-up call
+    prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+
+    # Baseline: measure without doc context
+    with ExitStack() as stack:
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_query_available", return_value={"available": False})
+        )
+        baseline_ms = measure_median(10)
+
+    # With doc context: measure with mocked doc-query
+    mock_doc_context = {
+        "files": ["src/test.py"],
+        "dependencies": [],
+        "similar": [],
+        "complexity": {},
+        "provenance": {"source_doc_id": "/tmp", "generated_at": "2025-11-24", "freshness_ms": 10}
+    }
+
+    with ExitStack() as stack:
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_query_available", return_value={"available": True})
+        )
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.get_task_context_from_docs", return_value=mock_doc_context)
+        )
+        from claude_skills.common.doc_integration import DocStatus
+        stack.enter_context(
+            patch("claude_skills.sdd_next.discovery.check_doc_availability", return_value=DocStatus.AVAILABLE)
+        )
+        with_doc_ms = measure_median(10)
+
+    # Calculate overhead
+    overhead_ms = with_doc_ms - baseline_ms
+
+    # Assert overhead is under 30ms
+    assert overhead_ms < 30, f"Doc context integration added {overhead_ms:.2f}ms overhead, expected <30ms (baseline: {baseline_ms:.2f}ms, with_doc: {with_doc_ms:.2f}ms)"

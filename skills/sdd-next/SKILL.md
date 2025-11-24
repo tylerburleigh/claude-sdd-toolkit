@@ -97,7 +97,7 @@ or
 ### Context Gathering Best Practices
 
 **Default workflow (stick to this unless spec says otherwise)**
-1. Run `sdd prepare-task` with no flags. The returned `context` block already includes the previous sibling, parent metadata, phase progress, sibling files, and the latest journal summary.
+1. Run `sdd prepare-task` with no flags. The returned `context` block already includes the previous sibling, parent metadata, phase progress, sibling files, the latest journal summary, and file-focused documentation context (when available via `context.file_docs`).
 2. Only call `sdd task-info`, `sdd get-task`, or `sdd progress` if the spec explicitly asks for extra metadata or you need files that are not exposed in `context`.
 3. After completing the task, re-run `sdd prepare-task` to surface the next recommendation and refreshed context.
 
@@ -123,7 +123,7 @@ or
 
 | Command | Returns | Use when | Redundant / Notes |
 | --- | --- | --- | --- |
-| `sdd prepare-task` | Recommended task plus `context` (previous sibling, parent, phase, sibling files, journal summary, dependencies) | **Always** – first call for every task | N/A |
+| `sdd prepare-task` | Recommended task plus `context` (previous sibling, parent, phase, sibling files, journal summary, dependencies, file_docs) | **Always** – first call for every task | `file_docs` automatically included when doc-query documentation is available |
 | `sdd task-info` | Raw task metadata straight from the spec | Spec explicitly references metadata not surfaced in `context` (acceptance criteria, detailed instructions) | Usually covered by `prepare-task`; only call when spec requires |
 | `sdd get-task` | Full JSON node, including deep metadata blobs | Rare audits where you must inspect the spec data exactly as stored | Redundant with `task-info` for normal flows |
 | `sdd progress` | Spec-wide counts, percentages, current phase | Preparing a status report or verifying completion prompts | `context.phase` already shows local progress; only run when reporting overall stats |

@@ -441,23 +441,33 @@ def prepare_task(
         result["doc_status"] = doc_status.value
         result["doc_prompt_needed"] = True
 
-    # Automatically gather codebase context if documentation is available
-    doc_check = check_doc_query_available()
-    if doc_check["available"]:
-        # Extract task description for context gathering
-        task_title = task_data.get("title", "")
-        task_description = task_data.get("description", task_title)
+    # Automatically gather codebase context ONLY if documentation is fresh (AVAILABLE)
+    # Stale docs are omitted to signal agent should use manual exploration
+    if doc_status == DocStatus.AVAILABLE:
+        doc_check = check_doc_query_available()
+        if doc_check["available"]:
+            # Extract task description for context gathering
+            task_title = task_data.get("title", "")
+            task_description = task_data.get("description", task_title)
 
-        # Get context from documentation
-        doc_context = get_task_context_from_docs(task_description)
-        if doc_context:
-            result["doc_context"] = doc_context
+            # Extract file_path from task metadata if available
+            task_file_path = task_data.get("metadata", {}).get("file_path")
 
-            # Add helpful message
-            if doc_context.get("files"):
-                result["doc_context"]["message"] = (
-                    f"Found {len(doc_context['files'])} relevant files from codebase documentation"
-                )
+            # Get context from documentation with enhanced parameters
+            doc_context = get_task_context_from_docs(
+                task_description,
+                project_root=str(spec_path.parent),
+                file_path=task_file_path,
+                spec_id=spec_id
+            )
+            if doc_context:
+                result["doc_context"] = doc_context
+
+                # Add helpful message
+                if doc_context.get("files"):
+                    result["doc_context"]["message"] = (
+                        f"Found {len(doc_context['files'])} relevant files from codebase documentation"
+                    )
 
     # Phase 4: Prepare enhanced context payload (defensive)
     try:
@@ -490,6 +500,10 @@ def prepare_task(
             "task_journal": task_journal,
             "dependencies": dependency_details,
         }
+
+        # Add file_docs to context if doc_context is available
+        if result.get("doc_context"):
+            result["context"]["file_docs"] = result["doc_context"]
 
         # Add plan validation only if task has a plan
         if plan_validation:
