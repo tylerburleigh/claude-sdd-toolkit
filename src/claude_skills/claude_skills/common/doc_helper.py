@@ -250,34 +250,15 @@ def get_task_context_from_docs(
             # Parse JSON output
             try:
                 context = json.loads(proc.stdout)
-
-                # Add provenance metadata
-                doc_check = check_doc_query_available()
-                generated_at = doc_check.get("stats", {}).get("generated_at")
-                generated_at_commit = doc_check.get("stats", {}).get("generated_at_commit")
-
-                context["provenance"] = {
-                    "source_doc_id": doc_check.get("location", "unknown"),
-                    "generated_at": generated_at,
-                    "generated_at_commit": generated_at_commit,
-                    "freshness_ms": query_time_ms
-                }
-
                 return context
             except json.JSONDecodeError:
-                # If not JSON, return structured text with provenance
+                # If not JSON, return structured text
                 return {
                     "files": [],
                     "dependencies": [],
                     "similar": [],
                     "complexity": {},
-                    "raw_output": proc.stdout,
-                    "provenance": {
-                        "source_doc_id": "unknown",
-                        "generated_at": None,
-                        "generated_at_commit": None,
-                        "freshness_ms": query_time_ms
-                    }
+                    "raw_output": proc.stdout
                 }
         else:
             return None
