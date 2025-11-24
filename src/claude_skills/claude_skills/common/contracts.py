@@ -31,6 +31,7 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
         3. Understand what work needs to be done
         4. Prepare the git environment appropriately
         5. Detect if the spec is complete
+        6. Access rich context without additional CLI calls
 
     Field Inclusion Rules:
 
@@ -43,6 +44,7 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
         - git.suggested_branch: Branch name to use
         - git.dirty: Whether working tree has uncommitted changes
         - spec_complete: Whether the spec is finished
+        - context: Enhanced context payload (new in default output)
 
         CONDITIONALLY INCLUDE (Optional):
         - file_path: Target file path (only if specified in task metadata)
@@ -50,12 +52,14 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
         - status: Task status (only if not "pending")
         - validation_warnings: Spec validation warnings (only if non-empty)
         - completion_info: Completion details (only if spec_complete is True)
+        - task_metadata: Full metadata fields (category, estimated_hours, etc.)
+        - extended_context: Additional context from enhancement flags
 
         OMIT (Redundant/Not Needed):
         - success, error: Exit code indicates success/failure
         - task_data: Fields duplicated at top level
         - task_details, spec_file, doc_context: Always null
-        - dependencies object: Flattened to top-level fields
+        - dependencies object: Now included in context block
         - repo_root: Agent knows from environment
         - needs_branch_creation: Duplicate of git.needs_branch
         - dirty_tree_status: Verbose, git.dirty is sufficient
@@ -73,13 +77,24 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
         ...     "task_id": "task-1-1-1",
         ...     "task_data": {
         ...         "title": "Implement extract_prepare_task_contract()",
-        ...         "metadata": {"details": "Extract fields: ..."}
+        ...         "metadata": {
+        ...             "details": ["Extract fields: ...", "Add context block"],
+        ...             "task_category": "implementation",
+        ...             "estimated_hours": 2
+        ...         }
         ...     },
         ...     "dependencies": {"can_start": True, "blocked_by": []},
         ...     "needs_branch_creation": True,
         ...     "suggested_branch_name": "feat/compact-json",
         ...     "dirty_tree_status": {"is_dirty": False},
         ...     "spec_complete": False,
+        ...     "context": {
+        ...         "previous_sibling": {"id": "task-1-1", "title": "...", "status": "completed"},
+        ...         "parent_task": {"id": "phase-1", "title": "Foundation"},
+        ...         "phase": {"title": "Phase 1", "percentage": 40},
+        ...         "sibling_files": [],
+        ...         "task_journal": {"entry_count": 0, "entries": []}
+        ...     }
         ...     # ... many other fields
         ... }
         >>> contract = extract_prepare_task_contract(full_output)
@@ -95,7 +110,18 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
                 "dirty": False
             },
             "spec_complete": False,
-            "details": "Extract fields: ..."
+            "context": {
+                "previous_sibling": {"id": "task-1-1", "title": "...", "status": "completed"},
+                "parent_task": {"id": "phase-1", "title": "Foundation"},
+                "phase": {"title": "Phase 1", "percentage": 40},
+                "sibling_files": [],
+                "task_journal": {"entry_count": 0, "entries": []}
+            },
+            "details": ["Extract fields: ...", "Add context block"],
+            "task_metadata": {
+                "category": "implementation",
+                "estimated_hours": 2
+            }
         }
     """
     contract = {}
@@ -126,6 +152,11 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
     # Spec completion status
     contract["spec_complete"] = prepare_task_output.get("spec_complete", False)
 
+    # Context payload - Always include if present (new default)
+    context = prepare_task_output.get("context")
+    if context:
+        contract["context"] = context
+
     # Conditional fields - Include only if present and non-empty
 
     # file_path from task_data.metadata
@@ -138,6 +169,20 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
     details = metadata.get("details")
     if details:
         contract["details"] = details
+
+    # task_metadata - Include full metadata if it has useful fields
+    task_metadata = {}
+    if metadata.get("task_category"):
+        task_metadata["category"] = metadata["task_category"]
+    if metadata.get("estimated_hours") is not None:
+        task_metadata["estimated_hours"] = metadata["estimated_hours"]
+    if metadata.get("acceptance_criteria"):
+        task_metadata["acceptance_criteria"] = metadata["acceptance_criteria"]
+    if metadata.get("verification_type"):
+        task_metadata["verification_type"] = metadata["verification_type"]
+
+    if task_metadata:
+        contract["task_metadata"] = task_metadata
 
     # status - only if not "pending" (default for next task)
     status = task_data.get("status")
@@ -158,6 +203,11 @@ def extract_prepare_task_contract(prepare_task_output: Dict[str, Any]) -> Dict[s
                 "is_complete": completion_info.get("should_prompt", False),
                 "reason": completion_info.get("reason", "")
             }
+
+    # extended_context - Include if enhancement flags were used
+    extended_context = prepare_task_output.get("extended_context")
+    if extended_context:
+        contract["extended_context"] = extended_context
 
     return contract
 

@@ -126,7 +126,11 @@ sdd next-task user-auth-2025-11-22-001 --json
 
 ### prepare-task
 
-Get comprehensive task information for execution.
+Get comprehensive task information for execution with enhanced default context.
+
+**One-Call Workflow:**
+
+The `prepare-task` command now provides all information needed for task execution in a single call, eliminating the need for separate `task-info` or `check-deps` calls unless specific overrides are required.
 
 **Syntax:**
 ```bash
@@ -146,23 +150,93 @@ sdd prepare-task <spec-id> [task-id] [OPTIONS]
 
 **Example:**
 ```bash
+# Get next task with enhanced default context (recommended)
+sdd prepare-task user-auth-2025-11-22-001 --json
+
+# Get specific task
 sdd prepare-task user-auth-2025-11-22-001 task-1-2 --json --compact
 ```
 
-**Output:**
+**Enhanced Default Output:**
+
+The default response now includes rich context without requiring additional flags:
+
 ```json
 {
   "task_id": "task-1-2",
-  "task_data": {...},
-  "dependencies": {...},
+  "task_data": {
+    "title": "Implement password hashing",
+    "status": "pending",
+    "metadata": {
+      "file_path": "src/auth.py",
+      "task_category": "implementation"
+    }
+  },
+  "dependencies": {
+    "can_start": true,
+    "blocked_by": [],
+    "soft_depends": []
+  },
   "context": {
-    "previous_sibling": {...},
-    "parent_task": {...},
-    "phase": {...},
-    "sibling_files": [...]
-  }
+    "previous_sibling": {
+      "id": "task-1-1",
+      "title": "Setup auth module",
+      "status": "completed",
+      "journal_excerpt": {
+        "summary": "Created auth.py with basic structure..."
+      }
+    },
+    "parent_task": {
+      "id": "phase-1",
+      "title": "Authentication Foundation",
+      "position_label": "2 of 5 tasks"
+    },
+    "phase": {
+      "title": "Phase 1: Foundation",
+      "percentage": 20,
+      "blockers": []
+    },
+    "sibling_files": [
+      {
+        "task_id": "task-1-1",
+        "file_path": "src/auth.py",
+        "changes_summary": "Created basic auth module structure..."
+      }
+    ],
+    "task_journal": {
+      "entry_count": 0,
+      "entries": []
+    },
+    "dependencies": {
+      "blocking": [],
+      "blocked_by_details": [],
+      "soft_depends": []
+    }
+  },
+  "needs_branch_creation": false,
+  "dirty_tree_status": {"is_dirty": false},
+  "spec_complete": false
 }
 ```
+
+**Key Default Fields:**
+
+| Field | Description |
+|-------|-------------|
+| `context.previous_sibling` | Previous task with journal summary for continuity |
+| `context.parent_task` | Parent task metadata and position |
+| `context.phase` | Current phase progress and blockers |
+| `context.sibling_files` | Files touched by related tasks |
+| `context.task_journal` | Task-specific journal entries |
+| `context.dependencies` | Detailed dependency info with titles/status/files |
+
+**When to Use Additional Commands:**
+
+- `task-info`: Only if you need metadata for a non-recommended task
+- `check-deps`: Only if you need to verify dependencies separately
+- Enhancement flags: Only for extended context (full journal, phase history, spec overview)
+
+**Performance:** <100ms median latency, <30ms overhead vs minimal context
 
 ---
 

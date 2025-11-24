@@ -153,3 +153,101 @@ def test_output_json_accepts_kwargs_and_positionals(capsys: pytest.CaptureFixtur
     assert json.loads(capsys.readouterr().out.strip()) == payload
     output_json(data=payload, compact=False)
     assert json.loads(capsys.readouterr().out) == payload
+
+
+def test_output_json_prepare_task_context_fields(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test that prepare-task payload with enhanced context fields serializes correctly."""
+    payload = {
+        "task_id": "task-2-1",
+        "task_data": {
+            "title": "Extend context_utils for default payload",
+            "status": "pending",
+            "metadata": {
+                "file_path": "src/context_utils.py",
+                "task_category": "implementation"
+            }
+        },
+        "dependencies": {
+            "can_start": True,
+            "blocked_by": [],
+            "soft_depends": []
+        },
+        "context": {
+            "previous_sibling": {
+                "id": "task-2-0",
+                "title": "Previous task",
+                "status": "completed"
+            },
+            "parent_task": {
+                "id": "phase-2",
+                "title": "File Modifications",
+                "position_label": "1 of 10 children"
+            },
+            "phase": {
+                "title": "Implementation",
+                "percentage": 35,
+                "blockers": []
+            },
+            "sibling_files": [],
+            "task_journal": {
+                "entry_count": 0,
+                "entries": []
+            },
+            "dependencies": {
+                "blocking": [],
+                "blocked_by_details": [],
+                "soft_depends": []
+            },
+            "plan_validation": {
+                "has_plan": False,
+                "plan_items": [],
+                "completed_steps": 0,
+                "total_steps": 0
+            }
+        }
+    }
+
+    # Test pretty-print mode
+    output_json(payload)
+    pretty_output = capsys.readouterr().out
+    assert json.loads(pretty_output) == payload
+    assert "context" in pretty_output
+    assert "dependencies" in pretty_output
+    assert "plan_validation" in pretty_output
+
+    # Test compact mode
+    output_json(payload, compact=True)
+    compact_output = capsys.readouterr().out.strip()
+    # Verify it's valid JSON
+    assert json.loads(compact_output) == payload
+    # Verify it's actually compact (no extra whitespace)
+    assert "\n" not in compact_output
+    assert "  " not in compact_output
+
+
+def test_output_json_enhanced_context_edge_cases(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test edge cases in enhanced context serialization."""
+    # Test with populated dependencies.blocked_by_details
+    payload = {
+        "context": {
+            "dependencies": {
+                "blocking": [
+                    {"id": "task-3-1", "title": "Blocker task", "status": "pending", "file_path": ""}
+                ],
+                "blocked_by_details": [
+                    {"id": "task-1-5", "title": "Dependency", "status": "completed", "file_path": "src/foo.py"}
+                ],
+                "soft_depends": []
+            }
+        }
+    }
+
+    output_json(payload, compact=True)
+    output = capsys.readouterr().out.strip()
+    parsed = json.loads(output)
+
+    # Verify nested arrays serialize correctly
+    assert len(parsed["context"]["dependencies"]["blocking"]) == 1
+    assert parsed["context"]["dependencies"]["blocking"][0]["id"] == "task-3-1"
+    assert len(parsed["context"]["dependencies"]["blocked_by_details"]) == 1
+    assert parsed["context"]["dependencies"]["blocked_by_details"][0]["file_path"] == "src/foo.py"

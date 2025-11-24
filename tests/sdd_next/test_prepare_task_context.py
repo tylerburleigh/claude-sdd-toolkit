@@ -23,6 +23,7 @@ def test_prepare_task_returns_context(sample_json_spec_simple, specs_structure):
         "phase",
         "sibling_files",
         "task_journal",
+        "dependencies",
     }
 
 
@@ -174,3 +175,73 @@ def test_prepare_task_context_overhead_under_30ms(sample_json_spec_simple, specs
     actual = measure_call()
     overhead_ms = (actual - baseline) * 1000
     assert overhead_ms < 30, f"Context gathering added {overhead_ms:.2f}ms, expected <30ms"
+
+
+def test_prepare_task_context_includes_dependencies(sample_json_spec_simple, specs_structure):
+    """Test that context.dependencies includes detailed dependency info"""
+    spec_path = sample_json_spec_simple
+    spec_data = json.loads(spec_path.read_text())
+
+    result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-2")
+
+    context = result["context"]
+    dependencies = context["dependencies"]
+
+    # Verify dependencies structure
+    assert isinstance(dependencies, dict)
+    assert "blocking" in dependencies
+    assert "blocked_by_details" in dependencies
+    assert "soft_depends" in dependencies
+
+    # All should be lists
+    assert isinstance(dependencies["blocking"], list)
+    assert isinstance(dependencies["blocked_by_details"], list)
+    assert isinstance(dependencies["soft_depends"], list)
+
+
+def test_prepare_task_json_output_pretty(sample_json_spec_simple, specs_structure):
+    """Test that prepare_task output can be serialized as pretty JSON"""
+    result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+
+    # Should serialize without errors
+    pretty_json = json.dumps(result, indent=2)
+    assert pretty_json
+    assert "\n" in pretty_json  # Pretty format has newlines
+
+    # Verify it's valid JSON
+    parsed = json.loads(pretty_json)
+    assert parsed == result
+
+
+def test_prepare_task_json_output_compact(sample_json_spec_simple, specs_structure):
+    """Test that prepare_task output can be serialized as compact JSON"""
+    result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
+
+    # Should serialize without errors
+    compact_json = json.dumps(result, separators=(',', ':'))
+    assert compact_json
+
+    # Compact format should be shorter (no extra whitespace)
+    pretty_json = json.dumps(result, indent=2)
+    assert len(compact_json) < len(pretty_json)
+
+    # Verify it's valid JSON
+    parsed = json.loads(compact_json)
+    assert parsed == result
+
+
+def test_prepare_task_latency_budget_100ms(sample_json_spec_simple, specs_structure):
+    """Test that prepare_task completes within 100ms latency budget"""
+    # Warm-up call to avoid cold-start effects
+    prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-2")
+
+    # Measure actual execution time over multiple runs
+    timings = []
+    for _ in range(5):
+        start = perf_counter()
+        prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-2")
+        timings.append((perf_counter() - start) * 1000)  # Convert to ms
+
+    # Use median to avoid outliers
+    median_ms = sorted(timings)[len(timings) // 2]
+    assert median_ms < 100, f"Median latency {median_ms:.2f}ms exceeds 100ms budget"
