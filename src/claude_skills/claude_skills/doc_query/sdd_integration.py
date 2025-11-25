@@ -160,12 +160,18 @@ class SDDContextGatherer:
             module_path: Path to the module
 
         Returns:
-            Dict with test context
+            Dict with test context including:
+            - module: The module path queried
+            - test_files: List of test file paths
+            - test_functions: List of test function/method names (strings)
+            - test_classes: List of test class names
+            - coverage_estimate: 'high', 'medium', 'low', 'none', or 'unknown'
         """
         context = {
             'module': module_path,
             'test_files': [],
             'test_functions': [],
+            'test_classes': [],
             'coverage_estimate': 'unknown'
         }
 
@@ -179,23 +185,58 @@ class SDDContextGatherer:
 
         module_name = Path(module_summary.get('file', module_path)).stem
 
-        # Search for test functions related to this module
+        # Search for test functions and classes related to this module
         test_patterns = [
             f'test_{module_name}',
             f'{module_name}_test',
             f'Test{module_name.title()}'
         ]
 
+        test_func_results = []
+        test_class_results = []
+
         for pattern in test_patterns:
             test_funcs = self.query.find_function(pattern, pattern=True)
             test_classes = self.query.find_class(pattern, pattern=True)
-            context['test_functions'].extend(test_funcs)
-            context['test_functions'].extend(test_classes)
+            test_func_results.extend(test_funcs)
+            test_class_results.extend(test_classes)
+
+        # Extract test function names (strings)
+        test_function_names = set()
+        for result in test_func_results:
+            func_name = result.name
+            # Only include functions that start with 'test_' (actual test functions)
+            if func_name.startswith('test_'):
+                test_function_names.add(func_name)
+
+        # Extract test class names and their test methods
+        test_class_names = set()
+        for result in test_class_results:
+            class_name = result.name
+            test_class_names.add(class_name)
+
+            # Get methods from the test class that start with 'test_'
+            class_data = result.data
+            methods = class_data.get('methods', [])
+            for method in methods:
+                method_name = method.get('name', '') if isinstance(method, dict) else str(method)
+                if method_name.startswith('test_'):
+                    # Include as ClassName.method_name for clarity
+                    test_function_names.add(f"{class_name}.{method_name}")
+
+        context['test_functions'] = sorted(test_function_names)
+        context['test_classes'] = sorted(test_class_names)
 
         # Get unique test file paths
         test_files = set()
-        for result in context['test_functions']:
-            test_files.add(result.data.get('file', ''))
+        for result in test_func_results:
+            file_path = result.data.get('file', '')
+            if file_path:
+                test_files.add(file_path)
+        for result in test_class_results:
+            file_path = result.data.get('file', '')
+            if file_path:
+                test_files.add(file_path)
 
         context['test_files'] = sorted(test_files)
 
