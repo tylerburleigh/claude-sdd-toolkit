@@ -2,7 +2,7 @@
 
 > Spec-Driven Development: Structured, trackable AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.7.5-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.7.7-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -218,6 +218,10 @@ See [docs/skills-reference.md](docs/skills-reference.md) for complete skill docu
 
 ## Version History
 
+**0.7.7** - Documentation context enhancements: automatic `context.file_docs` in `prepare-task` output with file-focused documentation, dependencies, and provenance metadata. Enhanced doc helper with `file_path`/`spec_id` parameters. Git-based staleness detection, call context integration, and test coverage improvements.
+
+**0.7.6** - Prepare-task default context enhancement: comprehensive context in default output including dependencies, phase, siblings, and journal. One-call workflow with <100ms latency. 30% token reduction.
+
 **0.7.5** - Provider security enhancements: read-only/tool restrictions across all AI providers (Codex, Claude, Gemini, Cursor Agent, OpenCode). Comprehensive security documentation with threat model and testing guides.
 
 **0.7.1** - Journal accessibility improvements: ergonomic positional syntax, journal data in `prepare-task` output. Full backward compatibility.
@@ -240,4 +244,4 @@ See [docs/changelog.md](docs/changelog.md) for complete version history.
 
 ---
 
-**Version:** 0.7.5 | **License:** MIT | **Author:** Tyler Burleigh
+**Version:** 0.7.7 | **License:** MIT | **Author:** Tyler Burleigh
