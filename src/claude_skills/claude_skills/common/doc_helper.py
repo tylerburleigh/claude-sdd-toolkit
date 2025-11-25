@@ -68,6 +68,88 @@ def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".")
     return 0
 
 
+def get_current_git_commit(project_root: str = ".") -> Optional[str]:
+    """
+    Get the current HEAD commit SHA.
+
+    Args:
+        project_root: Root directory of the project
+
+    Returns:
+        str | None: Full commit SHA or None if not a git repo
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return proc.stdout.strip()
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return None
+
+
+def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+    """
+    Count commits between two git commits.
+
+    Args:
+        commit_a: Earlier commit SHA (e.g., when docs were generated)
+        commit_b: Later commit SHA (e.g., current HEAD)
+        project_root: Root directory of the project
+
+    Returns:
+        int: Number of commits between commit_a and commit_b (0 if error)
+    """
+    try:
+        # Use git rev-list to count commits
+        proc = subprocess.run(
+            ["git", "rev-list", "--count", f"{commit_a}..{commit_b}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return int(proc.stdout.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError, Exception):
+        pass
+    return 0
+
+
+def count_files_changed_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+    """
+    Count files changed between two git commits.
+
+    Args:
+        commit_a: Earlier commit SHA
+        commit_b: Later commit SHA
+        project_root: Root directory of the project
+
+    Returns:
+        int: Number of files changed (0 if error)
+    """
+    try:
+        # Use git diff to count changed files
+        proc = subprocess.run(
+            ["git", "diff", "--name-only", commit_a, commit_b],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            files = [line for line in proc.stdout.strip().split('\n') if line]
+            return len(files)
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return 0
+
+
 def check_doc_query_available() -> dict:
     """
     Check if doc-query documentation exists and is accessible.
