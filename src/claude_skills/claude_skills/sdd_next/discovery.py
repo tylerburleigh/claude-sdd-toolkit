@@ -37,6 +37,41 @@ from claude_skills.common.git_config import is_git_enabled
 
 logger = logging.getLogger(__name__)
 
+# Pattern to detect file references in task description/title
+import re
+_FILE_PATTERN = re.compile(r'\b[\w./]+\.(py|ts|tsx|js|jsx|go|rs|java|rb|c|cpp|h|hpp|cs|swift|kt|scala|vue|svelte|md|json|yaml|yml|toml)\b', re.IGNORECASE)
+
+
+def _should_gather_doc_context(task_data: dict) -> bool:
+    """
+    Determine if doc context would be valuable for this task.
+
+    Skips doc context gathering for abstract/meta tasks that have no
+    file associations, reducing unnecessary subprocess calls.
+
+    Args:
+        task_data: Task metadata from spec
+
+    Returns:
+        bool: True if doc context should be gathered
+    """
+    # Always gather if task has explicit file_path
+    file_path = task_data.get("metadata", {}).get("file_path")
+    if file_path:
+        return True
+
+    # Check if description or title mentions specific files
+    description = task_data.get("description", "")
+    title = task_data.get("title", "")
+    combined_text = f"{title} {description}"
+
+    if _FILE_PATTERN.search(combined_text):
+        return True
+
+    # Skip for abstract tasks with no file references
+    logger.debug(f"Doc context: skipping (no file references in task)")
+    return False
+
 
 def is_unblocked(spec_data: Dict, task_id: str, task_data: Dict) -> bool:
     """
@@ -433,6 +468,7 @@ def prepare_task(
     # Phase 3: Context gathering from doc-query (Priority 1 Integration)
     # Check documentation availability first (proactive)
     doc_status = check_doc_availability()
+    logger.debug(f"Doc context: status={doc_status.value}")
 
     # If docs are missing or stale, note this for CLI to handle
     # (Library functions can't directly invoke skills or prompt, so we flag it)
@@ -440,12 +476,15 @@ def prepare_task(
         # Store status in result for CLI layer to handle
         result["doc_status"] = doc_status.value
         result["doc_prompt_needed"] = True
+        logger.debug(f"Doc context: skipped (status={doc_status.value}, prompt_needed=True)")
 
     # Automatically gather codebase context ONLY if documentation is fresh (AVAILABLE)
     # Stale docs are omitted to signal agent should use manual exploration
-    if doc_status == DocStatus.AVAILABLE:
+    # Also skip for abstract tasks with no file references (lazy evaluation)
+    if doc_status == DocStatus.AVAILABLE and _should_gather_doc_context(task_data):
         doc_check = check_doc_query_available()
         if doc_check["available"]:
+            logger.debug("Doc context: gathering context from doc-query")
             # Extract task description for context gathering
             task_title = task_data.get("title", "")
             task_description = task_data.get("description", task_title)
@@ -462,12 +501,15 @@ def prepare_task(
             )
             if doc_context:
                 result["doc_context"] = doc_context
+                logger.debug(f"Doc context: gathered {len(doc_context.get('files', []))} files")
 
                 # Add helpful message
                 if doc_context.get("files"):
                     result["doc_context"]["message"] = (
                         f"Found {len(doc_context['files'])} relevant files from codebase documentation"
                     )
+            else:
+                logger.debug("Doc context: get_task_context_from_docs returned None")
 
     # Phase 4: Prepare enhanced context payload (defensive)
     try:

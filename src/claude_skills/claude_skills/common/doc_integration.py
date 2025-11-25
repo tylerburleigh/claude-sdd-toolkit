@@ -9,12 +9,15 @@ sdd-next, sdd-update) and the documentation system (llm-doc-gen, doc-query).
 """
 
 from enum import Enum
+import logging
 import subprocess
 import json
 import os
 from typing import Optional
 from datetime import datetime, timezone
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Import git helpers for commit-based staleness detection
 try:
@@ -68,6 +71,7 @@ def check_doc_availability(force_refresh: bool = False) -> DocStatus:
 
     # Return cached result if available and not forcing refresh
     if not force_refresh and _doc_status_cache is not None:
+        logger.debug(f"check_doc_availability: returning cached status {_doc_status_cache.value}")
         return _doc_status_cache
 
     try:
@@ -86,6 +90,7 @@ def check_doc_availability(force_refresh: bool = False) -> DocStatus:
                 stats = json.loads(result.stdout)
                 status = _determine_status_from_stats(stats)
                 _doc_status_cache = status
+                logger.debug(f"check_doc_availability: status={status.value} (fresh check)")
                 return status
             except json.JSONDecodeError:
                 # Invalid JSON output
@@ -161,6 +166,7 @@ def _determine_status_from_stats(stats: dict) -> DocStatus:
             # Commits have changed - check how many
             commits_since = count_commits_between(generated_at_commit, current_commit)
             threshold = get_staleness_threshold()
+            logger.debug(f"Staleness check: {commits_since} commits since generation (threshold: {threshold})")
 
             if commits_since >= threshold:
                 return DocStatus.STALE

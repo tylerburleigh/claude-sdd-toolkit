@@ -6,10 +6,13 @@ These functions enable proactive documentation generation and context gathering.
 """
 
 import json
+import logging
 import subprocess
 import shutil
 from typing import Optional, Tuple
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def get_current_git_commit(project_root: str = ".") -> Optional[str]:
@@ -32,8 +35,8 @@ def get_current_git_commit(project_root: str = ".") -> Optional[str]:
         )
         if proc.returncode == 0:
             return proc.stdout.strip()
-    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
-        pass
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception) as e:
+        logger.debug(f"get_current_git_commit failed: {e}")
     return None
 
 
@@ -60,37 +63,8 @@ def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".")
         )
         if proc.returncode == 0:
             return int(proc.stdout.strip())
-    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError, Exception):
-        pass
-    return 0
-
-
-def count_files_changed_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
-    """
-    Count files changed between two git commits.
-
-    Args:
-        commit_a: Earlier commit SHA
-        commit_b: Later commit SHA
-        project_root: Root directory of the project
-
-    Returns:
-        int: Number of files changed (0 if error)
-    """
-    try:
-        # Use git diff to count changed files
-        proc = subprocess.run(
-            ["git", "diff", "--name-only", commit_a, commit_b],
-            capture_output=True,
-            text=True,
-            timeout=5,
-            cwd=project_root
-        )
-        if proc.returncode == 0:
-            files = [line for line in proc.stdout.strip().split('\n') if line]
-            return len(files)
-    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
-        pass
+    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError, Exception) as e:
+        logger.debug(f"count_commits_between failed ({commit_a}..{commit_b}): {e}")
     return 0
 
 
@@ -250,8 +224,10 @@ def get_task_context_from_docs(
             # Parse JSON output
             try:
                 context = json.loads(proc.stdout)
+                logger.debug(f"get_task_context_from_docs: returned {len(context.get('files', []))} files in {query_time_ms}ms")
                 return context
             except json.JSONDecodeError:
+                logger.debug(f"get_task_context_from_docs: non-JSON output, returning raw")
                 # If not JSON, return structured text
                 return {
                     "files": [],
@@ -261,11 +237,14 @@ def get_task_context_from_docs(
                     "raw_output": proc.stdout
                 }
         else:
+            logger.debug(f"get_task_context_from_docs: sdd-integration returned code {proc.returncode}")
             return None
 
     except subprocess.TimeoutExpired:
+        logger.debug("get_task_context_from_docs: subprocess timed out")
         return None
-    except Exception:
+    except Exception as e:
+        logger.debug(f"get_task_context_from_docs: exception {e}")
         return None
 
 

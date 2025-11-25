@@ -228,6 +228,110 @@ class SDDContextGatherer:
         """
         return self.query.get_high_complexity(threshold=threshold)
 
+    def get_call_context(
+        self,
+        function_name: Optional[str] = None,
+        file_path: Optional[str] = None
+    ) -> Dict[str, any]:
+        """
+        Get call graph context for a function.
+
+        Gathers caller/callee information using the underlying documentation
+        query methods. Useful for understanding function relationships and
+        impact analysis during implementation.
+
+        Args:
+            function_name: Name of the function to query. If provided alone,
+                searches for functions matching this name.
+            file_path: Path to file to focus on. If provided with function_name,
+                finds functions in that file matching the name. If provided alone,
+                returns call context for all functions in the file.
+
+        Returns:
+            Dict with call context:
+            - function_name: The queried function name (if single function)
+            - file_path: The file path (if provided)
+            - callers: List of dicts with {name, file, line}
+            - callees: List of dicts with {name, file, line}
+            - functions_found: List of function names found (if multiple)
+
+        Raises:
+            ValueError: If neither function_name nor file_path is provided
+
+        Example:
+            >>> gatherer = SDDContextGatherer()
+            >>> context = gatherer.get_call_context(function_name="process_data")
+            >>> print(f"Callers: {len(context['callers'])}")
+            >>> print(f"Callees: {len(context['callees'])}")
+        """
+        if not function_name and not file_path:
+            raise ValueError("Either function_name or file_path must be provided")
+
+        result = {
+            'function_name': function_name,
+            'file_path': file_path,
+            'callers': [],
+            'callees': [],
+            'functions_found': []
+        }
+
+        # Determine which functions to query
+        functions_to_query = []
+
+        if function_name:
+            # Find functions matching the name
+            matches = self.query.find_function(function_name, pattern=False)
+            if file_path:
+                # Filter to only functions in the specified file
+                matches = [m for m in matches if m.data.get('file', '') == file_path]
+            functions_to_query = [m.name for m in matches]
+        elif file_path:
+            # Find all functions in the file
+            # Use describe_module to get functions in the file
+            module_info = self.query.describe_module(
+                file_path,
+                top_functions=100,  # Get all functions
+                include_docstrings=False,
+                include_dependencies=False
+            )
+            functions_to_query = [
+                f.get('name', '') for f in module_info.get('top_functions', [])
+                if f.get('name')
+            ]
+
+        result['functions_found'] = functions_to_query
+
+        # Gather call context for each function
+        seen_callers = set()
+        seen_callees = set()
+
+        for func_name in functions_to_query:
+            # Get callers
+            callers = self.query.get_callers(func_name, include_file=True, include_line=True)
+            for caller in callers:
+                key = (caller.get('name', ''), caller.get('file', ''), caller.get('line'))
+                if key not in seen_callers:
+                    seen_callers.add(key)
+                    result['callers'].append({
+                        'name': caller.get('name', ''),
+                        'file': caller.get('file', ''),
+                        'line': caller.get('line')
+                    })
+
+            # Get callees
+            callees = self.query.get_callees(func_name, include_file=True, include_line=True)
+            for callee in callees:
+                key = (callee.get('name', ''), callee.get('file', ''), callee.get('line'))
+                if key not in seen_callees:
+                    seen_callees.add(key)
+                    result['callees'].append({
+                        'name': callee.get('name', ''),
+                        'file': callee.get('file', ''),
+                        'line': callee.get('line')
+                    })
+
+        return result
+
     def get_impact_analysis(self, module_path: str) -> Dict[str, any]:
         """
         Analyze the impact of changes to a module.
