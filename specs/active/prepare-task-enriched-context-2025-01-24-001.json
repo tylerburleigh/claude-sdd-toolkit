@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-enriched-context-2025-01-24-001",
   "title": "Prepare-Task Enriched Context (Phase 2)",
   "generated": "2025-01-24T10:00:00Z",
-  "last_updated": "2025-11-25T00:25:48.254192Z",
+  "last_updated": "2025-11-25T00:30:12.561917Z",
   "metadata": {
     "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-25T00:19:18.491157Z",
-    "progress_percentage": 18,
+    "progress_percentage": 22,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -38,23 +38,26 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {}
     },
     "phase-1": {
       "type": "phase",
       "title": "Call Graph Context (P0 - High Value, Low Effort)",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Show which functions call the target code and what it calls. Helps agents understand impact of changes and integration points.",
-        "risk_level": "low"
+        "risk_level": "low",
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:30:12.555799Z",
+        "journaled_at": "2025-11-25T00:30:12.561896Z"
       },
       "dependencies": {
         "blocks": [
@@ -231,7 +234,7 @@
     "phase-1-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "verify-1-1",
@@ -245,8 +248,12 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
-      "metadata": {}
+      "completed_tasks": 2,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:30:12.555796Z",
+        "journaled_at": "2025-11-25T00:30:12.560833Z"
+      }
     },
     "verify-1-1": {
       "type": "verify",
@@ -272,16 +279,22 @@
     "verify-1-2": {
       "type": "verify",
       "title": "Phase 1 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-verify",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "agent": "sdd-fidelity-review",
         "scope": "phase",
-        "target": "phase-1"
+        "target": "phase-1",
+        "started_at": "2025-11-25T00:26:16.531539Z",
+        "status_note": "Running fidelity review for Phase 1",
+        "completed_at": "2025-11-25T00:30:12.555645Z",
+        "needs_journaling": false,
+        "actual_hours": 0.066,
+        "journaled_at": "2025-11-25T00:30:12.558524Z"
       }
     },
     "phase-2": {
@@ -1083,6 +1096,33 @@
       "content": "Added 7 unit tests for get_call_context_from_docs() to test_doc_helper.py. Tests cover: ValueError when no params provided, tool unavailable scenario, successful retrieval with function_name, successful retrieval with file_path, command failure, timeout handling, and invalid JSON handling. All 7 tests pass (pytest -k call_context). Tests validate the doc_helper wrapper function which calls sdd-integration call-context command.",
       "metadata": {},
       "task_id": "verify-1-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.558520Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 1 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Fidelity review identified a critical blocking issue - the `call-context` CLI subcommand was missing from sdd_integration.py main(). Fixed by adding the call-context subcommand handler (lines 620-667) that parses --function, --file, and --json arguments and invokes SDDContextGatherer.get_call_context(). Also updated usage help text. Verified CLI works with manual test. All 7 unit tests continue to pass. Phase 1 implementation is now complete and functional end-to-end.",
+      "metadata": {},
+      "task_id": "verify-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.560828Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-verify"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.561890Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Call Graph Context (P0 - High Value, Low Effort)",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-1 have been completed.",
+      "metadata": {},
+      "task_id": "phase-1"
     }
   ]
 }

@@ -523,6 +523,8 @@ def main():
         print("\nCommands:")
         print("  task-context <description> [--file-path PATH] [--spec-id ID] [--json]")
         print("               Get context for a task with optional file/spec focus")
+        print("  call-context [--function NAME] [--file PATH] [--json]")
+        print("               Get call graph context (callers/callees) for a function or file")
         print("  suggest-files <description>    Suggest files for a task")
         print("  similar <feature>              Find similar implementations")
         print("  test-context <module>          Get test context for module")
@@ -616,6 +618,55 @@ def main():
         print(f"Affected modules: {len(impact['affected_modules'])}")
         for m in impact['affected_modules']:
             print(f"  - {m}")
+
+    elif command == 'call-context':
+        # Parse call-context with optional flags
+        parser = argparse.ArgumentParser(description='Get call graph context from documentation')
+        parser.add_argument('command', help='Command (call-context)')
+        parser.add_argument('--function', type=str, help='Function name to query callers/callees for')
+        parser.add_argument('--file', type=str, help='File path to get call context for all functions')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
+
+        args = parser.parse_args()
+
+        if not args.function and not args.file:
+            print("Error: Either --function or --file must be provided", file=sys.stderr)
+            sys.exit(1)
+
+        import json as json_module
+
+        try:
+            gatherer = SDDContextGatherer()
+            context = gatherer.get_call_context(
+                function_name=args.function,
+                file_path=args.file
+            )
+
+            if args.json:
+                print(json_module.dumps(context, indent=2))
+            else:
+                # Text format output
+                if args.function:
+                    print(f"\nCall context for function: {args.function}")
+                elif args.file:
+                    print(f"\nCall context for file: {args.file}")
+
+                print(f"\nFunctions found: {len(context['functions_found'])}")
+                for f in context['functions_found']:
+                    print(f"  - {f}")
+
+                print(f"\nCallers ({len(context['callers'])}):")
+                for caller in context['callers']:
+                    line = f":{caller['line']}" if caller.get('line') else ""
+                    print(f"  - {caller['name']} ({caller['file']}{line})")
+
+                print(f"\nCallees ({len(context['callees'])}):")
+                for callee in context['callees']:
+                    line = f":{callee['line']}" if callee.get('line') else ""
+                    print(f"  - {callee['name']} ({callee['file']}{line})")
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
     else:
         print(f"Unknown command: {command}")
