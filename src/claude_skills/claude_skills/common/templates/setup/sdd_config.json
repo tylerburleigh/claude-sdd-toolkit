@@ -7,5 +7,10 @@
     "default_mode": "json",
     "json_compact": true,
     "default_verbosity": "quiet"
+  },
+  "_doc_context_description": "Controls which enrichments are gathered for prepare-task. Disable to reduce token usage or latency.",
+  "doc_context": {
+    "call_graph": true,
+    "test_context": true
   }
 }

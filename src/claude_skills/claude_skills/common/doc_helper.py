@@ -340,7 +340,7 @@ def get_test_context_from_docs(
     """
     Get test context for a module from codebase documentation.
 
-    Retrieves test files, test functions, coverage estimate, and coverage hint
+    Retrieves test files and test functions related to a module
     using the sdd-integration test-context command.
 
     Args:
@@ -353,15 +353,12 @@ def get_test_context_from_docs(
             "test_files": list[str],  # Test file paths
             "test_functions": list[str],  # Test function names
             "test_classes": list[str],    # Test class names
-            "coverage_estimate": str,     # 'high', 'medium', 'low', 'none', 'unknown'
-            "coverage_hint": str          # Human-readable coverage analysis
         } or None if unavailable
 
     Example:
         >>> context = get_test_context_from_docs("src/auth.py")
         >>> if context:
-        ...     print(f"Coverage: {context['coverage_estimate']}")
-        ...     print(f"Hint: {context['coverage_hint']}")
+        ...     print(f"Test files: {context['test_files']}")
     """
     if not check_sdd_integration_available():
         logger.debug("get_test_context_from_docs: sdd-integration not available")
@@ -403,6 +400,84 @@ def get_test_context_from_docs(
         return None
     except Exception as e:
         logger.debug(f"get_test_context_from_docs: exception {e}")
+        return None
+
+
+def get_complexity_hotspots_from_docs(
+    file_path: Optional[str] = None,
+    threshold: int = 5,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get complexity hotspots from codebase documentation.
+
+    Retrieves high-complexity functions that may need careful attention
+    using the sdd-integration complexity command.
+
+    Args:
+        file_path: Optional path to filter results to a specific file
+        threshold: Complexity threshold (default: 5)
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "file_path": str | None,       # The file filter (if provided)
+            "threshold": int,              # The complexity threshold used
+            "hotspots": list[dict],        # List of {name, complexity, line, file}
+            "total_count": int             # Total number of hotspots
+        } or None if unavailable
+
+    Example:
+        >>> result = get_complexity_hotspots_from_docs(
+        ...     file_path="src/auth.py",
+        ...     threshold=5
+        ... )
+        >>> if result:
+        ...     for hotspot in result['hotspots']:
+        ...         print(f"{hotspot['name']}: {hotspot['complexity']}")
+    """
+    if not check_sdd_integration_available():
+        logger.debug("get_complexity_hotspots_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "complexity", "--json"]
+        if file_path:
+            cmd.extend(["--file", file_path])
+        cmd.extend(["--threshold", str(threshold)])
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                result = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_complexity_hotspots_from_docs: returned "
+                    f"{result.get('total_count', 0)} hotspots"
+                )
+                return result
+            except json.JSONDecodeError:
+                logger.debug("get_complexity_hotspots_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_complexity_hotspots_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_complexity_hotspots_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_complexity_hotspots_from_docs: exception {e}")
         return None
 
 

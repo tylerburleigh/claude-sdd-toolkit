@@ -14,6 +14,8 @@ from claude_skills.common.doc_helper import (
     check_sdd_integration_available,
     get_task_context_from_docs,
     get_call_context_from_docs,
+    get_test_context_from_docs,
+    get_complexity_hotspots_from_docs,
     should_generate_docs,
     ensure_documentation_exists,
 )
@@ -377,5 +379,174 @@ class TestGetCallContextFromDocs:
         )
 
         result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is None
+
+
+class TestGetTestContextFromDocs:
+    """Tests for get_test_context_from_docs function."""
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    def test_test_context_tool_unavailable(self, mock_check):
+        """Test when sdd-integration is not available."""
+        mock_check.return_value = False
+
+        result = get_test_context_from_docs("src/auth.py")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_test_context_success(self, mock_run, mock_check):
+        """Test successful test context retrieval."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"module": "src/auth.py", "test_files": ["tests/test_auth.py"], "test_functions": ["test_login", "test_logout"], "test_classes": ["TestAuth"]}'
+        )
+
+        result = get_test_context_from_docs("src/auth.py")
+
+        assert result is not None
+        assert result["module"] == "src/auth.py"
+        assert len(result["test_files"]) == 1
+        assert result["test_files"][0] == "tests/test_auth.py"
+        assert len(result["test_functions"]) == 2
+        assert result["test_classes"] == ["TestAuth"]
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_test_context_command_failed(self, mock_run, mock_check):
+        """Test when command fails."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(returncode=1, stdout="")
+
+        result = get_test_context_from_docs("src/auth.py")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_test_context_timeout(self, mock_run, mock_check):
+        """Test when command times out."""
+        mock_check.return_value = True
+        mock_run.side_effect = subprocess.TimeoutExpired("sdd-integration", 30)
+
+        result = get_test_context_from_docs("src/auth.py")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_test_context_invalid_json(self, mock_run, mock_check):
+        """Test when output is not valid JSON."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="Not valid JSON"
+        )
+
+        result = get_test_context_from_docs("src/auth.py")
+
+        assert result is None
+
+
+class TestGetComplexityHotspotsFromDocs:
+    """Tests for get_complexity_hotspots_from_docs function."""
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    def test_complexity_tool_unavailable(self, mock_check):
+        """Test when sdd-integration is not available."""
+        mock_check.return_value = False
+
+        result = get_complexity_hotspots_from_docs()
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_success_no_filter(self, mock_run, mock_check):
+        """Test successful complexity hotspots retrieval without file filter."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"file_path": null, "threshold": 5, "hotspots": [{"name": "complex_func", "complexity": 12, "line": 45, "file": "src/core.py"}], "total_count": 1}'
+        )
+
+        result = get_complexity_hotspots_from_docs()
+
+        assert result is not None
+        assert result["threshold"] == 5
+        assert len(result["hotspots"]) == 1
+        assert result["hotspots"][0]["name"] == "complex_func"
+        assert result["hotspots"][0]["complexity"] == 12
+        assert result["total_count"] == 1
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_with_file_filter(self, mock_run, mock_check):
+        """Test complexity hotspots retrieval with file filter."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"file_path": "src/auth.py", "threshold": 5, "hotspots": [{"name": "validate_token", "complexity": 8, "line": 100, "file": "src/auth.py"}], "total_count": 1}'
+        )
+
+        result = get_complexity_hotspots_from_docs(file_path="src/auth.py")
+
+        assert result is not None
+        assert result["file_path"] == "src/auth.py"
+        assert len(result["hotspots"]) == 1
+        assert result["hotspots"][0]["name"] == "validate_token"
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_with_custom_threshold(self, mock_run, mock_check):
+        """Test complexity hotspots with custom threshold."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"file_path": null, "threshold": 10, "hotspots": [], "total_count": 0}'
+        )
+
+        result = get_complexity_hotspots_from_docs(threshold=10)
+
+        assert result is not None
+        assert result["threshold"] == 10
+        assert result["total_count"] == 0
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_command_failed(self, mock_run, mock_check):
+        """Test when command fails."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(returncode=1, stdout="")
+
+        result = get_complexity_hotspots_from_docs()
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_timeout(self, mock_run, mock_check):
+        """Test when command times out."""
+        mock_check.return_value = True
+        mock_run.side_effect = subprocess.TimeoutExpired("sdd-integration", 30)
+
+        result = get_complexity_hotspots_from_docs()
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_complexity_invalid_json(self, mock_run, mock_check):
+        """Test when output is not valid JSON."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="Not valid JSON"
+        )
+
+        result = get_complexity_hotspots_from_docs()
 
         assert result is None

@@ -124,6 +124,7 @@ from .doc_helper import (
     get_task_context_from_docs,
     get_call_context_from_docs,
     get_test_context_from_docs,
+    get_complexity_hotspots_from_docs,
     should_generate_docs,
     ensure_documentation_exists,
 )
@@ -299,6 +300,7 @@ __all__ = [
     "get_task_context_from_docs",
     "get_call_context_from_docs",
     "get_test_context_from_docs",
+    "get_complexity_hotspots_from_docs",
     "should_generate_docs",
     "ensure_documentation_exists",
 

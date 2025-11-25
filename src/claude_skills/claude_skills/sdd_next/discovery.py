@@ -23,6 +23,7 @@ from claude_skills.common import (
     validate_spec_before_proceed,
     get_task_context_from_docs,
     get_call_context_from_docs,
+    get_test_context_from_docs,
     check_doc_query_available,
 )
 from claude_skills.common.doc_integration import (
@@ -35,6 +36,7 @@ from claude_skills.common.paths import find_spec_file
 from claude_skills.common.completion import check_spec_completion, should_prompt_completion
 from claude_skills.common.git_metadata import find_git_root, check_dirty_tree
 from claude_skills.common.git_config import is_git_enabled
+from claude_skills.common.sdd_config import get_doc_context_settings
 
 logger = logging.getLogger(__name__)
 
@@ -548,27 +550,67 @@ def prepare_task(
         if result.get("doc_context"):
             file_docs = dict(result["doc_context"])
 
-            # Gather call graph context if we have a file_path
+            # Gather enrichment context if we have a file_path and docs are available
             task_file_path = task_data.get("metadata", {}).get("file_path")
             if task_file_path and doc_status == DocStatus.AVAILABLE:
-                try:
-                    call_context = get_call_context_from_docs(
-                        file_path=task_file_path,
-                        project_root=str(spec_path.parent)
-                    )
-                    if call_context:
-                        file_docs["call_graph"] = {
-                            "callers": call_context.get("callers", []),
-                            "callees": call_context.get("callees", []),
-                            "functions_found": call_context.get("functions_found", [])
-                        }
-                        logger.debug(
-                            f"Doc context: gathered call_graph with "
-                            f"{len(file_docs['call_graph']['callers'])} callers, "
-                            f"{len(file_docs['call_graph']['callees'])} callees"
+                # Load enrichment settings from config
+                doc_settings = get_doc_context_settings(spec_path.parent)
+                project_root = str(spec_path.parent)
+
+                # Run enabled enrichment queries in parallel
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+
+                def gather_call_graph():
+                    if not doc_settings.get("call_graph", True):
+                        return None
+                    try:
+                        call_context = get_call_context_from_docs(
+                            file_path=task_file_path,
+                            project_root=project_root
                         )
-                except Exception as e:
-                    logger.debug(f"Doc context: call_graph gathering failed: {e}")
+                        if call_context:
+                            return ("call_graph", {
+                                "callers": call_context.get("callers", []),
+                                "callees": call_context.get("callees", []),
+                                "functions_found": call_context.get("functions_found", [])
+                            })
+                    except Exception as e:
+                        logger.debug(f"Doc context: call_graph gathering failed: {e}")
+                    return None
+
+                def gather_test_context():
+                    if not doc_settings.get("test_context", True):
+                        return None
+                    try:
+                        test_context = get_test_context_from_docs(
+                            module_path=task_file_path,
+                            project_root=project_root
+                        )
+                        if test_context:
+                            return ("test_context", {
+                                "test_files": test_context.get("test_files", []),
+                                "test_functions": test_context.get("test_functions", []),
+                            })
+                    except Exception as e:
+                        logger.debug(f"Doc context: test_context gathering failed: {e}")
+                    return None
+
+                # Execute all enabled queries in parallel
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = [
+                        executor.submit(gather_call_graph),
+                        executor.submit(gather_test_context),
+                    ]
+
+                    for future in as_completed(futures):
+                        try:
+                            result_tuple = future.result()
+                            if result_tuple:
+                                key, value = result_tuple
+                                file_docs[key] = value
+                                logger.debug(f"Doc context: gathered {key}")
+                        except Exception as e:
+                            logger.debug(f"Doc context: parallel gather failed: {e}")
 
             result["context"]["file_docs"] = file_docs
 
