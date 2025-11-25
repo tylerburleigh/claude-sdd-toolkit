@@ -13,6 +13,7 @@ from claude_skills.common.doc_helper import (
     check_doc_query_available,
     check_sdd_integration_available,
     get_task_context_from_docs,
+    get_call_context_from_docs,
     should_generate_docs,
     ensure_documentation_exists,
 )
@@ -287,3 +288,94 @@ class TestEnsureDocumentationExists:
 
         assert success is False
         assert "recommend" in message.lower()
+
+
+class TestGetCallContextFromDocs:
+    """Tests for get_call_context_from_docs function."""
+
+    def test_call_context_requires_params(self):
+        """Test that ValueError is raised when neither param is provided."""
+        with pytest.raises(ValueError) as exc_info:
+            get_call_context_from_docs()
+
+        assert "Either function_name or file_path must be provided" in str(exc_info.value)
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    def test_call_context_tool_unavailable(self, mock_check):
+        """Test when sdd-integration is not available."""
+        mock_check.return_value = False
+
+        result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_call_context_with_function_name(self, mock_run, mock_check):
+        """Test successful call context retrieval with function_name."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"function_name": "test_func", "file_path": null, "callers": [{"name": "caller1", "file": "a.py", "line": 10}], "callees": [{"name": "callee1", "file": "b.py", "line": 20}], "functions_found": ["test_func"]}'
+        )
+
+        result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is not None
+        assert result["function_name"] == "test_func"
+        assert len(result["callers"]) == 1
+        assert result["callers"][0]["name"] == "caller1"
+        assert len(result["callees"]) == 1
+        assert result["callees"][0]["name"] == "callee1"
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_call_context_with_file_path(self, mock_run, mock_check):
+        """Test successful call context retrieval with file_path."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='{"function_name": null, "file_path": "src/app.py", "callers": [], "callees": [], "functions_found": ["func1", "func2"]}'
+        )
+
+        result = get_call_context_from_docs(file_path="src/app.py")
+
+        assert result is not None
+        assert result["file_path"] == "src/app.py"
+        assert result["functions_found"] == ["func1", "func2"]
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_call_context_command_failed(self, mock_run, mock_check):
+        """Test when command fails."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(returncode=1, stdout="")
+
+        result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_call_context_timeout(self, mock_run, mock_check):
+        """Test when command times out."""
+        mock_check.return_value = True
+        mock_run.side_effect = subprocess.TimeoutExpired("sdd-integration", 30)
+
+        result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is None
+
+    @patch("claude_skills.common.doc_helper.check_sdd_integration_available")
+    @patch("claude_skills.common.doc_helper.subprocess.run")
+    def test_call_context_invalid_json(self, mock_run, mock_check):
+        """Test when output is not valid JSON."""
+        mock_check.return_value = True
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="Not valid JSON"
+        )
+
+        result = get_call_context_from_docs(function_name="test_func")
+
+        assert result is None
