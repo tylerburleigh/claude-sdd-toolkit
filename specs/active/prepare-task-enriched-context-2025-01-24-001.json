@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-enriched-context-2025-01-24-001",
   "title": "Prepare-Task Enriched Context (Phase 2)",
   "generated": "2025-01-24T10:00:00Z",
-  "last_updated": "2025-11-25T00:22:45.695855Z",
+  "last_updated": "2025-11-25T00:24:08.480492Z",
   "metadata": {
     "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-25T00:19:18.491157Z",
-    "progress_percentage": 11,
+    "progress_percentage": 14,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -38,7 +38,7 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {}
     },
     "phase-1": {
@@ -51,7 +51,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Show which functions call the target code and what it calls. Helps agents understand impact of changes and integration points.",
         "risk_level": "low"
@@ -67,7 +67,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -75,8 +75,12 @@
         "task-1-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:24:08.475778Z",
+        "journaled_at": "2025-11-25T00:24:08.480472Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-1-verify"
@@ -199,7 +203,7 @@
     "task-1-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -210,12 +214,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "changes": "Include call_graph in file_docs context within prepare_task()"
+        "changes": "Include call_graph in file_docs context within prepare_task()",
+        "started_at": "2025-11-25T00:23:11.605266Z",
+        "status_note": "Including call_graph in file_docs context in prepare_task()",
+        "completed_at": "2025-11-25T00:24:08.475645Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-25T00:24:08.478412Z"
       }
     },
     "phase-1-verify": {
@@ -1040,6 +1050,24 @@
       "content": "Added get_call_context_from_docs() function at doc_helper.py:251. Function wraps sdd-integration call-context command, accepting optional function_name and file_path parameters. Returns structured dict with callers/callees or None if unavailable. Includes proper error handling (ValueError when no args, subprocess timeout, JSON parse errors). Follows existing pattern of get_task_context_from_docs(). Tests pass - ValueError raised correctly, function handles missing sdd-integration gracefully.",
       "metadata": {},
       "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:24:08.478407Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_next/discovery.py",
+      "author": "claude-code",
+      "content": "Updated discovery.py to include call_graph in file_docs context within prepare_task(). Changes: 1) Added import of get_call_context_from_docs from claude_skills.common at line 25. 2) Modified file_docs assembly logic (lines 548-573) to gather call_graph context when task has file_path and docs are available. The call_graph contains callers, callees, and functions_found arrays. Also added get_call_context_from_docs to common/__init__.py exports. Verified all imports work correctly.",
+      "metadata": {},
+      "task_id": "task-1-3"
+    },
+    {
+      "timestamp": "2025-11-25T00:24:08.480469Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-files"
     }
   ]
 }

@@ -22,6 +22,7 @@ from .context_utils import (
 from claude_skills.common import (
     validate_spec_before_proceed,
     get_task_context_from_docs,
+    get_call_context_from_docs,
     check_doc_query_available,
 )
 from claude_skills.common.doc_integration import (
@@ -545,7 +546,31 @@ def prepare_task(
 
         # Add file_docs to context if doc_context is available
         if result.get("doc_context"):
-            result["context"]["file_docs"] = result["doc_context"]
+            file_docs = dict(result["doc_context"])
+
+            # Gather call graph context if we have a file_path
+            task_file_path = task_data.get("metadata", {}).get("file_path")
+            if task_file_path and doc_status == DocStatus.AVAILABLE:
+                try:
+                    call_context = get_call_context_from_docs(
+                        file_path=task_file_path,
+                        project_root=str(spec_path.parent)
+                    )
+                    if call_context:
+                        file_docs["call_graph"] = {
+                            "callers": call_context.get("callers", []),
+                            "callees": call_context.get("callees", []),
+                            "functions_found": call_context.get("functions_found", [])
+                        }
+                        logger.debug(
+                            f"Doc context: gathered call_graph with "
+                            f"{len(file_docs['call_graph']['callers'])} callers, "
+                            f"{len(file_docs['call_graph']['callees'])} callees"
+                        )
+                except Exception as e:
+                    logger.debug(f"Doc context: call_graph gathering failed: {e}")
+
+            result["context"]["file_docs"] = file_docs
 
         # Add plan validation only if task has a plan
         if plan_validation:
