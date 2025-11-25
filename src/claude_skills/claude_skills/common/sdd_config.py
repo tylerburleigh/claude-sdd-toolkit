@@ -31,6 +31,12 @@ DEFAULT_SDD_CONFIG = {
         "json": None,  # DEPRECATED: Use default_mode="json" instead
         "compact": None,  # DEPRECATED: Use json_compact instead
         "default_format": None,  # DEPRECATED: Use default_mode instead
+    },
+    "doc_context": {
+        # Controls which enrichments are gathered for prepare-task context
+        # All enabled by default - disable to reduce token usage or latency
+        "call_graph": True,       # Include caller/callee information
+        "test_context": True,     # Include test files
     }
 }
 
@@ -212,8 +218,36 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
         validated["output"]["compact"] = None
         validated["output"]["default_format"] = None
 
+    # Validate doc_context section
+    if "doc_context" in config and isinstance(config["doc_context"], dict):
+        doc_context = config["doc_context"]
+        validated["doc_context"] = {}
+
+        # Validate each enrichment toggle
+        enrichment_keys = ["call_graph", "test_context"]
+        for key in enrichment_keys:
+            if key in doc_context:
+                value = doc_context[key]
+                if isinstance(value, bool):
+                    validated["doc_context"][key] = value
+                else:
+                    logger.warning(
+                        f"Invalid type for sdd config 'doc_context.{key}': expected bool, "
+                        f"got {type(value).__name__}. Using default: True"
+                    )
+                    validated["doc_context"][key] = True
+            else:
+                # Not specified, use default (enabled)
+                validated["doc_context"][key] = True
+    else:
+        # No doc_context section - use all defaults (all enabled)
+        validated["doc_context"] = {
+            "call_graph": True,
+            "test_context": True,
+        }
+
     # Warn about unknown keys (but don't fail)
-    known_keys = {"output", "work_mode", "_comment", "_description", "_work_mode_options"}
+    known_keys = {"output", "work_mode", "doc_context", "_comment", "_description", "_work_mode_options", "_doc_context_description"}
     unknown_keys = set(config.keys()) - known_keys
     if unknown_keys:
         logger.warning(
@@ -370,3 +404,33 @@ def get_work_mode(project_path: Optional[Path] = None) -> str:
             # Request approval for each task
     """
     return get_sdd_setting("work_mode", project_path, default="single")
+
+
+def get_doc_context_settings(project_path: Optional[Path] = None) -> Dict[str, bool]:
+    """Get doc context enrichment settings from configuration.
+
+    Controls which enrichments are gathered during prepare-task:
+    - call_graph: Include caller/callee information
+    - test_context: Include test files
+
+    All enrichments are enabled by default. Disable to reduce token usage
+    or improve latency.
+
+    Args:
+        project_path: Path to project root (optional)
+
+    Returns:
+        Dict with boolean flags for each enrichment type
+
+    Example:
+        settings = get_doc_context_settings()
+        if settings["call_graph"]:
+            # Gather call graph context
+        if settings["test_context"]:
+            # Gather test context
+    """
+    config = load_sdd_config(project_path)
+    return config.get("doc_context", {
+        "call_graph": True,
+        "test_context": True,
+    })

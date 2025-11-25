@@ -154,19 +154,23 @@ class SDDContextGatherer:
 
     def get_test_context(self, module_path: str) -> Dict[str, any]:
         """
-        Find test files and test coverage context for a module.
+        Find test files and functions related to a module.
 
         Args:
             module_path: Path to the module
 
         Returns:
-            Dict with test context
+            Dict with test context including:
+            - module: The module path queried
+            - test_files: List of test file paths
+            - test_functions: List of test function/method names (strings)
+            - test_classes: List of test class names
         """
         context = {
             'module': module_path,
             'test_files': [],
             'test_functions': [],
-            'coverage_estimate': 'unknown'
+            'test_classes': [],
         }
 
         # Look for test files
@@ -179,40 +183,60 @@ class SDDContextGatherer:
 
         module_name = Path(module_summary.get('file', module_path)).stem
 
-        # Search for test functions related to this module
+        # Search for test functions and classes related to this module
         test_patterns = [
             f'test_{module_name}',
             f'{module_name}_test',
             f'Test{module_name.title()}'
         ]
 
+        test_func_results = []
+        test_class_results = []
+
         for pattern in test_patterns:
             test_funcs = self.query.find_function(pattern, pattern=True)
             test_classes = self.query.find_class(pattern, pattern=True)
-            context['test_functions'].extend(test_funcs)
-            context['test_functions'].extend(test_classes)
+            test_func_results.extend(test_funcs)
+            test_class_results.extend(test_classes)
+
+        # Extract test function names (strings)
+        test_function_names = set()
+        for result in test_func_results:
+            func_name = result.name
+            # Only include functions that start with 'test_' (actual test functions)
+            if func_name.startswith('test_'):
+                test_function_names.add(func_name)
+
+        # Extract test class names and their test methods
+        test_class_names = set()
+        for result in test_class_results:
+            class_name = result.name
+            test_class_names.add(class_name)
+
+            # Get methods from the test class that start with 'test_'
+            class_data = result.data
+            methods = class_data.get('methods', [])
+            for method in methods:
+                method_name = method.get('name', '') if isinstance(method, dict) else str(method)
+                if method_name.startswith('test_'):
+                    # Include as ClassName.method_name for clarity
+                    test_function_names.add(f"{class_name}.{method_name}")
+
+        context['test_functions'] = sorted(test_function_names)
+        context['test_classes'] = sorted(test_class_names)
 
         # Get unique test file paths
         test_files = set()
-        for result in context['test_functions']:
-            test_files.add(result.data.get('file', ''))
+        for result in test_func_results:
+            file_path = result.data.get('file', '')
+            if file_path:
+                test_files.add(file_path)
+        for result in test_class_results:
+            file_path = result.data.get('file', '')
+            if file_path:
+                test_files.add(file_path)
 
         context['test_files'] = sorted(test_files)
-
-        # Estimate coverage
-        total_functions = module_summary.get('statistics', {}).get('function_count', 0)
-        test_count = len(context['test_functions'])
-
-        if total_functions > 0:
-            coverage_ratio = test_count / total_functions
-            if coverage_ratio >= 1.0:
-                context['coverage_estimate'] = 'high'
-            elif coverage_ratio >= 0.5:
-                context['coverage_estimate'] = 'medium'
-            elif coverage_ratio > 0:
-                context['coverage_estimate'] = 'low'
-            else:
-                context['coverage_estimate'] = 'none'
 
         return context
 
@@ -228,53 +252,175 @@ class SDDContextGatherer:
         """
         return self.query.get_high_complexity(threshold=threshold)
 
-    def get_impact_analysis(self, module_path: str) -> Dict[str, any]:
+    def get_complexity_hotspots(
+        self,
+        file_path: Optional[str] = None,
+        threshold: int = 5
+    ) -> Dict[str, any]:
         """
-        Analyze the impact of changes to a module.
+        Get complexity hotspots for a specific file or entire codebase.
+
+        Identifies high-complexity functions that may need careful attention
+        during implementation or refactoring.
 
         Args:
-            module_path: Path to the module
+            file_path: Optional path to filter results to a specific file
+            threshold: Complexity threshold (default: 5)
 
         Returns:
-            Dict with impact analysis
+            Dict with complexity hotspot information:
+            - file_path: The file path filter (if provided)
+            - threshold: The complexity threshold used
+            - hotspots: List of {name, complexity, line, file} dicts
+            - total_count: Total number of hotspots found
+
+        Example:
+            >>> gatherer = SDDContextGatherer()
+            >>> result = gatherer.get_complexity_hotspots(
+            ...     file_path="src/auth.py",
+            ...     threshold=5
+            ... )
+            >>> for hotspot in result['hotspots']:
+            ...     print(f"{hotspot['name']}: complexity {hotspot['complexity']}")
         """
-        context = {
-            'module': module_path,
-            'direct_dependencies': [],
-            'reverse_dependencies': [],
-            'affected_modules': [],
-            'impact_scope': 'unknown',
-            'module_summary': self.query.describe_module(
-                module_path,
-                include_docstrings=False,
-                include_dependencies=True
-            )
+        result = {
+            'file_path': file_path,
+            'threshold': threshold,
+            'hotspots': [],
+            'total_count': 0
         }
 
-        # Get direct dependencies
-        direct_deps = self.query.get_dependencies(module_path, reverse=False)
-        context['direct_dependencies'] = [d.name for d in direct_deps]
+        # Get high complexity functions
+        high_complexity = self.query.get_high_complexity(threshold=threshold)
 
-        # Get reverse dependencies (who depends on this)
-        reverse_deps = self.query.get_dependencies(module_path, reverse=True)
-        context['reverse_dependencies'] = [d.name for d in reverse_deps]
+        # Filter by file if specified
+        if file_path:
+            high_complexity = [
+                r for r in high_complexity
+                if r.data.get('file', '') == file_path
+            ]
 
-        # Affected modules include both
-        affected = set(context['direct_dependencies'] + context['reverse_dependencies'])
-        context['affected_modules'] = sorted(affected)
+        # Convert to output format
+        hotspots = []
+        for func in high_complexity:
+            hotspots.append({
+                'name': func.name,
+                'complexity': func.data.get('complexity', 0),
+                'line': func.data.get('line'),
+                'file': func.data.get('file', '')
+            })
 
-        # Determine impact scope
-        total_affected = len(context['affected_modules'])
-        if total_affected == 0:
-            context['impact_scope'] = 'isolated'
-        elif total_affected <= 3:
-            context['impact_scope'] = 'low'
-        elif total_affected <= 10:
-            context['impact_scope'] = 'medium'
-        else:
-            context['impact_scope'] = 'high'
+        # Sort by complexity (highest first)
+        hotspots.sort(key=lambda x: -x['complexity'])
 
-        return context
+        result['hotspots'] = hotspots
+        result['total_count'] = len(hotspots)
+
+        return result
+
+    def get_call_context(
+        self,
+        function_name: Optional[str] = None,
+        file_path: Optional[str] = None
+    ) -> Dict[str, any]:
+        """
+        Get call graph context for a function.
+
+        Gathers caller/callee information using the underlying documentation
+        query methods. Useful for understanding function relationships and
+        impact analysis during implementation.
+
+        Args:
+            function_name: Name of the function to query. If provided alone,
+                searches for functions matching this name.
+            file_path: Path to file to focus on. If provided with function_name,
+                finds functions in that file matching the name. If provided alone,
+                returns call context for all functions in the file.
+
+        Returns:
+            Dict with call context:
+            - function_name: The queried function name (if single function)
+            - file_path: The file path (if provided)
+            - callers: List of dicts with {name, file, line}
+            - callees: List of dicts with {name, file, line}
+            - functions_found: List of function names found (if multiple)
+
+        Raises:
+            ValueError: If neither function_name nor file_path is provided
+
+        Example:
+            >>> gatherer = SDDContextGatherer()
+            >>> context = gatherer.get_call_context(function_name="process_data")
+            >>> print(f"Callers: {len(context['callers'])}")
+            >>> print(f"Callees: {len(context['callees'])}")
+        """
+        if not function_name and not file_path:
+            raise ValueError("Either function_name or file_path must be provided")
+
+        result = {
+            'function_name': function_name,
+            'file_path': file_path,
+            'callers': [],
+            'callees': [],
+            'functions_found': []
+        }
+
+        # Determine which functions to query
+        functions_to_query = []
+
+        if function_name:
+            # Find functions matching the name
+            matches = self.query.find_function(function_name, pattern=False)
+            if file_path:
+                # Filter to only functions in the specified file
+                matches = [m for m in matches if m.data.get('file', '') == file_path]
+            functions_to_query = [m.name for m in matches]
+        elif file_path:
+            # Find all functions in the file
+            # Use describe_module to get functions in the file
+            module_info = self.query.describe_module(
+                file_path,
+                top_functions=100,  # Get all functions
+                include_docstrings=False,
+                include_dependencies=False
+            )
+            functions_to_query = [
+                f.get('name', '') for f in module_info.get('top_functions', [])
+                if f.get('name')
+            ]
+
+        result['functions_found'] = functions_to_query
+
+        # Gather call context for each function
+        seen_callers = set()
+        seen_callees = set()
+
+        for func_name in functions_to_query:
+            # Get callers
+            callers = self.query.get_callers(func_name, include_file=True, include_line=True)
+            for caller in callers:
+                key = (caller.get('name', ''), caller.get('file', ''), caller.get('line'))
+                if key not in seen_callers:
+                    seen_callers.add(key)
+                    result['callers'].append({
+                        'name': caller.get('name', ''),
+                        'file': caller.get('file', ''),
+                        'line': caller.get('line')
+                    })
+
+            # Get callees
+            callees = self.query.get_callees(func_name, include_file=True, include_line=True)
+            for callee in callees:
+                key = (callee.get('name', ''), callee.get('file', ''), callee.get('line'))
+                if key not in seen_callees:
+                    seen_callees.add(key)
+                    result['callees'].append({
+                        'name': callee.get('name', ''),
+                        'file': callee.get('file', ''),
+                        'line': callee.get('line')
+                    })
+
+        return result
 
     def _extract_keywords(self, text: str) -> List[str]:
         """Extract meaningful keywords from text."""
@@ -371,19 +517,47 @@ def get_test_context(module_path: str, docs_path: Optional[str] = None) -> Dict[
     return gatherer.get_test_context(module_path)
 
 
-def get_impact_analysis(module_path: str, docs_path: Optional[str] = None) -> Dict[str, any]:
+def get_call_context(
+    function_name: Optional[str] = None,
+    file_path: Optional[str] = None,
+    docs_path: Optional[str] = None
+) -> Dict[str, any]:
     """
-    Get impact analysis for a module (convenience function).
+    Get call graph context for a function (convenience function).
 
     Args:
-        module_path: Path to the module
+        function_name: Name of the function to query
+        file_path: Path to file to focus on
         docs_path: Optional path to documentation
 
     Returns:
-        Dict with impact analysis
+        Dict with call context including callers and callees
+
+    Raises:
+        ValueError: If neither function_name nor file_path is provided
     """
     gatherer = SDDContextGatherer(docs_path)
-    return gatherer.get_impact_analysis(module_path)
+    return gatherer.get_call_context(function_name=function_name, file_path=file_path)
+
+
+def get_complexity_hotspots(
+    file_path: Optional[str] = None,
+    threshold: int = 5,
+    docs_path: Optional[str] = None
+) -> Dict[str, any]:
+    """
+    Get complexity hotspots for a file (convenience function).
+
+    Args:
+        file_path: Optional path to filter results to a specific file
+        threshold: Complexity threshold (default: 5)
+        docs_path: Optional path to documentation
+
+    Returns:
+        Dict with complexity hotspot information
+    """
+    gatherer = SDDContextGatherer(docs_path)
+    return gatherer.get_complexity_hotspots(file_path=file_path, threshold=threshold)
 
 
 def main():
@@ -396,10 +570,13 @@ def main():
         print("\nCommands:")
         print("  task-context <description> [--file-path PATH] [--spec-id ID] [--json]")
         print("               Get context for a task with optional file/spec focus")
+        print("  call-context [--function NAME] [--file PATH] [--json]")
+        print("               Get call graph context (callers/callees) for a function or file")
+        print("  complexity [--file PATH] [--threshold N] [--json]")
+        print("               Get complexity hotspots for a file or entire codebase")
         print("  suggest-files <description>    Suggest files for a task")
         print("  similar <feature>              Find similar implementations")
-        print("  test-context <module>          Get test context for module")
-        print("  impact <module>                Get impact analysis")
+        print("  test-context <module> [--json] Get test context for module")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -473,22 +650,125 @@ def main():
             print(f"  - {r.name} ({r.entity_type}) in {r.data.get('file', 'unknown')}")
 
     elif command == 'test-context' and len(sys.argv) >= 3:
-        module = sys.argv[2]
-        context = get_test_context(module)
-        print(f"\nTest context for: {module}")
-        print(f"Test files: {len(context['test_files'])}")
-        for f in context['test_files']:
-            print(f"  - {f}")
-        print(f"Coverage estimate: {context['coverage_estimate']}")
+        # Parse test-context with optional flags
+        parser = argparse.ArgumentParser(description='Get test context from documentation')
+        parser.add_argument('command', help='Command (test-context)')
+        parser.add_argument('module', help='Module path to analyze')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
 
-    elif command == 'impact' and len(sys.argv) >= 3:
-        module = sys.argv[2]
-        impact = get_impact_analysis(module)
-        print(f"\nImpact analysis for: {module}")
-        print(f"Impact scope: {impact['impact_scope']}")
-        print(f"Affected modules: {len(impact['affected_modules'])}")
-        for m in impact['affected_modules']:
-            print(f"  - {m}")
+        args = parser.parse_args()
+
+        import json as json_module
+
+        try:
+            gatherer = SDDContextGatherer()
+            context = gatherer.get_test_context(args.module)
+
+            if args.json:
+                print(json_module.dumps(context, indent=2))
+            else:
+                print(f"\nTest context for: {args.module}")
+                print(f"Test files: {len(context['test_files'])}")
+                for f in context['test_files']:
+                    print(f"  - {f}")
+                print(f"Test functions: {len(context['test_functions'])}")
+                for func in context['test_functions'][:10]:  # Show first 10
+                    print(f"  - {func}")
+                if len(context['test_functions']) > 10:
+                    print(f"  ... and {len(context['test_functions']) - 10} more")
+                print(f"Test classes: {len(context['test_classes'])}")
+                for cls in context['test_classes']:
+                    print(f"  - {cls}")
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    elif command == 'call-context':
+        # Parse call-context with optional flags
+        parser = argparse.ArgumentParser(description='Get call graph context from documentation')
+        parser.add_argument('command', help='Command (call-context)')
+        parser.add_argument('--function', type=str, help='Function name to query callers/callees for')
+        parser.add_argument('--file', type=str, help='File path to get call context for all functions')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
+
+        args = parser.parse_args()
+
+        if not args.function and not args.file:
+            print("Error: Either --function or --file must be provided", file=sys.stderr)
+            sys.exit(1)
+
+        import json as json_module
+
+        try:
+            gatherer = SDDContextGatherer()
+            context = gatherer.get_call_context(
+                function_name=args.function,
+                file_path=args.file
+            )
+
+            if args.json:
+                print(json_module.dumps(context, indent=2))
+            else:
+                # Text format output
+                if args.function:
+                    print(f"\nCall context for function: {args.function}")
+                elif args.file:
+                    print(f"\nCall context for file: {args.file}")
+
+                print(f"\nFunctions found: {len(context['functions_found'])}")
+                for f in context['functions_found']:
+                    print(f"  - {f}")
+
+                print(f"\nCallers ({len(context['callers'])}):")
+                for caller in context['callers']:
+                    line = f":{caller['line']}" if caller.get('line') else ""
+                    print(f"  - {caller['name']} ({caller['file']}{line})")
+
+                print(f"\nCallees ({len(context['callees'])}):")
+                for callee in context['callees']:
+                    line = f":{callee['line']}" if callee.get('line') else ""
+                    print(f"  - {callee['name']} ({callee['file']}{line})")
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    elif command == 'complexity':
+        # Parse complexity with optional flags
+        parser = argparse.ArgumentParser(description='Get complexity hotspots from documentation')
+        parser.add_argument('command', help='Command (complexity)')
+        parser.add_argument('--file', type=str, help='File path to filter results to')
+        parser.add_argument('--threshold', type=int, default=5, help='Complexity threshold (default: 5)')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
+
+        args = parser.parse_args()
+
+        import json as json_module
+
+        try:
+            gatherer = SDDContextGatherer()
+            result = gatherer.get_complexity_hotspots(
+                file_path=args.file,
+                threshold=args.threshold
+            )
+
+            if args.json:
+                print(json_module.dumps(result, indent=2))
+            else:
+                # Text format output
+                if args.file:
+                    print(f"\nComplexity hotspots for: {args.file}")
+                else:
+                    print(f"\nComplexity hotspots (threshold >= {args.threshold})")
+
+                print(f"\nFound {result['total_count']} hotspots:")
+                for hotspot in result['hotspots'][:20]:  # Show first 20
+                    line = f":{hotspot['line']}" if hotspot.get('line') else ""
+                    print(f"  - {hotspot['name']} (complexity: {hotspot['complexity']}) in {hotspot['file']}{line}")
+                if result['total_count'] > 20:
+                    print(f"  ... and {result['total_count'] - 20} more")
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
     else:
         print(f"Unknown command: {command}")

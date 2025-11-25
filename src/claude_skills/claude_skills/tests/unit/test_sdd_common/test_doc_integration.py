@@ -16,6 +16,7 @@ from claude_skills.common.doc_integration import (
     _determine_status_from_stats,
     prompt_for_generation,
     _build_generation_prompt,
+    get_staleness_threshold,
 )
 
 
@@ -308,6 +309,113 @@ class TestDetermineStatusFromStats:
         stats = {"generated_at": recent_date}
         result = _determine_status_from_stats(stats)
         assert result == DocStatus.AVAILABLE
+
+    @patch("claude_skills.common.doc_integration.get_current_git_commit")
+    @patch("claude_skills.common.doc_integration.count_commits_between")
+    @patch("claude_skills.common.doc_integration.get_staleness_threshold")
+    def test_git_based_staleness_exceeds_threshold(self, mock_threshold, mock_count, mock_current):
+        """Test when commits since generation exceed threshold (should be STALE)."""
+        mock_current.return_value = "current_commit_sha"
+        mock_count.return_value = 15  # More than threshold
+        mock_threshold.return_value = 10
+
+        stats = {
+            "metadata": {
+                "generated_at_commit": "old_commit_sha",
+                "generated_at": "2025-01-15T12:00:00Z"
+            }
+        }
+        result = _determine_status_from_stats(stats)
+
+        assert result == DocStatus.STALE
+        mock_count.assert_called_once_with("old_commit_sha", "current_commit_sha")
+
+    @patch("claude_skills.common.doc_integration.get_current_git_commit")
+    @patch("claude_skills.common.doc_integration.count_commits_between")
+    @patch("claude_skills.common.doc_integration.get_staleness_threshold")
+    def test_git_based_staleness_within_threshold(self, mock_threshold, mock_count, mock_current):
+        """Test when commits since generation are within threshold (should be AVAILABLE)."""
+        mock_current.return_value = "current_commit_sha"
+        mock_count.return_value = 5  # Less than threshold
+        mock_threshold.return_value = 10
+
+        stats = {
+            "metadata": {
+                "generated_at_commit": "old_commit_sha",
+                "generated_at": "2025-01-15T12:00:00Z"
+            }
+        }
+        result = _determine_status_from_stats(stats)
+
+        assert result == DocStatus.AVAILABLE
+
+    @patch("claude_skills.common.doc_integration.get_current_git_commit")
+    def test_git_based_same_commit(self, mock_current):
+        """Test when current commit matches generation commit (should be AVAILABLE)."""
+        mock_current.return_value = "same_commit_sha"
+
+        stats = {
+            "metadata": {
+                "generated_at_commit": "same_commit_sha",
+                "generated_at": "2025-01-15T12:00:00Z"
+            }
+        }
+        result = _determine_status_from_stats(stats)
+
+        assert result == DocStatus.AVAILABLE
+
+    @patch("claude_skills.common.doc_integration.get_current_git_commit")
+    def test_fallback_to_time_when_no_git_metadata(self, mock_current):
+        """Test fallback to time-based staleness when no git metadata present."""
+        mock_current.return_value = "current_commit_sha"
+
+        # Old timestamp but no generated_at_commit
+        old_date = (datetime.now(timezone.utc) - timedelta(days=10)).isoformat()
+        stats = {
+            "metadata": {},
+            "generated_at": old_date
+        }
+        result = _determine_status_from_stats(stats)
+
+        assert result == DocStatus.STALE
+
+    @patch("claude_skills.common.doc_integration.get_current_git_commit")
+    def test_fallback_when_current_commit_unavailable(self, mock_current):
+        """Test when generated_at_commit exists but can't get current commit."""
+        mock_current.return_value = None  # Can't get current commit
+
+        stats = {
+            "metadata": {
+                "generated_at_commit": "old_commit_sha",
+                "generated_at": "2025-01-15T12:00:00Z"
+            }
+        }
+        result = _determine_status_from_stats(stats)
+
+        # Should treat as available when we can't determine staleness
+        assert result == DocStatus.AVAILABLE
+
+
+class TestStalenessThreshold:
+    """Tests for get_staleness_threshold configuration."""
+
+    def test_default_threshold(self):
+        """Test that default threshold is 10 when env var not set."""
+        with patch.dict('os.environ', {}, clear=True):
+            threshold = get_staleness_threshold()
+            assert threshold == 10
+
+    def test_custom_threshold_from_env(self):
+        """Test that threshold can be configured via environment variable."""
+        with patch.dict('os.environ', {'SDD_STALENESS_COMMIT_THRESHOLD': '20'}):
+            threshold = get_staleness_threshold()
+            assert threshold == 20
+
+    def test_invalid_threshold_uses_default(self):
+        """Test that invalid env var value falls back to default."""
+        with patch.dict('os.environ', {'SDD_STALENESS_COMMIT_THRESHOLD': 'invalid'}):
+            threshold = get_staleness_threshold()
+            assert threshold == 10
 
 
 class TestPromptForGeneration:

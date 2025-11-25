@@ -6,21 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.7.7] - 2025-11-25
+
 ### Added
 - **Automatic documentation context in prepare-task**: `sdd prepare-task` now automatically populates `context.file_docs` with file-focused documentation when doc-query is available
   - Includes relevant files, dependencies, and provenance metadata (source, timestamp, git SHA, freshness)
   - Eliminates need to manually call doc-query helpers after running prepare-task
   - Falls back gracefully when documentation is unavailable or stale
   - Integration leverages `file_path` from task metadata for focused context
+- **Call context integration**: New `get_call_context()` convenience function for retrieving callers/callees at module level
+  - Simplifies documentation queries with direct access to call graph relationships
+  - Integrated into doc helper for richer task context
+- **Test coverage enhancements**:
+  - Added comprehensive unit tests for `get_call_context()` and `get_test_context()`
+  - Test function list extraction with coverage hint generation based on function coverage analysis
+  - Enhanced test coverage for default context fields and doc integration
+- **Git-based staleness detection**: Documentation freshness tracking using git commit SHAs
+  - Automatic detection of stale documentation based on file modifications
+  - Provenance metadata includes source, timestamp, and git SHA for auditing
 
 ### Changed
 - Enhanced doc helper (`get_task_context_from_docs()`) to accept `file_path` and `spec_id` parameters for targeted documentation queries
 - Updated `prepare_task()` to pass task metadata through to doc helper for richer context gathering
+- Enhanced `doc_integration.py` with improved error handling and fallback mechanisms
+- Added `doc_context` configuration settings to `sdd_config.json` template for fine-grained control
 
 ### Documentation
 - Updated `analysis/prepare-task-default-context.md` with `context.file_docs` field documentation
 - Updated `skills/sdd-next/SKILL.md` to document automatic file_docs inclusion in default workflow
 - Added `context.file_docs` to Command Value Matrix in sdd-next skill documentation
+- Added comprehensive test documentation for doc helper and integration
 
 ## [0.7.6] - 2025-11-23
 

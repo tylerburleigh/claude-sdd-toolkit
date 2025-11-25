@@ -1,0 +1,1186 @@
+{
+  "spec_id": "prepare-task-enriched-context-2025-01-24-001",
+  "title": "Prepare-Task Enriched Context (Phase 2)",
+  "generated": "2025-01-24T10:00:00Z",
+  "last_updated": "2025-11-25T00:35:05.932405Z",
+  "metadata": {
+    "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
+    "objectives": [
+      "Add call graph context (callers/callees) to file_docs",
+      "Enhance test context with test files and coverage hints",
+      "Include complexity hotspots for target files",
+      "Add impact analysis (blast radius) for risk assessment",
+      "Maintain <100ms total latency budget"
+    ],
+    "complexity": "medium",
+    "estimated_hours": 12,
+    "assumptions": [
+      "Schema v1 docs may lack call data - graceful fallback required",
+      "Each enrichment should be configurable/toggleable",
+      "Parallel queries with early termination on timeout"
+    ],
+    "status": "active",
+    "activated_date": "2025-11-25T00:19:18.491157Z",
+    "progress_percentage": 33,
+    "current_phase": "phase-2"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Prepare-Task Enriched Context (Phase 2)",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 27,
+      "completed_tasks": 9,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Call Graph Context (P0 - High Value, Low Effort)",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 6,
+      "metadata": {
+        "purpose": "Show which functions call the target code and what it calls. Helps agents understand impact of changes and integration points.",
+        "risk_level": "low",
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:30:12.555799Z",
+        "journaled_at": "2025-11-25T00:30:12.561896Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:24:08.475778Z",
+        "journaled_at": "2025-11-25T00:24:08.480472Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "changes": "Add get_call_context() method to SDDContextGatherer class"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Add get_call_context() method using get_callers()/get_callees() from doc_query_lib",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "details": [
+          "Use existing self.query methods to gather caller/callee information",
+          "Accept file_path or function_name as input",
+          "Return structured dict with callers list and callees list",
+          "Each entry should include: name, file, line number"
+        ],
+        "started_at": "2025-11-25T00:19:57.266450Z",
+        "status_note": "Starting implementation of get_call_context() method",
+        "completed_at": "2025-11-25T00:20:41.946976Z",
+        "needs_journaling": false,
+        "actual_hours": 0.012,
+        "journaled_at": "2025-11-25T00:20:41.949755Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-1-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Add convenience function get_call_context() at module level",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "details": "Follow pattern of existing convenience functions like get_task_context()",
+        "task_category": "implementation",
+        "started_at": "2025-11-25T00:21:08.874786Z",
+        "status_note": "Adding module-level convenience function for get_call_context()",
+        "completed_at": "2025-11-25T00:21:40.414348Z",
+        "needs_journaling": false,
+        "actual_hours": 0.009,
+        "journaled_at": "2025-11-25T00:21:40.417175Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/doc_helper.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "blocks": [
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add get_call_context_from_docs() function that wraps sdd-integration call-context command",
+        "started_at": "2025-11-25T00:22:05.153830Z",
+        "status_note": "Adding get_call_context_from_docs() wrapper function",
+        "completed_at": "2025-11-25T00:22:45.692151Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-25T00:22:45.694796Z"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Include call_graph in file_docs context within prepare_task()",
+        "started_at": "2025-11-25T00:23:11.605266Z",
+        "status_note": "Including call_graph in file_docs context in prepare_task()",
+        "completed_at": "2025-11-25T00:24:08.475645Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-25T00:24:08.478412Z"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:30:12.555796Z",
+        "journaled_at": "2025-11-25T00:30:12.560833Z"
+      }
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Unit tests pass for get_call_context()",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_doc_query/ -k call_context -v",
+        "expected": "All tests pass",
+        "started_at": "2025-11-25T00:24:35.851458Z",
+        "status_note": "Running unit tests for get_call_context()",
+        "completed_at": "2025-11-25T00:25:48.249890Z",
+        "needs_journaling": false,
+        "actual_hours": 0.02,
+        "journaled_at": "2025-11-25T00:25:48.252964Z"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "started_at": "2025-11-25T00:26:16.531539Z",
+        "status_note": "Running fidelity review for Phase 1",
+        "completed_at": "2025-11-25T00:30:12.555645Z",
+        "needs_journaling": false,
+        "actual_hours": 0.066,
+        "journaled_at": "2025-11-25T00:30:12.558524Z"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Test Context Enhancement (P1 - High Value, Medium Effort)",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1"
+        ],
+        "blocks": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 3,
+      "metadata": {
+        "purpose": "Show relevant test files and coverage hints. Agents need to know which tests to run and where coverage gaps exist.",
+        "risk_level": "medium"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 3,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:35:05.927124Z",
+        "journaled_at": "2025-11-25T00:35:05.932384Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+      "status": "completed",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "changes": "Enhance existing get_test_context() method with richer output"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Add test_functions list extraction to get_test_context()",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "details": [
+          "Extract individual test function names from test files",
+          "Include test method names from test classes",
+          "Return as test_functions list in output"
+        ],
+        "started_at": "2025-11-25T00:30:40.980742Z",
+        "status_note": "Adding test_functions list extraction to get_test_context()",
+        "completed_at": "2025-11-25T00:31:38.282374Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-25T00:31:38.285344Z"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-2-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add coverage_hint generation based on function coverage analysis",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "details": [
+          "Compare module functions with discovered test functions",
+          "Generate human-readable coverage hint string",
+          "Example: '3 functions lack direct test coverage'"
+        ],
+        "task_category": "implementation",
+        "started_at": "2025-11-25T00:32:06.078441Z",
+        "status_note": "Adding coverage_hint generation to get_test_context()",
+        "completed_at": "2025-11-25T00:32:59.652829Z",
+        "needs_journaling": false,
+        "actual_hours": 0.015,
+        "journaled_at": "2025-11-25T00:32:59.655744Z"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/doc_helper.py",
+      "status": "completed",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add get_test_context_from_docs() wrapper function",
+        "started_at": "2025-11-25T00:33:28.746379Z",
+        "status_note": "Adding get_test_context_from_docs() wrapper function",
+        "completed_at": "2025-11-25T00:35:05.926964Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-25T00:35:05.929902Z"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Unit tests pass for enhanced get_test_context()",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_doc_query/ -k test_context -v",
+        "expected": "All tests pass"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Complexity Hotspots (P2 - Medium Value, Low Effort)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2"
+        ],
+        "blocks": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Identify high-complexity functions in the task's target area. Helps agents focus attention on code that needs careful handling.",
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add get_complexity_hotspots() method that filters get_high_complexity() results to task's file_path"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/doc_helper.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add get_complexity_hotspots_from_docs() wrapper function"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Unit tests pass for get_complexity_hotspots()",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_doc_query/ -k complexity -v",
+        "expected": "All tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Impact Analysis (P3 - High Value, Medium Effort)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3"
+        ],
+        "blocks": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Show blast radius of changes - what other code depends on this. Provides risk assessment before making changes.",
+        "risk_level": "medium"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Enhance existing get_impact_analysis() with risk_factors list"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add risk_factors list generation to get_impact_analysis()",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": [
+          "Analyze dependency count and types",
+          "Check if module is in API/interface layer",
+          "Generate human-readable risk factors list",
+          "Example: ['High call count', 'Used by API layer']"
+        ]
+      },
+      "dependencies": {
+        "blocks": [
+          "task-4-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Add indirect_dependents count via transitive dependency analysis",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-4-1-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Walk dependency tree to count indirect dependents (modules that depend on direct dependents)",
+        "task_category": "implementation"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/doc_helper.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add get_impact_analysis_from_docs() wrapper function"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Unit tests pass for enhanced get_impact_analysis()",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_doc_query/ -k impact -v",
+        "expected": "All tests pass"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Integration & Performance Testing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Wire up all enrichments in discovery.py and verify performance budget maintained",
+        "risk_level": "medium"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2",
+        "task-5-1-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Integrate all enrichment functions into prepare_task() file_docs assembly"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Add call_graph, test_context, complexity_hotspots, and impact to file_docs assembly",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": [
+          "Import new functions from doc_helper.py",
+          "Call each enrichment function when doc_status == AVAILABLE",
+          "Assemble into unified file_docs structure"
+        ]
+      },
+      "dependencies": {
+        "blocks": [
+          "task-5-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Add parallel query execution with timeout handling",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-5-1-1"
+        ],
+        "blocks": [
+          "task-5-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": [
+          "Use concurrent.futures for parallel queries",
+          "Set 100ms total timeout budget",
+          "Early termination on timeout - return partial results"
+        ],
+        "task_category": "implementation"
+      }
+    },
+    "task-5-1-3": {
+      "type": "subtask",
+      "title": "Add configurable toggles for each enrichment type",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-5-1-2"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": [
+          "Add enable_call_graph, enable_test_context, etc. parameters",
+          "Default all to True for backwards compatibility",
+          "Allow per-call override via function arguments"
+        ],
+        "task_category": "implementation"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Add graceful fallback for schema v1 docs",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Handle missing call data in older docs gracefully - return empty sections rather than errors"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Integration test verifies enriched file_docs structure",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_next_doc_integration.py -v",
+        "expected": "All tests pass with enriched file_docs containing call_graph, test_context, complexity_hotspots, impact"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Performance test confirms <100ms latency budget",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py -k performance -v",
+        "expected": "prepare_task() completes in <100ms for typical tasks"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Full spec fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-25T00:20:41.949750Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add get_call_context() method using get_callers()/get_callees() from doc_query_lib",
+      "author": "claude-code",
+      "content": "Implemented get_call_context() method in SDDContextGatherer class at sdd_integration.py:231. Method accepts optional function_name and file_path parameters, uses self.query.get_callers() and self.query.get_callees() to gather call graph information, and returns structured dict with callers/callees lists (each entry has name, file, line). Includes deduplication logic for multiple function matches. Verified with manual tests - ValueError raised correctly when no arguments provided, method returns expected structure.",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:21:40.417170Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add convenience function get_call_context() at module level",
+      "author": "claude-code",
+      "content": "Added module-level convenience function get_call_context() at sdd_integration.py:493. Function follows the same pattern as other convenience functions (get_task_context, get_impact_analysis, etc.) - accepts optional function_name, file_path, and docs_path parameters, instantiates SDDContextGatherer, and delegates to the class method. Verified with manual tests - returns correct structure and raises ValueError when required.",
+      "metadata": {},
+      "task_id": "task-1-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:22:45.694792Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/doc_helper.py",
+      "author": "claude-code",
+      "content": "Added get_call_context_from_docs() function at doc_helper.py:251. Function wraps sdd-integration call-context command, accepting optional function_name and file_path parameters. Returns structured dict with callers/callees or None if unavailable. Includes proper error handling (ValueError when no args, subprocess timeout, JSON parse errors). Follows existing pattern of get_task_context_from_docs(). Tests pass - ValueError raised correctly, function handles missing sdd-integration gracefully.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:24:08.478407Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_next/discovery.py",
+      "author": "claude-code",
+      "content": "Updated discovery.py to include call_graph in file_docs context within prepare_task(). Changes: 1) Added import of get_call_context_from_docs from claude_skills.common at line 25. 2) Modified file_docs assembly logic (lines 548-573) to gather call_graph context when task has file_path and docs are available. The call_graph contains callers, callees, and functions_found arrays. Also added get_call_context_from_docs to common/__init__.py exports. Verified all imports work correctly.",
+      "metadata": {},
+      "task_id": "task-1-3"
+    },
+    {
+      "timestamp": "2025-11-25T00:24:08.480469Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-files"
+    },
+    {
+      "timestamp": "2025-11-25T00:25:48.252955Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Unit tests pass for get_call_context()",
+      "author": "claude-code",
+      "content": "Added 7 unit tests for get_call_context_from_docs() to test_doc_helper.py. Tests cover: ValueError when no params provided, tool unavailable scenario, successful retrieval with function_name, successful retrieval with file_path, command failure, timeout handling, and invalid JSON handling. All 7 tests pass (pytest -k call_context). Tests validate the doc_helper wrapper function which calls sdd-integration call-context command.",
+      "metadata": {},
+      "task_id": "verify-1-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.558520Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Phase 1 implementation fidelity review",
+      "author": "claude-code",
+      "content": "Fidelity review identified a critical blocking issue - the `call-context` CLI subcommand was missing from sdd_integration.py main(). Fixed by adding the call-context subcommand handler (lines 620-667) that parses --function, --file, and --json arguments and invokes SDDContextGatherer.get_call_context(). Also updated usage help text. Verified CLI works with manual test. All 7 unit tests continue to pass. Phase 1 implementation is now complete and functional end-to-end.",
+      "metadata": {},
+      "task_id": "verify-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.560828Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Verification",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-verify have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-verify"
+    },
+    {
+      "timestamp": "2025-11-25T00:30:12.561890Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Call Graph Context (P0 - High Value, Low Effort)",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-1 have been completed.",
+      "metadata": {},
+      "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:31:38.285339Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add test_functions list extraction to get_test_context()",
+      "author": "claude-code",
+      "content": "Enhanced get_test_context() method in sdd_integration.py to extract test function names as strings. Changes: 1) test_functions now returns list of string names instead of QueryResult objects, 2) Added test_classes list for class names, 3) Extracts test_xxx methods from test classes using ClassName.method_name format, 4) Only includes functions/methods that start with test_ prefix, 5) Updated docstring to document new return fields. Verified function works - returns correct structure with test_functions, test_classes, test_files, and coverage_estimate.",
+      "metadata": {},
+      "task_id": "task-2-1-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:32:59.655740Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add coverage_hint generation based on function coverage analysis",
+      "author": "claude-code",
+      "content": "Added coverage_hint field to get_test_context() output. Implementation compares module functions with discovered test functions using name matching (test_xyz -> xyz). Generates human-readable hints like '3 functions lack direct test coverage', 'All public functions have corresponding tests', or 'No public functions found in module'. Excludes private functions (starting with _) from analysis. Updated docstring. Verified function works correctly.",
+      "metadata": {},
+      "task_id": "task-2-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:35:05.929897Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/doc_helper.py",
+      "author": "claude-code",
+      "content": "Added get_test_context_from_docs() wrapper function to doc_helper.py (lines 336-406). Function calls sdd-integration test-context command with --json flag and returns parsed test context. Also updated sdd_integration.py test-context CLI handler to support --json flag with argparse (lines 683-714). Updated help text. Added export to common/__init__.py. Verified CLI returns JSON with test_files, test_functions, test_classes, coverage_estimate, and coverage_hint fields. Imports work correctly.",
+      "metadata": {},
+      "task_id": "task-2-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:35:05.932379Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
+    }
+  ]
+}

@@ -246,7 +246,7 @@ def _regenerate_documentation(specs_dir: Path, printer: PrettyPrinter) -> bool:
     try:
         result = subprocess.run(
             ['sdd', 'doc', 'generate', str(source_dir),
-             '--output-dir', str(docs_dir), '--format', 'both'],
+             '--output-dir', str(docs_dir)],
             capture_output=True,
             text=True,
             timeout=300

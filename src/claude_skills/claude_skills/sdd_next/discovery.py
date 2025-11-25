@@ -22,6 +22,8 @@ from .context_utils import (
 from claude_skills.common import (
     validate_spec_before_proceed,
     get_task_context_from_docs,
+    get_call_context_from_docs,
+    get_test_context_from_docs,
     check_doc_query_available,
 )
 from claude_skills.common.doc_integration import (
@@ -34,8 +36,44 @@ from claude_skills.common.paths import find_spec_file
 from claude_skills.common.completion import check_spec_completion, should_prompt_completion
 from claude_skills.common.git_metadata import find_git_root, check_dirty_tree
 from claude_skills.common.git_config import is_git_enabled
+from claude_skills.common.sdd_config import get_doc_context_settings
 
 logger = logging.getLogger(__name__)
+
+# Pattern to detect file references in task description/title
+import re
+_FILE_PATTERN = re.compile(r'\b[\w./]+\.(py|ts|tsx|js|jsx|go|rs|java|rb|c|cpp|h|hpp|cs|swift|kt|scala|vue|svelte|md|json|yaml|yml|toml)\b', re.IGNORECASE)
+
+
+def _should_gather_doc_context(task_data: dict) -> bool:
+    """
+    Determine if doc context would be valuable for this task.
+
+    Skips doc context gathering for abstract/meta tasks that have no
+    file associations, reducing unnecessary subprocess calls.
+
+    Args:
+        task_data: Task metadata from spec
+
+    Returns:
+        bool: True if doc context should be gathered
+    """
+    # Always gather if task has explicit file_path
+    file_path = task_data.get("metadata", {}).get("file_path")
+    if file_path:
+        return True
+
+    # Check if description or title mentions specific files
+    description = task_data.get("description", "")
+    title = task_data.get("title", "")
+    combined_text = f"{title} {description}"
+
+    if _FILE_PATTERN.search(combined_text):
+        return True
+
+    # Skip for abstract tasks with no file references
+    logger.debug(f"Doc context: skipping (no file references in task)")
+    return False
 
 
 def is_unblocked(spec_data: Dict, task_id: str, task_data: Dict) -> bool:
@@ -433,6 +471,7 @@ def prepare_task(
     # Phase 3: Context gathering from doc-query (Priority 1 Integration)
     # Check documentation availability first (proactive)
     doc_status = check_doc_availability()
+    logger.debug(f"Doc context: status={doc_status.value}")
 
     # If docs are missing or stale, note this for CLI to handle
     # (Library functions can't directly invoke skills or prompt, so we flag it)
@@ -440,12 +479,15 @@ def prepare_task(
         # Store status in result for CLI layer to handle
         result["doc_status"] = doc_status.value
         result["doc_prompt_needed"] = True
+        logger.debug(f"Doc context: skipped (status={doc_status.value}, prompt_needed=True)")
 
     # Automatically gather codebase context ONLY if documentation is fresh (AVAILABLE)
     # Stale docs are omitted to signal agent should use manual exploration
-    if doc_status == DocStatus.AVAILABLE:
+    # Also skip for abstract tasks with no file references (lazy evaluation)
+    if doc_status == DocStatus.AVAILABLE and _should_gather_doc_context(task_data):
         doc_check = check_doc_query_available()
         if doc_check["available"]:
+            logger.debug("Doc context: gathering context from doc-query")
             # Extract task description for context gathering
             task_title = task_data.get("title", "")
             task_description = task_data.get("description", task_title)
@@ -462,12 +504,15 @@ def prepare_task(
             )
             if doc_context:
                 result["doc_context"] = doc_context
+                logger.debug(f"Doc context: gathered {len(doc_context.get('files', []))} files")
 
                 # Add helpful message
                 if doc_context.get("files"):
                     result["doc_context"]["message"] = (
                         f"Found {len(doc_context['files'])} relevant files from codebase documentation"
                     )
+            else:
+                logger.debug("Doc context: get_task_context_from_docs returned None")
 
     # Phase 4: Prepare enhanced context payload (defensive)
     try:
@@ -503,7 +548,71 @@ def prepare_task(
 
         # Add file_docs to context if doc_context is available
         if result.get("doc_context"):
-            result["context"]["file_docs"] = result["doc_context"]
+            file_docs = dict(result["doc_context"])
+
+            # Gather enrichment context if we have a file_path and docs are available
+            task_file_path = task_data.get("metadata", {}).get("file_path")
+            if task_file_path and doc_status == DocStatus.AVAILABLE:
+                # Load enrichment settings from config
+                doc_settings = get_doc_context_settings(spec_path.parent)
+                project_root = str(spec_path.parent)
+
+                # Run enabled enrichment queries in parallel
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+
+                def gather_call_graph():
+                    if not doc_settings.get("call_graph", True):
+                        return None
+                    try:
+                        call_context = get_call_context_from_docs(
+                            file_path=task_file_path,
+                            project_root=project_root
+                        )
+                        if call_context:
+                            return ("call_graph", {
+                                "callers": call_context.get("callers", []),
+                                "callees": call_context.get("callees", []),
+                                "functions_found": call_context.get("functions_found", [])
+                            })
+                    except Exception as e:
+                        logger.debug(f"Doc context: call_graph gathering failed: {e}")
+                    return None
+
+                def gather_test_context():
+                    if not doc_settings.get("test_context", True):
+                        return None
+                    try:
+                        test_context = get_test_context_from_docs(
+                            module_path=task_file_path,
+                            project_root=project_root
+                        )
+                        if test_context:
+                            return ("test_context", {
+                                "test_files": test_context.get("test_files", []),
+                                "test_functions": test_context.get("test_functions", []),
+                            })
+                    except Exception as e:
+                        logger.debug(f"Doc context: test_context gathering failed: {e}")
+                    return None
+
+                # Execute all enabled queries in parallel
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = [
+                        executor.submit(gather_call_graph),
+                        executor.submit(gather_test_context),
+                    ]
+
+                    for future in as_completed(futures):
+                        try:
+                            result_tuple = future.result()
+                            if result_tuple:
+                                key, value = result_tuple
+                                file_docs[key] = value
+                                logger.debug(f"Doc context: gathered {key}")
+                        except Exception as e:
+                            logger.debug(f"Doc context: parallel gather failed: {e}")
+
+            result["context"]["file_docs"] = file_docs
 
         # Add plan validation only if task has a plan
         if plan_validation:

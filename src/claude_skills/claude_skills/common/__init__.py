@@ -122,6 +122,9 @@ from .doc_helper import (
     check_doc_query_available,
     check_sdd_integration_available,
     get_task_context_from_docs,
+    get_call_context_from_docs,
+    get_test_context_from_docs,
+    get_complexity_hotspots_from_docs,
     should_generate_docs,
     ensure_documentation_exists,
 )
@@ -295,6 +298,9 @@ __all__ = [
     "check_doc_query_available",
     "check_sdd_integration_available",
     "get_task_context_from_docs",
+    "get_call_context_from_docs",
+    "get_test_context_from_docs",
+    "get_complexity_hotspots_from_docs",
     "should_generate_docs",
     "ensure_documentation_exists",
 

@@ -6,10 +6,66 @@ These functions enable proactive documentation generation and context gathering.
 """
 
 import json
+import logging
 import subprocess
 import shutil
 from typing import Optional, Tuple
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+
+def get_current_git_commit(project_root: str = ".") -> Optional[str]:
+    """
+    Get the current HEAD commit SHA.
+
+    Args:
+        project_root: Root directory of the project
+
+    Returns:
+        str | None: Full commit SHA or None if not a git repo
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return proc.stdout.strip()
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception) as e:
+        logger.debug(f"get_current_git_commit failed: {e}")
+    return None
+
+
+def count_commits_between(commit_a: str, commit_b: str, project_root: str = ".") -> int:
+    """
+    Count commits between two git commits.
+
+    Args:
+        commit_a: Earlier commit SHA (e.g., when docs were generated)
+        commit_b: Later commit SHA (e.g., current HEAD)
+        project_root: Root directory of the project
+
+    Returns:
+        int: Number of commits between commit_a and commit_b (0 if error)
+    """
+    try:
+        # Use git rev-list to count commits
+        proc = subprocess.run(
+            ["git", "rev-list", "--count", f"{commit_a}..{commit_b}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=project_root
+        )
+        if proc.returncode == 0:
+            return int(proc.stdout.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError, Exception) as e:
+        logger.debug(f"count_commits_between failed ({commit_a}..{commit_b}): {e}")
+    return 0
 
 
 def get_current_git_commit(project_root: str = ".") -> Optional[str]:
@@ -250,8 +306,10 @@ def get_task_context_from_docs(
             # Parse JSON output
             try:
                 context = json.loads(proc.stdout)
+                logger.debug(f"get_task_context_from_docs: returned {len(context.get('files', []))} files in {query_time_ms}ms")
                 return context
             except json.JSONDecodeError:
+                logger.debug(f"get_task_context_from_docs: non-JSON output, returning raw")
                 # If not JSON, return structured text
                 return {
                     "files": [],
@@ -261,11 +319,247 @@ def get_task_context_from_docs(
                     "raw_output": proc.stdout
                 }
         else:
+            logger.debug(f"get_task_context_from_docs: sdd-integration returned code {proc.returncode}")
             return None
 
     except subprocess.TimeoutExpired:
+        logger.debug("get_task_context_from_docs: subprocess timed out")
         return None
-    except Exception:
+    except Exception as e:
+        logger.debug(f"get_task_context_from_docs: exception {e}")
+        return None
+
+
+def get_call_context_from_docs(
+    function_name: Optional[str] = None,
+    file_path: Optional[str] = None,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get call graph context from codebase documentation.
+
+    Retrieves caller/callee information for a function or file using the
+    sdd-integration call-context command.
+
+    Args:
+        function_name: Name of the function to query callers/callees for
+        file_path: Path to file to get call context for all functions
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "function_name": str | None,  # The queried function (if provided)
+            "file_path": str | None,      # The queried file (if provided)
+            "callers": list[dict],        # List of {name, file, line}
+            "callees": list[dict],        # List of {name, file, line}
+            "functions_found": list[str]  # Functions found matching query
+        } or None if unavailable
+
+    Raises:
+        ValueError: If neither function_name nor file_path is provided
+
+    Example:
+        >>> context = get_call_context_from_docs(function_name="process_data")
+        >>> if context:
+        ...     print(f"Callers: {len(context['callers'])}")
+        ...     print(f"Callees: {len(context['callees'])}")
+    """
+    if not function_name and not file_path:
+        raise ValueError("Either function_name or file_path must be provided")
+
+    if not check_sdd_integration_available():
+        logger.debug("get_call_context_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "call-context"]
+        if function_name:
+            cmd.extend(["--function", function_name])
+        if file_path:
+            cmd.extend(["--file", file_path])
+        cmd.append("--json")
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                context = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_call_context_from_docs: returned "
+                    f"{len(context.get('callers', []))} callers, "
+                    f"{len(context.get('callees', []))} callees"
+                )
+                return context
+            except json.JSONDecodeError:
+                logger.debug("get_call_context_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_call_context_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_call_context_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_call_context_from_docs: exception {e}")
+        return None
+
+
+def get_test_context_from_docs(
+    module_path: str,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get test context for a module from codebase documentation.
+
+    Retrieves test files and test functions related to a module
+    using the sdd-integration test-context command.
+
+    Args:
+        module_path: Path to the module to analyze
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "module": str,            # The module path queried
+            "test_files": list[str],  # Test file paths
+            "test_functions": list[str],  # Test function names
+            "test_classes": list[str],    # Test class names
+        } or None if unavailable
+
+    Example:
+        >>> context = get_test_context_from_docs("src/auth.py")
+        >>> if context:
+        ...     print(f"Test files: {context['test_files']}")
+    """
+    if not check_sdd_integration_available():
+        logger.debug("get_test_context_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "test-context", module_path, "--json"]
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                context = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_test_context_from_docs: returned "
+                    f"{len(context.get('test_files', []))} test files, "
+                    f"coverage={context.get('coverage_estimate', 'unknown')}"
+                )
+                return context
+            except json.JSONDecodeError:
+                logger.debug("get_test_context_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_test_context_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_test_context_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_test_context_from_docs: exception {e}")
+        return None
+
+
+def get_complexity_hotspots_from_docs(
+    file_path: Optional[str] = None,
+    threshold: int = 5,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get complexity hotspots from codebase documentation.
+
+    Retrieves high-complexity functions that may need careful attention
+    using the sdd-integration complexity command.
+
+    Args:
+        file_path: Optional path to filter results to a specific file
+        threshold: Complexity threshold (default: 5)
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "file_path": str | None,       # The file filter (if provided)
+            "threshold": int,              # The complexity threshold used
+            "hotspots": list[dict],        # List of {name, complexity, line, file}
+            "total_count": int             # Total number of hotspots
+        } or None if unavailable
+
+    Example:
+        >>> result = get_complexity_hotspots_from_docs(
+        ...     file_path="src/auth.py",
+        ...     threshold=5
+        ... )
+        >>> if result:
+        ...     for hotspot in result['hotspots']:
+        ...         print(f"{hotspot['name']}: {hotspot['complexity']}")
+    """
+    if not check_sdd_integration_available():
+        logger.debug("get_complexity_hotspots_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "complexity", "--json"]
+        if file_path:
+            cmd.extend(["--file", file_path])
+        cmd.extend(["--threshold", str(threshold)])
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                result = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_complexity_hotspots_from_docs: returned "
+                    f"{result.get('total_count', 0)} hotspots"
+                )
+                return result
+            except json.JSONDecodeError:
+                logger.debug("get_complexity_hotspots_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_complexity_hotspots_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_complexity_hotspots_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_complexity_hotspots_from_docs: exception {e}")
         return None
 
 

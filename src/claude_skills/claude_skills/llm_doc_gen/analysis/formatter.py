@@ -14,9 +14,17 @@ from pathlib import Path
 try:
     from .schema import SCHEMA_VERSION
     from .optimization.streaming import StreamingJSONWriter
+    from ...common.doc_helper import get_current_git_commit
 except ImportError:
-    from schema import SCHEMA_VERSION
+    from .schema import SCHEMA_VERSION
     from optimization.streaming import StreamingJSONWriter
+    # When running standalone, import from absolute path
+    try:
+        from claude_skills.common.doc_helper import get_current_git_commit
+    except ImportError:
+        # Fallback if doc_helper not available
+        def get_current_git_commit(project_root: str = ".") -> Optional[str]:
+            return None
 
 
 class MarkdownGenerator:
@@ -261,6 +269,7 @@ class JSONGenerator:
             "project_name": self.project_name,
             "version": self.version,
             "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "generated_at_commit": get_current_git_commit(),
             "languages": sorted(list(languages)) if languages else ["unknown"],
             "schema_version": SCHEMA_VERSION
         }

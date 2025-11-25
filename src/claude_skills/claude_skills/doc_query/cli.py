@@ -141,8 +141,7 @@ def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[
                 regen_cmd = [
                     'sdd', 'doc', 'generate',
                     str(source_dir),
-                    '--output-dir', str(query.docs_path.parent),
-                    '--format', 'both'
+                    '--output-dir', str(query.docs_path.parent)
                 ]
 
                 result = subprocess.run(
