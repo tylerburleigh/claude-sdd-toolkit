@@ -606,7 +606,7 @@ def main():
         print("               Get call graph context (callers/callees) for a function or file")
         print("  suggest-files <description>    Suggest files for a task")
         print("  similar <feature>              Find similar implementations")
-        print("  test-context <module>          Get test context for module")
+        print("  test-context <module> [--json] Get test context for module")
         print("  impact <module>                Get impact analysis")
         sys.exit(1)
 
@@ -681,13 +681,37 @@ def main():
             print(f"  - {r.name} ({r.entity_type}) in {r.data.get('file', 'unknown')}")
 
     elif command == 'test-context' and len(sys.argv) >= 3:
-        module = sys.argv[2]
-        context = get_test_context(module)
-        print(f"\nTest context for: {module}")
-        print(f"Test files: {len(context['test_files'])}")
-        for f in context['test_files']:
-            print(f"  - {f}")
-        print(f"Coverage estimate: {context['coverage_estimate']}")
+        # Parse test-context with optional flags
+        parser = argparse.ArgumentParser(description='Get test context from documentation')
+        parser.add_argument('command', help='Command (test-context)')
+        parser.add_argument('module', help='Module path to analyze')
+        parser.add_argument('--json', action='store_true', help='Output in JSON format')
+
+        args = parser.parse_args()
+
+        import json as json_module
+
+        try:
+            gatherer = SDDContextGatherer()
+            context = gatherer.get_test_context(args.module)
+
+            if args.json:
+                print(json_module.dumps(context, indent=2))
+            else:
+                print(f"\nTest context for: {args.module}")
+                print(f"Test files: {len(context['test_files'])}")
+                for f in context['test_files']:
+                    print(f"  - {f}")
+                print(f"Test functions: {len(context['test_functions'])}")
+                for func in context['test_functions'][:10]:  # Show first 10
+                    print(f"  - {func}")
+                if len(context['test_functions']) > 10:
+                    print(f"  ... and {len(context['test_functions']) - 10} more")
+                print(f"Coverage estimate: {context['coverage_estimate']}")
+                print(f"Coverage hint: {context['coverage_hint']}")
+        except RuntimeError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
     elif command == 'impact' and len(sys.argv) >= 3:
         module = sys.argv[2]

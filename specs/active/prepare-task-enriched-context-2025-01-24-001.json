@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-enriched-context-2025-01-24-001",
   "title": "Prepare-Task Enriched Context (Phase 2)",
   "generated": "2025-01-24T10:00:00Z",
-  "last_updated": "2025-11-25T00:32:59.656832Z",
+  "last_updated": "2025-11-25T00:35:05.932405Z",
   "metadata": {
     "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-25T00:19:18.491157Z",
-    "progress_percentage": 29,
+    "progress_percentage": 33,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -38,7 +38,7 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {}
     },
     "phase-1": {
@@ -316,7 +316,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Show relevant test files and coverage hints. Agents need to know which tests to run and where coverage gaps exist.",
         "risk_level": "medium"
@@ -325,15 +325,19 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1",
         "task-2-2"
       ],
       "total_tasks": 3,
-      "completed_tasks": 2,
-      "metadata": {},
+      "completed_tasks": 3,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-25T00:35:05.927124Z",
+        "journaled_at": "2025-11-25T00:35:05.932384Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-verify"
@@ -429,7 +433,7 @@
     "task-2-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/doc_helper.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "dependencies": {
@@ -440,12 +444,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "changes": "Add get_test_context_from_docs() wrapper function"
+        "changes": "Add get_test_context_from_docs() wrapper function",
+        "started_at": "2025-11-25T00:33:28.746379Z",
+        "status_note": "Adding get_test_context_from_docs() wrapper function",
+        "completed_at": "2025-11-25T00:35:05.926964Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-25T00:35:05.929902Z"
       }
     },
     "phase-2-verify": {
@@ -1153,6 +1163,24 @@
       "content": "Added coverage_hint field to get_test_context() output. Implementation compares module functions with discovered test functions using name matching (test_xyz -> xyz). Generates human-readable hints like '3 functions lack direct test coverage', 'All public functions have corresponding tests', or 'No public functions found in module'. Excludes private functions (starting with _) from analysis. Updated docstring. Verified function works correctly.",
       "metadata": {},
       "task_id": "task-2-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:35:05.929897Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/doc_helper.py",
+      "author": "claude-code",
+      "content": "Added get_test_context_from_docs() wrapper function to doc_helper.py (lines 336-406). Function calls sdd-integration test-context command with --json flag and returns parsed test context. Also updated sdd_integration.py test-context CLI handler to support --json flag with argparse (lines 683-714). Updated help text. Added export to common/__init__.py. Verified CLI returns JSON with test_files, test_functions, test_classes, coverage_estimate, and coverage_hint fields. Imports work correctly.",
+      "metadata": {},
+      "task_id": "task-2-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:35:05.932379Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
     }
   ]
 }

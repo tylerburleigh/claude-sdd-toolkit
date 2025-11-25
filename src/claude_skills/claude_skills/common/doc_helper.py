@@ -333,6 +333,79 @@ def get_call_context_from_docs(
         return None
 
 
+def get_test_context_from_docs(
+    module_path: str,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get test context for a module from codebase documentation.
+
+    Retrieves test files, test functions, coverage estimate, and coverage hint
+    using the sdd-integration test-context command.
+
+    Args:
+        module_path: Path to the module to analyze
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "module": str,            # The module path queried
+            "test_files": list[str],  # Test file paths
+            "test_functions": list[str],  # Test function names
+            "test_classes": list[str],    # Test class names
+            "coverage_estimate": str,     # 'high', 'medium', 'low', 'none', 'unknown'
+            "coverage_hint": str          # Human-readable coverage analysis
+        } or None if unavailable
+
+    Example:
+        >>> context = get_test_context_from_docs("src/auth.py")
+        >>> if context:
+        ...     print(f"Coverage: {context['coverage_estimate']}")
+        ...     print(f"Hint: {context['coverage_hint']}")
+    """
+    if not check_sdd_integration_available():
+        logger.debug("get_test_context_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "test-context", module_path, "--json"]
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                context = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_test_context_from_docs: returned "
+                    f"{len(context.get('test_files', []))} test files, "
+                    f"coverage={context.get('coverage_estimate', 'unknown')}"
+                )
+                return context
+            except json.JSONDecodeError:
+                logger.debug("get_test_context_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_test_context_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_test_context_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_test_context_from_docs: exception {e}")
+        return None
+
+
 def should_generate_docs(project_root: str = ".", interactive: bool = True) -> dict:
     """
     Check if documentation should be generated.
