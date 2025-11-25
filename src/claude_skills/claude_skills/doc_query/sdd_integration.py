@@ -166,13 +166,15 @@ class SDDContextGatherer:
             - test_functions: List of test function/method names (strings)
             - test_classes: List of test class names
             - coverage_estimate: 'high', 'medium', 'low', 'none', or 'unknown'
+            - coverage_hint: Human-readable coverage analysis string
         """
         context = {
             'module': module_path,
             'test_files': [],
             'test_functions': [],
             'test_classes': [],
-            'coverage_estimate': 'unknown'
+            'coverage_estimate': 'unknown',
+            'coverage_hint': ''
         }
 
         # Look for test files
@@ -240,9 +242,34 @@ class SDDContextGatherer:
 
         context['test_files'] = sorted(test_files)
 
-        # Estimate coverage
+        # Estimate coverage and generate coverage hint
         total_functions = module_summary.get('statistics', {}).get('function_count', 0)
         test_count = len(context['test_functions'])
+
+        # Get module function names for coverage comparison
+        module_functions = set()
+        top_funcs = module_summary.get('top_functions', [])
+        for func in top_funcs:
+            func_name = func.get('name', '') if isinstance(func, dict) else str(func)
+            if func_name and not func_name.startswith('_'):  # Exclude private functions
+                module_functions.add(func_name)
+
+        # Find functions that appear to have tests (simple name matching)
+        tested_functions = set()
+        for test_func in context['test_functions']:
+            # Extract the function name being tested from test function name
+            # e.g., "test_process_data" -> "process_data"
+            # e.g., "TestAuth.test_login" -> "login"
+            if '.' in test_func:
+                test_name = test_func.split('.')[-1]
+            else:
+                test_name = test_func
+            if test_name.startswith('test_'):
+                target_func = test_name[5:]  # Remove 'test_' prefix
+                if target_func in module_functions:
+                    tested_functions.add(target_func)
+
+        untested_count = len(module_functions) - len(tested_functions)
 
         if total_functions > 0:
             coverage_ratio = test_count / total_functions
@@ -254,6 +281,17 @@ class SDDContextGatherer:
                 context['coverage_estimate'] = 'low'
             else:
                 context['coverage_estimate'] = 'none'
+
+        # Generate human-readable coverage hint
+        if untested_count > 0:
+            func_word = 'function' if untested_count == 1 else 'functions'
+            context['coverage_hint'] = f"{untested_count} {func_word} lack direct test coverage"
+        elif len(module_functions) > 0 and len(tested_functions) == len(module_functions):
+            context['coverage_hint'] = "All public functions have corresponding tests"
+        elif len(module_functions) == 0:
+            context['coverage_hint'] = "No public functions found in module"
+        else:
+            context['coverage_hint'] = f"{len(tested_functions)} of {len(module_functions)} functions have tests"
 
         return context
 
