@@ -248,6 +248,91 @@ def get_task_context_from_docs(
         return None
 
 
+def get_call_context_from_docs(
+    function_name: Optional[str] = None,
+    file_path: Optional[str] = None,
+    project_root: str = "."
+) -> Optional[dict]:
+    """
+    Get call graph context from codebase documentation.
+
+    Retrieves caller/callee information for a function or file using the
+    sdd-integration call-context command.
+
+    Args:
+        function_name: Name of the function to query callers/callees for
+        file_path: Path to file to get call context for all functions
+        project_root: Root directory of the project (default: current dir)
+
+    Returns:
+        dict | None: {
+            "function_name": str | None,  # The queried function (if provided)
+            "file_path": str | None,      # The queried file (if provided)
+            "callers": list[dict],        # List of {name, file, line}
+            "callees": list[dict],        # List of {name, file, line}
+            "functions_found": list[str]  # Functions found matching query
+        } or None if unavailable
+
+    Raises:
+        ValueError: If neither function_name nor file_path is provided
+
+    Example:
+        >>> context = get_call_context_from_docs(function_name="process_data")
+        >>> if context:
+        ...     print(f"Callers: {len(context['callers'])}")
+        ...     print(f"Callees: {len(context['callees'])}")
+    """
+    if not function_name and not file_path:
+        raise ValueError("Either function_name or file_path must be provided")
+
+    if not check_sdd_integration_available():
+        logger.debug("get_call_context_from_docs: sdd-integration not available")
+        return None
+
+    try:
+        # Build command
+        cmd = ["sdd-integration", "call-context"]
+        if function_name:
+            cmd.extend(["--function", function_name])
+        if file_path:
+            cmd.extend(["--file", file_path])
+        cmd.append("--json")
+
+        # Execute command
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=project_root
+        )
+
+        if proc.returncode == 0:
+            try:
+                context = json.loads(proc.stdout)
+                logger.debug(
+                    f"get_call_context_from_docs: returned "
+                    f"{len(context.get('callers', []))} callers, "
+                    f"{len(context.get('callees', []))} callees"
+                )
+                return context
+            except json.JSONDecodeError:
+                logger.debug("get_call_context_from_docs: non-JSON output")
+                return None
+        else:
+            logger.debug(
+                f"get_call_context_from_docs: sdd-integration returned code {proc.returncode}"
+            )
+            return None
+
+    except subprocess.TimeoutExpired:
+        logger.debug("get_call_context_from_docs: subprocess timed out")
+        return None
+    except Exception as e:
+        logger.debug(f"get_call_context_from_docs: exception {e}")
+        return None
+
+
 def should_generate_docs(project_root: str = ".", interactive: bool = True) -> dict:
     """
     Check if documentation should be generated.

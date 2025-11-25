@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-enriched-context-2025-01-24-001",
   "title": "Prepare-Task Enriched Context (Phase 2)",
   "generated": "2025-01-24T10:00:00Z",
-  "last_updated": "2025-11-25T00:21:40.418238Z",
+  "last_updated": "2025-11-25T00:22:45.695855Z",
   "metadata": {
     "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-25T00:19:18.491157Z",
-    "progress_percentage": 7,
+    "progress_percentage": 11,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -38,7 +38,7 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "phase-1": {
@@ -51,7 +51,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Show which functions call the target code and what it calls. Helps agents understand impact of changes and integration points.",
         "risk_level": "low"
@@ -75,7 +75,7 @@
         "task-1-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -169,7 +169,7 @@
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/doc_helper.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -182,12 +182,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/doc_helper.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "changes": "Add get_call_context_from_docs() function that wraps sdd-integration call-context command"
+        "changes": "Add get_call_context_from_docs() function that wraps sdd-integration call-context command",
+        "started_at": "2025-11-25T00:22:05.153830Z",
+        "status_note": "Adding get_call_context_from_docs() wrapper function",
+        "completed_at": "2025-11-25T00:22:45.692151Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-25T00:22:45.694796Z"
       }
     },
     "task-1-3": {
@@ -1025,6 +1031,15 @@
       "content": "Added module-level convenience function get_call_context() at sdd_integration.py:493. Function follows the same pattern as other convenience functions (get_task_context, get_impact_analysis, etc.) - accepts optional function_name, file_path, and docs_path parameters, instantiates SDDContextGatherer, and delegates to the class method. Verified with manual tests - returns correct structure and raises ValueError when required.",
       "metadata": {},
       "task_id": "task-1-1-2"
+    },
+    {
+      "timestamp": "2025-11-25T00:22:45.694792Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/doc_helper.py",
+      "author": "claude-code",
+      "content": "Added get_call_context_from_docs() function at doc_helper.py:251. Function wraps sdd-integration call-context command, accepting optional function_name and file_path parameters. Returns structured dict with callers/callees or None if unavailable. Includes proper error handling (ValueError when no args, subprocess timeout, JSON parse errors). Follows existing pattern of get_task_context_from_docs(). Tests pass - ValueError raised correctly, function handles missing sdd-integration gracefully.",
+      "metadata": {},
+      "task_id": "task-1-2"
     }
   ]
 }
