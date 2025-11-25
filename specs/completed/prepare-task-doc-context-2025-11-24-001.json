@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-doc-context-2025-11-24-001",
   "title": "Enhance prepare-task with automatic doc context",
   "generated": "2025-11-24T00:00:00Z",
-  "last_updated": "2025-11-24T16:33:47.816772Z",
+  "last_updated": "2025-11-25T14:26:23.731427Z",
   "metadata": {
     "description": "Enable sdd prepare-task to automatically pull scoped codebase documentation for referenced files when docs are fresh, delivering file-specific guidance in a single call.",
     "objectives": [
@@ -24,7 +24,9 @@
     "git.branch_name": "prepare-task-code-doc-context-enhancement",
     "git.base_branch": "main",
     "git.pr_url": "https://github.com/tylerburleigh/claude-sdd-toolkit/pull/39",
-    "git.pr_number": "39"
+    "git.pr_number": "39",
+    "completed_date": "2025-11-25T14:25:46.855882Z",
+    "actual_hours": 0.531
   },
   "hierarchy": {
     "spec-root": {
