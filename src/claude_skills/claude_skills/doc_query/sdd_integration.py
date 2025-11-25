@@ -490,6 +490,29 @@ def get_impact_analysis(module_path: str, docs_path: Optional[str] = None) -> Di
     return gatherer.get_impact_analysis(module_path)
 
 
+def get_call_context(
+    function_name: Optional[str] = None,
+    file_path: Optional[str] = None,
+    docs_path: Optional[str] = None
+) -> Dict[str, any]:
+    """
+    Get call graph context for a function (convenience function).
+
+    Args:
+        function_name: Name of the function to query
+        file_path: Path to file to focus on
+        docs_path: Optional path to documentation
+
+    Returns:
+        Dict with call context including callers and callees
+
+    Raises:
+        ValueError: If neither function_name nor file_path is provided
+    """
+    gatherer = SDDContextGatherer(docs_path)
+    return gatherer.get_call_context(function_name=function_name, file_path=file_path)
+
+
 def main():
     """Main CLI entry point for sdd-integration commands."""
     import sys

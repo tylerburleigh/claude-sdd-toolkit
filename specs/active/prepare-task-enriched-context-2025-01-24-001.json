@@ -2,7 +2,7 @@
   "spec_id": "prepare-task-enriched-context-2025-01-24-001",
   "title": "Prepare-Task Enriched Context (Phase 2)",
   "generated": "2025-01-24T10:00:00Z",
-  "last_updated": "2025-11-25T00:20:41.950766Z",
+  "last_updated": "2025-11-25T00:21:40.418238Z",
   "metadata": {
     "description": "Enrich task context using underutilized doc-query capabilities. Currently prepare-task only uses get_task_context() but doc-query has 20+ query methods. This spec adds call graphs, test context, complexity hotspots, and impact analysis to the file_docs payload.",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-25T00:19:18.491157Z",
-    "progress_percentage": 3,
+    "progress_percentage": 7,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -38,7 +38,7 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "phase-1": {
@@ -51,7 +51,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Show which functions call the target code and what it calls. Helps agents understand impact of changes and integration points.",
         "risk_level": "low"
@@ -75,7 +75,7 @@
         "task-1-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -88,7 +88,7 @@
     "task-1-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -102,7 +102,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
         "task_category": "implementation",
@@ -143,7 +143,7 @@
     "task-1-1-2": {
       "type": "subtask",
       "title": "Add convenience function get_call_context() at module level",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -154,10 +154,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "details": "Follow pattern of existing convenience functions like get_task_context()",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-25T00:21:08.874786Z",
+        "status_note": "Adding module-level convenience function for get_call_context()",
+        "completed_at": "2025-11-25T00:21:40.414348Z",
+        "needs_journaling": false,
+        "actual_hours": 0.009,
+        "journaled_at": "2025-11-25T00:21:40.417175Z"
       }
     },
     "task-1-2": {
@@ -1010,6 +1016,15 @@
       "content": "Implemented get_call_context() method in SDDContextGatherer class at sdd_integration.py:231. Method accepts optional function_name and file_path parameters, uses self.query.get_callers() and self.query.get_callees() to gather call graph information, and returns structured dict with callers/callees lists (each entry has name, file, line). Includes deduplication logic for multiple function matches. Verified with manual tests - ValueError raised correctly when no arguments provided, method returns expected structure.",
       "metadata": {},
       "task_id": "task-1-1-1"
+    },
+    {
+      "timestamp": "2025-11-25T00:21:40.417170Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add convenience function get_call_context() at module level",
+      "author": "claude-code",
+      "content": "Added module-level convenience function get_call_context() at sdd_integration.py:493. Function follows the same pattern as other convenience functions (get_task_context, get_impact_analysis, etc.) - accepts optional function_name, file_path, and docs_path parameters, instantiates SDDContextGatherer, and delegates to the class method. Verified with manual tests - returns correct structure and raises ValueError when required.",
+      "metadata": {},
+      "task_id": "task-1-1-2"
     }
   ]
 }
