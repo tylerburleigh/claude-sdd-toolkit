@@ -8,11 +8,8 @@
  * and outputs streaming responses as line-delimited JSON to stdout.
  */
 
-import { createOpencodeClient } from '@opencode-ai/sdk/client';
+import { spawnSync } from 'child_process';
 import { createInterface } from 'readline';
-
-// Global client instance for graceful shutdown
-let opcodeClient = null;
 
 /**
  * Parse command line arguments for simple flags
@@ -78,9 +75,7 @@ function showVersion() {
  * Cleanup function for graceful shutdown
  */
 async function cleanup() {
-  // OpenCode client doesn't need explicit cleanup
-  // Just null out the reference
-  opcodeClient = null;
+  // No-op for CLI wrapper mode.
 }
 
 /**
@@ -186,92 +181,117 @@ async function main() {
     process.exit(0);
   }
 
-  // Get server configuration from environment variables
-  const serverUrl = process.env.OPENCODE_SERVER_URL || 'https://api.opencode.ai';
-  const apiKey = process.env.OPENCODE_API_KEY;
-
-  // Note: OPENCODE_API_KEY is only required for Zen models
-  // For non-Zen models (openai/*, anthropic/*, etc.), the SDK uses ~/.local/share/opencode/auth.json
+  // Get server configuration from environment variables.
+  // Fidelity review uses a local headless server started by the provider.
+  const serverUrl = process.env.OPENCODE_SERVER_URL || 'http://127.0.0.1:4097';
 
   // Validate configuration object
   if (payload.config && typeof payload.config !== 'object') {
     throw new Error('config must be an object');
   }
 
-  // Create OpenCode client that connects to server
-  // Python provider ensures server is running via _ensure_server_running()
-  opcodeClient = createOpencodeClient({
-    baseUrl: 'http://localhost:4096'
-  });
-
   // Parse model specification
   const modelConfig = payload.config?.model || 'default-model';
-  let providerID, modelID;
+  const selectedModel =
+    typeof modelConfig === 'string'
+      ? modelConfig
+      : `${modelConfig.providerID}/${modelConfig.modelID}`;
 
-  // Parse model format: "provider/model" or just "model"
-  if (typeof modelConfig === 'string' && modelConfig.includes('/')) {
-    [providerID, modelID] = modelConfig.split('/', 2);
-  } else if (typeof modelConfig === 'object') {
-    providerID = modelConfig.providerID;
-    modelID = modelConfig.modelID;
-  } else {
-    providerID = 'opencode';
-    modelID = modelConfig;
+  const combinedPrompt = [payload.system_prompt, payload.prompt]
+    .filter(value => typeof value === 'string' && value.trim().length > 0)
+    .join('\n\n');
+
+  const opencodeBinary = process.env.OPENCODE_CLI_BINARY || 'opencode';
+  const commandArgs = [
+    'run',
+    '--format',
+    'json',
+    '--model',
+    selectedModel,
+    '--attach',
+    serverUrl,
+    combinedPrompt || payload.prompt
+  ];
+
+  const completed = spawnSync(opencodeBinary, commandArgs, {
+    encoding: 'utf-8',
+    env: process.env,
+    maxBuffer: 10 * 1024 * 1024
+  });
+
+  if (completed.error) {
+    throw new Error(`Failed to execute opencode CLI: ${completed.error.message}`);
+  }
+  if (completed.status !== 0) {
+    const stderr = (completed.stderr || '').trim();
+    const stdout = (completed.stdout || '').trim();
+    throw new Error(
+      `opencode run exited with code ${completed.status}: ${stderr || stdout || 'no output'}`
+    );
   }
 
-  // Create session
-  const session = await opcodeClient.session.create();
+  const lines = (completed.stdout || '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
 
-  try {
-    // Build request body, filtering out null/undefined values
-    const requestBody = {
-      model: {
-        providerID: providerID,
-        modelID: modelID
-      },
-      parts: [
-        {
-          type: 'text',
-          text: payload.prompt
-        }
-      ]
-    };
+  let sessionId = null;
+  let collectedText = '';
+  let usage = {};
+  let streamError = null;
 
-    // Only add system prompt if it's not null/undefined
-    if (payload.system_prompt != null) {
-      requestBody.system = payload.system_prompt;
+  for (const line of lines) {
+    let event;
+    try {
+      event = JSON.parse(line);
+    } catch (error) {
+      continue;
     }
 
-    // Execute prompt using the session API with correct structure
-    const response = await opcodeClient.session.prompt({
-      path: {
-        id: session.data.id
-      },
-      body: requestBody
-    });
+    if (event.sessionID) {
+      sessionId = event.sessionID;
+    }
 
-    // Extract response text from parts
-    const responseParts = response.data?.parts || [];
-    const textParts = responseParts
-      .filter(part => part.type === 'text')
-      .map(part => part.text)
-      .join('');
+    if (event.type === 'error') {
+      const errorData = event.error || {};
+      const errorMessage =
+        errorData?.data?.message ||
+        errorData?.message ||
+        event.message ||
+        'Unknown OpenCode error';
+      streamError = errorMessage;
+    }
 
-    // Emit response as line-delimited JSON
-    const finalResponse = {
-      type: 'done',
-      response: {
-        text: textParts,
-        usage: response.data?.usage || {},
-        model: `${providerID}/${modelID}`,
-        sessionId: session.data.id
-      }
-    };
-    console.log(JSON.stringify(finalResponse));
+    if (event.type === 'text' && event.part && typeof event.part.text === 'string') {
+      collectedText += event.part.text;
+    }
 
-  } catch (error) {
-    throw new Error(`Prompt execution failed: ${error.message}`);
+    if (event.type === 'step_finish' && event.part && event.part.tokens) {
+      const tokens = event.part.tokens;
+      const inputTokens = Number(tokens.input || 0);
+      const outputTokens = Number(tokens.output || 0);
+      usage = {
+        prompt_tokens: inputTokens,
+        completion_tokens: outputTokens,
+        total_tokens: inputTokens + outputTokens
+      };
+    }
   }
+
+  if (streamError) {
+    throw new Error(`Prompt execution failed: ${streamError}`);
+  }
+
+  const finalResponse = {
+    type: 'done',
+    response: {
+      text: collectedText,
+      usage,
+      model: selectedModel,
+      sessionId: sessionId || null
+    }
+  };
+  console.log(JSON.stringify(finalResponse));
 
   // Cleanup before exit
   await cleanup();

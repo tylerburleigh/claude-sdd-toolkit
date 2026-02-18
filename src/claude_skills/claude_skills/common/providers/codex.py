@@ -36,6 +36,14 @@ DEFAULT_BINARY = "codex"
 DEFAULT_TIMEOUT_SECONDS = 360
 AVAILABILITY_OVERRIDE_ENV = "CODEX_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CODEX_CLI_BINARY"
+MODEL_FALLBACKS: Dict[str, str] = {
+    "gpt-5.3-codex": "gpt-5.2-codex",
+}
+MODEL_ACCESS_ERROR_MARKERS = (
+    "does not exist or you do not have access",
+    "model_not_found",
+    "unknown model",
+)
 
 # Read-only operations allowed by Codex --sandbox read-only mode
 # Note: These are enforced natively by OS-level sandboxing, not by this wrapper
@@ -245,6 +253,36 @@ def _default_runner(
 
 CODEX_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
+        id="gpt-5.3-codex",
+        display_name="GPT-5.3 Codex",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.FUNCTION_CALLING,
+        },
+        routing_hints={"tier": "primary", "optimized_for": "codex"},
+    ),
+    ModelDescriptor(
+        id="gpt-5.2-codex",
+        display_name="GPT-5.2 Codex",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.FUNCTION_CALLING,
+        },
+        routing_hints={"tier": "primary", "optimized_for": "codex"},
+    ),
+    ModelDescriptor(
+        id="gpt-5.2",
+        display_name="GPT-5.2",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.FUNCTION_CALLING,
+        },
+        routing_hints={"tier": "general"},
+    ),
+    ModelDescriptor(
         id="gpt-5.1-codex",
         display_name="GPT-5.1 Codex",
         capabilities={
@@ -392,6 +430,29 @@ class CodexProvider(ProviderContext):
         except subprocess.TimeoutExpired as exc:
             raise ProviderTimeoutError(str(exc), provider=self.metadata.provider_name) from exc
 
+    def _failure_detail(self, completed: subprocess.CompletedProcess[str]) -> str:
+        stderr = (completed.stderr or "").strip()
+        stdout = (completed.stdout or "").strip()
+        if stderr and stdout and stdout not in stderr:
+            return f"{stderr}\n{stdout}"
+        return stderr or stdout or "no stderr"
+
+    def _fallback_model(
+        self, requested_model: str, failure_detail: str
+    ) -> Optional[str]:
+        fallback = MODEL_FALLBACKS.get(requested_model)
+        if not fallback:
+            return None
+
+        available = {descriptor.id for descriptor in self.metadata.models}
+        if fallback not in available:
+            return None
+
+        normalized_detail = failure_detail.lower()
+        if any(marker in normalized_detail for marker in MODEL_ACCESS_ERROR_MARKERS):
+            return fallback
+        return None
+
     def _flatten_text(self, payload: Any) -> str:
         if isinstance(payload, str):
             return payload
@@ -524,6 +585,7 @@ class CodexProvider(ProviderContext):
         model = self._ensure_model(
             str(request.metadata.get("model")) if request.metadata and "model" in request.metadata else self._model
         )
+        original_model = model
         prompt = self._build_prompt(request)
         attachments = self._normalize_attachment_paths(request)
         command = self._build_command(model, prompt, attachments)
@@ -531,16 +593,36 @@ class CodexProvider(ProviderContext):
         completed = self._run(command, timeout=timeout)
 
         if completed.returncode != 0:
-            stderr = (completed.stderr or "").strip()
-            raise ProviderExecutionError(
-                f"Codex CLI exited with code {completed.returncode}: {stderr or 'no stderr'}",
-                provider=self.metadata.provider_name,
-            )
+            detail = self._failure_detail(completed)
+            fallback_model = self._fallback_model(model, detail)
+            if fallback_model is None:
+                raise ProviderExecutionError(
+                    f"Codex CLI exited with code {completed.returncode}: {detail}",
+                    provider=self.metadata.provider_name,
+                )
+
+            fallback_command = self._build_command(fallback_model, prompt, attachments)
+            fallback_completed = self._run(fallback_command, timeout=timeout)
+            if fallback_completed.returncode != 0:
+                fallback_detail = self._failure_detail(fallback_completed)
+                raise ProviderExecutionError(
+                    f"Codex CLI exited with code {fallback_completed.returncode} after fallback "
+                    f"'{model}' -> '{fallback_model}': {fallback_detail}",
+                    provider=self.metadata.provider_name,
+                )
+
+            completed = fallback_completed
+            model = fallback_model
 
         content, usage, metadata, reported_model = self._process_events(
             completed.stdout,
             stream=request.stream,
         )
+        if model != original_model:
+            metadata["model_fallback"] = {
+                "requested": original_model,
+                "used": model,
+            }
 
         return GenerationResult(
             content=content,

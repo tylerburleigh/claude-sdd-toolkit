@@ -11,11 +11,13 @@ import subprocess
 import logging
 import xml.etree.ElementTree as ET
 import hashlib
+import time
 
 from claude_skills.common.spec import load_json_spec, get_node
 from claude_skills.common.paths import find_specs_directory
 from claude_skills.common.git_metadata import find_git_root
 from claude_skills.common.cache import CacheManager
+from claude_skills.common.integrations import execute_verify_task
 
 logger = logging.getLogger(__name__)
 
@@ -1050,6 +1052,10 @@ class FidelityReviewer:
         if self.spec_data is None:
             return "Error: Specification not loaded"
 
+        repo_root = find_git_root() or Path.cwd()
+        # Use a merge-base diff to include committed changes on the current branch.
+        diff_base_ref = f"{base_branch}...HEAD"
+
         # Determine review scope
         scope_description = ""
         requirements_list = []
@@ -1087,7 +1093,12 @@ class FidelityReviewer:
         prompt_parts.append("## Context\n")
         prompt_parts.append(f"**Spec ID:** {self.spec_id}\n")
 
-        spec_title = self.spec_data.get("title", "Untitled")
+        spec_title = self.spec_data.get("title") or ""
+        if not spec_title:
+            spec_root = get_node(self.spec_data, "spec-root") or {}
+            spec_title = spec_root.get("title", "")
+        if not spec_title:
+            spec_title = "Untitled"
         prompt_parts.append(f"**Spec Title:** {spec_title}\n")
 
         spec_description = self.spec_data.get("description", "")
@@ -1126,7 +1137,7 @@ class FidelityReviewer:
 
         if task_id:
             # Get diffs for specific task
-            task_diffs = self.get_task_diffs(task_id)
+            task_diffs = self.get_task_diffs(task_id, base_ref=diff_base_ref)
             if task_diffs:
                 for file_path, diff_content in task_diffs.items():
                     if diff_content:
@@ -1141,7 +1152,7 @@ class FidelityReviewer:
                 prompt_parts.append("*No git diff available*\n\n")
         elif phase_id:
             # Get diffs for entire phase
-            phase_diffs = self.get_phase_diffs(phase_id)
+            phase_diffs = self.get_phase_diffs(phase_id, base_ref=diff_base_ref)
             if phase_diffs:
                 for tid, file_diffs in phase_diffs.items():
                     prompt_parts.append(f"### Task: {tid}\n\n")
@@ -1156,12 +1167,15 @@ class FidelityReviewer:
                             else:
                                 prompt_parts.append(diff_content)
                             prompt_parts.append("\n```\n\n")
+                        else:
+                            prompt_parts.append(f"**File:** `{file_path}`\n\n")
+                            prompt_parts.append("*No changes detected*\n\n")
             else:
                 prompt_parts.append("*No git diffs available*\n\n")
         elif file_paths:
             # Get diffs for specific files
             for file_path in file_paths:
-                diff_content = self.get_file_diff(file_path)
+                diff_content = self.get_file_diff(file_path, base_ref=diff_base_ref)
                 if diff_content:
                     prompt_parts.append(f"### File: `{file_path}`\n\n")
                     prompt_parts.append("```diff\n")
@@ -1184,6 +1198,123 @@ class FidelityReviewer:
         # 4. TEST RESULTS
         if include_tests:
             prompt_parts.append("## Test Results\n\n")
+
+            # Include spec-defined verification command evidence when available.
+            def truncate_text(text: str, max_chars: int = 6000) -> str:
+                if len(text) <= max_chars:
+                    return text
+                head = text[: max_chars // 2]
+                tail = text[-(max_chars // 2) :]
+                return f"{head}\n... (truncated) ...\n{tail}"
+
+            def find_phase_for_node(node_id: str) -> Optional[str]:
+                current_id = node_id
+                while True:
+                    node = get_node(self.spec_data, current_id)
+                    if not node:
+                        return None
+                    if node.get("type") == "phase":
+                        return current_id
+                    parent = node.get("parent")
+                    if not parent:
+                        return None
+                    current_id = parent
+
+            verify_ids: List[str] = []
+            if phase_id:
+                for node_id in self._collect_task_ids_recursive(phase_id):
+                    node = get_node(self.spec_data, node_id) or {}
+                    if node.get("type") == "verify":
+                        verify_ids.append(node_id)
+            elif task_id:
+                phase_for_task = find_phase_for_node(task_id)
+                if phase_for_task:
+                    for node_id in self._collect_task_ids_recursive(phase_for_task):
+                        node = get_node(self.spec_data, node_id) or {}
+                        if node.get("type") == "verify":
+                            verify_ids.append(node_id)
+            else:
+                hierarchy = self.spec_data.get("hierarchy", {})
+                for node_id, node_data in hierarchy.items():
+                    if node_data.get("type") == "verify":
+                        verify_ids.append(node_id)
+
+            had_verification_evidence = False
+            if verify_ids:
+                had_verification_evidence = True
+                prompt_parts.append("### Spec Verification Steps\n\n")
+
+                for verify_id in verify_ids:
+                    verify_node = get_node(self.spec_data, verify_id) or {}
+                    verify_title = verify_node.get("title", verify_id)
+                    verify_status = verify_node.get("status", "")
+                    verify_meta = verify_node.get("metadata", {}) or {}
+
+                    expected = verify_meta.get("expected")
+                    command = verify_meta.get("command")
+                    verification_result = verify_meta.get("verification_result")
+
+                    prompt_parts.append(f"#### {verify_id}: {verify_title}\n\n")
+                    if verify_status:
+                        prompt_parts.append(f"**Status:** {verify_status}\n\n")
+                    if expected:
+                        prompt_parts.append(f"**Expected:** {expected}\n\n")
+                    if command:
+                        prompt_parts.append("**Command:**\n")
+                        prompt_parts.append("```bash\n")
+                        prompt_parts.append(command)
+                        prompt_parts.append("\n```\n\n")
+
+                    if isinstance(verification_result, dict):
+                        vr_status = verification_result.get("status")
+                        vr_date = verification_result.get("date")
+                        vr_output = verification_result.get("output") or ""
+                        vr_issues = verification_result.get("issues")
+                        vr_notes = verification_result.get("notes")
+
+                        prompt_parts.append("**Recorded Result:**\n")
+                        if vr_status:
+                            prompt_parts.append(f"- Status: {vr_status}\n")
+                        if vr_date:
+                            prompt_parts.append(f"- Date: {vr_date}\n")
+                        if vr_issues:
+                            prompt_parts.append(f"- Issues: {vr_issues}\n")
+                        if vr_notes:
+                            prompt_parts.append(f"- Notes: {vr_notes}\n")
+                        prompt_parts.append("\n")
+
+                        if vr_output:
+                            prompt_parts.append("**Recorded Output:**\n")
+                            prompt_parts.append("```text\n")
+                            prompt_parts.append(truncate_text(str(vr_output)))
+                            prompt_parts.append("\n```\n\n")
+
+                    elif command and verify_meta.get("verification_type") != "manual":
+                        start = time.monotonic()
+                        exec_result = execute_verify_task(self.spec_data, verify_id, spec_root=str(repo_root))
+                        duration_s = time.monotonic() - start
+                        success = bool(exec_result.get("success"))
+                        output = exec_result.get("output") or ""
+                        errors = exec_result.get("errors") or []
+
+                        prompt_parts.append("**Execution Result:**\n")
+                        prompt_parts.append(f"- Success: {str(success).lower()}\n")
+                        prompt_parts.append(f"- Duration: {duration_s:.2f}s\n")
+                        if errors:
+                            prompt_parts.append(f"- Errors: {len(errors)}\n")
+                        prompt_parts.append("\n")
+
+                        if output:
+                            prompt_parts.append("**Output:**\n")
+                            prompt_parts.append("```text\n")
+                            prompt_parts.append(truncate_text(str(output)))
+                            prompt_parts.append("\n```\n\n")
+
+                        if errors:
+                            prompt_parts.append("**Errors:**\n")
+                            prompt_parts.append("```text\n")
+                            prompt_parts.append(truncate_text("\n".join(str(e) for e in errors)))
+                            prompt_parts.append("\n```\n\n")
 
             test_results = None
             if task_id:
@@ -1223,7 +1354,8 @@ class FidelityReviewer:
 
                 prompt_parts.append("\n")
             else:
-                prompt_parts.append("*No test results available*\n\n")
+                if not had_verification_evidence:
+                    prompt_parts.append("*No test results available*\n\n")
 
         # 5. JOURNAL ENTRIES
         prompt_parts.append("## Journal Entries\n\n")

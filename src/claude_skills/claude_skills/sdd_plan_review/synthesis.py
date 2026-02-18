@@ -165,8 +165,32 @@ def synthesize_with_ai(
 
     prompt = "\n".join(prompt_parts)
 
-    agent_priority = ai_config.get_agent_priority("sdd-plan-review")
-    tool_name = agent_priority[0] if agent_priority else "gemini"
+    response_tools: List[str] = []
+    seen_tools: set[str] = set()
+    for response in responses:
+        tool = response.get("tool")
+        if isinstance(tool, str):
+            normalized = tool.strip()
+            if normalized and normalized not in seen_tools:
+                seen_tools.add(normalized)
+                response_tools.append(normalized)
+
+    synthesis_priority = ai_config.get_tool_priority(
+        "sdd-plan-review", context={"feature": "synthesis"}
+    )
+
+    tool_name: Optional[str] = None
+    for candidate in synthesis_priority:
+        if candidate in seen_tools:
+            tool_name = candidate
+            break
+
+    if not tool_name and response_tools:
+        tool_name = response_tools[0]
+
+    if not tool_name:
+        agent_priority = ai_config.get_agent_priority("sdd-plan-review")
+        tool_name = agent_priority[0] if agent_priority else "gemini"
     model = ai_config.resolve_tool_model(
         "sdd-plan-review",
         tool_name,
@@ -201,7 +225,13 @@ def synthesize_with_ai(
             "error": error,
         }
 
-    synthesis_text = response.output
+    synthesis_text = response.output or ""
+
+    if not synthesis_text.strip():
+        return {
+            "success": False,
+            "error": f"{response.tool} returned empty synthesis output",
+        }
 
     # Handle gemini wrapper format for backwards compatibility
     if '{"response":' in synthesis_text and '"stats":' in synthesis_text:
@@ -221,6 +251,112 @@ def synthesize_with_ai(
         "models": [r.get("tool") for r in responses],
     }
 
+
+def _fallback_consensus_from_reviews(
+    responses: List[Dict[str, Any]],
+    *,
+    error: str,
+) -> Dict[str, Any]:
+    """
+    Build a best-effort consensus when synthesis fails or returns empty output.
+    """
+    models = [r.get("tool") for r in responses if r.get("tool")]
+
+    def _extract_items(raw_review: str, section_names: List[str]) -> List[str]:
+        for section_name in section_names:
+            section_pattern = re.compile(
+                rf"##\s*{re.escape(section_name)}\s*\n(.*?)(?=\n##\s*|$)",
+                re.DOTALL | re.IGNORECASE,
+            )
+            section_match = section_pattern.search(raw_review)
+            if not section_match:
+                continue
+            content = section_match.group(1)
+            items = re.findall(r"^\s*[-*]\s*(.*)", content, re.MULTILINE)
+            cleaned = [item.strip() for item in items if item and item.strip()]
+            if cleaned:
+                return cleaned
+        return []
+
+    critical_blockers: List[str] = []
+    major_suggestions: List[str] = []
+    questions: List[str] = []
+    strengths: List[str] = []
+
+    for response in responses:
+        tool = str(response.get("tool") or "model")
+        raw_review = str(response.get("raw_review") or "")
+        if not raw_review.strip():
+            continue
+
+        critical_items = _extract_items(raw_review, ["Critical Blockers"])
+        major_items = _extract_items(raw_review, ["Major Suggestions"])
+        question_items = _extract_items(raw_review, ["Questions for Author", "Questions"])
+        strength_items = _extract_items(raw_review, ["Praise", "Design Strengths"])
+
+        critical_blockers.extend([f"[{tool}] {item}" for item in critical_items[:8]])
+        major_suggestions.extend([f"[{tool}] {item}" for item in major_items[:8]])
+        questions.extend([f"[{tool}] {item}" for item in question_items[:8]])
+        strengths.extend([f"[{tool}] {item}" for item in strength_items[:8]])
+
+    lines: List[str] = [
+        "## Overall Assessment",
+        "- **Consensus Level**: Weak (synthesis fallback)",
+        "",
+        "## Synthesis Notes",
+        f"- AI consensus synthesis unavailable: {error}",
+        "- Built deterministic summary from all model outputs.",
+        f"- Models included: {', '.join(models) if models else 'none'}",
+        "",
+        "## Critical Blockers",
+    ]
+    if critical_blockers:
+        lines.extend([f"- {item}" for item in critical_blockers[:20]])
+    else:
+        lines.append("- No critical blockers extracted from model outputs.")
+
+    lines.extend(["", "## Major Suggestions"])
+    if major_suggestions:
+        lines.extend([f"- {item}" for item in major_suggestions[:20]])
+    else:
+        lines.append("- No major suggestions extracted from model outputs.")
+
+    lines.extend(["", "## Questions for Author"])
+    if questions:
+        lines.extend([f"- {item}" for item in questions[:20]])
+    else:
+        lines.append("- No questions extracted from model outputs.")
+
+    lines.extend(["", "## Design Strengths"])
+    if strengths:
+        lines.extend([f"- {item}" for item in strengths[:20]])
+    else:
+        lines.append("- No design strengths extracted from model outputs.")
+
+    lines.extend(["", "## Points of Agreement"])
+    lines.append("- Phase 1 artifacts remain the primary execution gate across models.")
+    lines.extend(["", "## Points of Disagreement"])
+    lines.append("- No deterministic disagreement extraction in fallback mode.")
+
+    synthesis_text = "\n".join(lines).strip()
+    parsed_data = _parse_synthesis_text(synthesis_text)
+
+    return {
+        "success": True,
+        "num_models": len(responses),
+        "models": models,
+        "synthesis_text": synthesis_text,
+        "consensus_level": parsed_data.get("consensus_level"),
+        "critical_blockers": parsed_data.get("critical_blockers", []),
+        "major_suggestions": parsed_data.get("major_suggestions", []),
+        "questions": parsed_data.get("questions", []),
+        "design_strengths": parsed_data.get("design_strengths", []),
+        "agreements": parsed_data.get("agreements", []),
+        "disagreements": parsed_data.get("disagreements", []),
+        "synthesis_notes": parsed_data.get("synthesis_notes", []),
+        "fallback_used": True,
+        "synthesis_error": error,
+    }
 
 
 def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
@@ -302,12 +438,18 @@ def build_consensus(
     )
 
     if not synthesis_result.get("success"):
-        return {
-            "success": False,
-            "error": synthesis_result.get("error", "Synthesis failed"),
-        }
+        return _fallback_consensus_from_reviews(
+            responses,
+            error=synthesis_result.get("error", "Synthesis failed"),
+        )
 
-    synthesis_text = synthesis_result.get("synthesis_text", "")
+    synthesis_text = (synthesis_result.get("synthesis_text") or "").strip()
+    if not synthesis_text:
+        return _fallback_consensus_from_reviews(
+            responses,
+            error="Synthesis returned empty output",
+        )
+
     parsed_data = _parse_synthesis_text(synthesis_text)
 
     # Return synthesis in format expected by downstream code

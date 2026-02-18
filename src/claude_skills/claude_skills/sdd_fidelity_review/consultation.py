@@ -268,6 +268,10 @@ POSITIVE_STATUS_TOKENS = (
     "completed",
     "sufficient",
     "adequate",
+    "not_applicable",
+    "not applicable",
+    "n/a",
+    "na",
     "true",
     "aligned",
 )
@@ -496,11 +500,48 @@ def _is_negative_status(text: Optional[str]) -> bool:
     if not text or not isinstance(text, str):
         return False
     lowered = text.strip().lower()
-    if any(token in lowered for token in NEGATIVE_STATUS_TOKENS):
-        return True
+    # Treat explicit neutral/positive statuses as non-negative even though they contain "not".
     if any(token == lowered for token in POSITIVE_STATUS_TOKENS):
         return False
-    return False
+
+    # Exact-match negative statuses (these appear in structured JSON fields like answer/status/met).
+    exact_negative = {
+        "no",
+        "fail",
+        "failed",
+        "failure",
+        "missing",
+        "insufficient",
+        "inadequate",
+        "partial",
+        "block",
+        "blocked",
+        "deviation",
+        "unable",
+    }
+    if lowered in exact_negative:
+        return True
+
+    # For free-form details/explanations, avoid overly-broad tokens like "no"/"not" which appear
+    # in benign contexts ("no issues", "not applicable"). Focus on stronger negative markers.
+    negative_markers = (
+        "doesn't",
+        "does not",
+        "did not",
+        "not met",
+        "not satisfied",
+        "unable",
+        "missing",
+        "insufficient",
+        "inadequate",
+        "fail",
+        "failed",
+        "failure",
+        "blocked",
+        "deviation",
+        "deviates",
+    )
+    return any(marker in lowered for marker in negative_markers)
 
 
 def _is_positive_status(text: Optional[str]) -> bool:
@@ -1158,6 +1199,7 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
     json_payload = _load_json_from_text(output)
     structured_payload: Optional[Dict[str, Any]] = None
     summary_provided = False
+    verdict_from_json_payload = False
 
     if isinstance(json_payload, dict):
         if (
@@ -1171,6 +1213,7 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         verdict_from_json = _coerce_verdict(json_payload.get("verdict"))
         if verdict_from_json is not None:
             verdict = verdict_from_json
+            verdict_from_json_payload = True
 
         json_summary = json_payload.get("summary")
         if isinstance(json_summary, str) and json_summary.strip():
@@ -1211,19 +1254,24 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
     # Heuristic: If "PASS" appears but also mentions issues/concerns, mark as PARTIAL
     # But exclude phrases like "no issues", "no problems", etc.
     if verdict == FidelityVerdict.PASS:
-        output_lower = output.lower()
-        # Check for negative patterns first (no issues, no problems, etc.)
-        negative_patterns = [
-            r'no\s+issue', r'no\s+problem', r'no\s+concern',
-            r'no\s+warning', r'no\s+error', r'0\s+issue', r'0\s+problem'
-        ]
-        has_negatives = any(re.search(pattern, output_lower) for pattern in negative_patterns)
-
-        # Only downgrade to PARTIAL if we find concerns AND don't have negatives
-        if not has_negatives:
-            concern_keywords = ['issue', 'problem', 'concern', 'warning', 'error']
-            if any(keyword in output_lower for keyword in concern_keywords):
+        if verdict_from_json_payload:
+            # If the model explicitly returned verdict=pass but also populated issues, treat as partial.
+            if issues:
                 verdict = FidelityVerdict.PARTIAL
+        else:
+            output_lower = output.lower()
+            # Check for negative patterns first (no issues, no problems, etc.)
+            negative_patterns = [
+                r'no\s+issue', r'no\s+problem', r'no\s+concern',
+                r'no\s+warning', r'no\s+error', r'0\s+issue', r'0\s+problem'
+            ]
+            has_negatives = any(re.search(pattern, output_lower) for pattern in negative_patterns)
+
+            # Only downgrade to PARTIAL if we find concerns AND don't have negatives
+            if not has_negatives:
+                concern_keywords = ['issue', 'problem', 'concern', 'warning', 'error']
+                if any(keyword in output_lower for keyword in concern_keywords):
+                    verdict = FidelityVerdict.PARTIAL
 
     normalized_output = output.replace("\r\n", "\n")
 

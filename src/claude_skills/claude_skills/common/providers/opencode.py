@@ -38,11 +38,23 @@ from .detectors import detect_provider_availability
 DEFAULT_BINARY = "node"
 DEFAULT_WRAPPER_SCRIPT = Path(__file__).parent / "opencode_wrapper.js"
 DEFAULT_TIMEOUT_SECONDS = 360
-DEFAULT_SERVER_URL = "http://localhost:4096"
+# Use a dedicated default port to avoid colliding with desktop-managed servers
+# that may enforce auth and break headless wrapper invocations.
+DEFAULT_SERVER_URL = "http://127.0.0.1:4097"
 SERVER_STARTUP_TIMEOUT = 30
 AVAILABILITY_OVERRIDE_ENV = "OPENCODE_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "OPENCODE_BINARY"
 CUSTOM_WRAPPER_ENV = "OPENCODE_WRAPPER_SCRIPT"
+MODEL_FALLBACKS: Dict[str, str] = {
+    "openrouter/moonshotai/kimi-k2.5:free": "opencode/big-pickle",
+    "openrouter/moonshotai/kimi-k2.5": "opencode/big-pickle",
+}
+OPENROUTER_AUTH_ERROR_MARKERS = (
+    "no cookie auth credentials found",
+    "\"code\":401",
+    "statuscode\":401",
+    "unauthorized",
+)
 
 # Read-only tools configuration for OpenCode server
 # Uses dual-layer protection: tool disabling + permission denial
@@ -237,13 +249,44 @@ class OpenCodeProvider(ProviderContext):
             - Tool blocking may not work for MCP tools (OpenCode issue #3756)
             - Config is server-wide, affecting all sessions on this server instance
         """
+        def load_base_config() -> Dict[str, Any]:
+            """Load the user's OpenCode config if present.
+
+            We preserve provider/model settings (e.g. OpenRouter/Kimi) while enforcing
+            read-only tool restrictions in the temp config.
+            """
+            candidate_paths: List[Path] = []
+            explicit_config = (self._env or {}).get("OPENCODE_CONFIG")
+            if explicit_config:
+                candidate_paths.append(Path(explicit_config).expanduser())
+            candidate_paths.append(Path.home() / ".config" / "opencode" / "opencode.json")
+
+            for candidate in candidate_paths:
+                try:
+                    if candidate.exists():
+                        with open(candidate, "r", encoding="utf-8") as handle:
+                            loaded = json.load(handle)
+                        if isinstance(loaded, dict):
+                            return loaded
+                except (OSError, json.JSONDecodeError):
+                    continue
+            return {}
+
         # Create temp directory for config
         temp_dir = Path(tempfile.mkdtemp(prefix="opencode_readonly_"))
 
+        base_config = load_base_config()
+        merged_config: Dict[str, Any] = dict(base_config)
+        merged_config["$schema"] = READONLY_TOOLS_CONFIG.get(
+            "$schema", merged_config.get("$schema")
+        )
+        merged_config["tools"] = dict(READONLY_TOOLS_CONFIG.get("tools", {}))
+        merged_config["permission"] = dict(READONLY_TOOLS_CONFIG.get("permission", {}))
+
         # Create config file
         config_path = temp_dir / "opencode.json"
-        with open(config_path, 'w') as f:
-            json.dump(READONLY_TOOLS_CONFIG, f, indent=2)
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(merged_config, f, indent=2)
 
         return config_path
 
@@ -298,13 +341,13 @@ class OpenCodeProvider(ProviderContext):
 
     def _ensure_server_running(self) -> None:
         """Ensure OpenCode server is running, start if necessary."""
-        # Extract port from server URL (default: 4096)
+        # Extract port from server URL (default: 4097)
         server_url = self._env.get("OPENCODE_SERVER_URL", DEFAULT_SERVER_URL) if self._env else DEFAULT_SERVER_URL
         try:
             # Parse port from URL (e.g., "http://localhost:4096" -> 4096)
             port = int(server_url.split(":")[-1].rstrip("/"))
         except (ValueError, IndexError):
-            port = 4096
+            port = 4097
 
         # Check if server is already running
         if self._is_port_open(port):
@@ -378,35 +421,71 @@ class OpenCodeProvider(ProviderContext):
             provider=self.metadata.provider_name,
         )
 
-    def _execute(self, request: GenerationRequest) -> GenerationResult:
-        """Execute generation request via OpenCode wrapper."""
-        # Ensure server is running before making request
-        self._ensure_server_running()
+    def _failure_detail(self, completed: subprocess.CompletedProcess[str]) -> str:
+        stderr = (completed.stderr or "").strip()
+        stdout = (completed.stdout or "").strip()
+        if stderr and stdout and stdout not in stderr:
+            return f"{stderr}\n{stdout}"
+        return stderr or stdout or "no stderr"
 
-        # Build JSON payload for wrapper stdin
+    def _fallback_model(
+        self, requested_model: str, failure_detail: str
+    ) -> Optional[str]:
+        fallback = MODEL_FALLBACKS.get(requested_model)
+        if fallback is None and requested_model.startswith("openrouter/"):
+            fallback = "opencode/big-pickle"
+        if fallback is None or fallback == requested_model:
+            return None
+
+        normalized_detail = failure_detail.lower()
+        if any(marker in normalized_detail for marker in OPENROUTER_AUTH_ERROR_MARKERS):
+            return fallback
+        return None
+
+    def _invoke_wrapper(
+        self,
+        *,
+        request: GenerationRequest,
+        model: str,
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
         payload = {
             "prompt": request.prompt,
             "system_prompt": request.system_prompt if hasattr(request, "system_prompt") else None,
             "config": {
-                "model": self._model,
+                "model": model,
                 "temperature": request.temperature if hasattr(request, "temperature") else None,
                 "max_tokens": request.max_tokens if hasattr(request, "max_tokens") else None,
             },
         }
 
-        # Build command to invoke wrapper
         command = [self._binary, str(self._wrapper_path)]
         if request.stream:
             command.append("--stream")
 
+        return self._runner(
+            command,
+            timeout=timeout,
+            env=self._env,
+            input_data=json.dumps(payload),
+        )
+
+    def _execute(self, request: GenerationRequest) -> GenerationResult:
+        """Execute generation request via OpenCode wrapper."""
+        # Ensure server is running before making request
+        self._ensure_server_running()
+
         # Execute wrapper with JSON payload via stdin
         timeout = request.timeout or self._timeout
+        selected_model = self._ensure_model(
+            str(request.metadata.get("model"))
+            if request.metadata and "model" in request.metadata
+            else self._model
+        )
+        original_model = selected_model
         try:
-            completed = self._runner(
-                command,
-                timeout=timeout,
-                env=self._env,
-                input_data=json.dumps(payload),
+            completed = self._invoke_wrapper(
+                request=request, model=selected_model, timeout=timeout
             )
         except FileNotFoundError as exc:
             raise ProviderUnavailableError(
@@ -420,11 +499,38 @@ class OpenCodeProvider(ProviderContext):
             ) from exc
 
         if completed.returncode != 0:
-            stderr = (completed.stderr or "").strip()
-            raise ProviderExecutionError(
-                f"OpenCode wrapper exited with code {completed.returncode}: {stderr or 'no stderr'}",
-                provider=self.metadata.provider_name,
-            )
+            detail = self._failure_detail(completed)
+            fallback_model = self._fallback_model(selected_model, detail)
+            if fallback_model is None:
+                raise ProviderExecutionError(
+                    f"OpenCode wrapper exited with code {completed.returncode}: {detail}",
+                    provider=self.metadata.provider_name,
+                )
+
+            try:
+                fallback_completed = self._invoke_wrapper(
+                    request=request, model=fallback_model, timeout=timeout
+                )
+            except FileNotFoundError as exc:
+                raise ProviderUnavailableError(
+                    f"Node.js binary '{self._binary}' not found",
+                    provider=self.metadata.provider_name,
+                ) from exc
+            except subprocess.TimeoutExpired as exc:
+                raise ProviderTimeoutError(
+                    f"OpenCode wrapper timed out after {timeout}s",
+                    provider=self.metadata.provider_name,
+                ) from exc
+
+            if fallback_completed.returncode != 0:
+                fallback_detail = self._failure_detail(fallback_completed)
+                raise ProviderExecutionError(
+                    f"OpenCode wrapper exited with code {fallback_completed.returncode} after fallback "
+                    f"'{selected_model}' -> '{fallback_model}': {fallback_detail}",
+                    provider=self.metadata.provider_name,
+                )
+            completed = fallback_completed
+            selected_model = fallback_model
 
         # Parse line-delimited JSON output
         content_parts = []
@@ -483,10 +589,15 @@ class OpenCodeProvider(ProviderContext):
         # Use default usage if not provided
         if final_usage is None:
             final_usage = TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0)
+        if selected_model != original_model:
+            raw_payload["model_fallback"] = {
+                "requested": original_model,
+                "used": selected_model,
+            }
 
         return GenerationResult(
             content=final_content,
-            model_fqn=f"{self.metadata.provider_name}:{self._model}",
+            model_fqn=f"{self.metadata.provider_name}:{selected_model}",
             status=ProviderStatus.SUCCESS,
             usage=final_usage,
             stderr=(completed.stderr or "").strip() or None,
