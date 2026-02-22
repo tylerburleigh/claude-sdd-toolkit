@@ -1,5 +1,14 @@
 # SDD Toolkit
 
+> [!IMPORTANT]
+> **This project is no longer maintained.** The ideas here have evolved into the Foundry ecosystem, which offers a more robust and modular approach to spec-driven development:
+>
+> - [**foundry-mcp**](https://github.com/foundry-works/foundry-mcp) — MCP server for spec-driven development workflows
+> - [**claude-foundry**](https://github.com/foundry-works/claude-foundry) — Claude Code plugin powered by foundry-mcp
+> - [**foundry-sandbox**](https://github.com/foundry-works/foundry-sandbox) — Docker-based sandbox for running Claude Code with isolated credentials
+>
+> We recommend migrating to Foundry for active development and support.
+
 > Spec-Driven Development: Structured, trackable AI-assisted development through machine-readable specifications
 
 [![Plugin Version](https://img.shields.io/badge/version-0.7.7-blue.svg)]()
