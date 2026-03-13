@@ -338,7 +338,9 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                 command,
                 capture_output=True,
                 text=True,
-                timeout=300,
+                # Verification commands often run Docker, build steps, or dependency installs.
+                # Use a longer timeout than unit tests to avoid spurious failures.
+                timeout=1800,
                 shell=True,
                 cwd=spec_root
             )
